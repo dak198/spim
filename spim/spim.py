@@ -24,3 +24,7 @@ class Spim(commands.Cog):
     async def red_delete_data_for_user(self, *, requester: RequestType, user_id: int) -> None:
         # TODO: Replace this with the proper end user data removal handling.
         super().red_delete_data_for_user(requester=requester, user_id=user_id)
+
+    @commands.command()
+    async def foo(self, ctx):
+        await ctx.send("Hello World!")
