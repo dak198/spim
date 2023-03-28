@@ -28,3 +28,7 @@ class Spim(commands.Cog):
     @commands.command()
     async def foo(self, ctx):
         await ctx.send("Hello World!")
+
+    @commands.command()
+    async def bar(self, ctx):
+        await ctx.send("Bepis gaming")
