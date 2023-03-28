@@ -31,4 +31,4 @@ class Spim(commands.Cog):
 
     @commands.command()
     async def bar(self, ctx):
-        await ctx.send("Bepis gaming")
+        await ctx.send("Bepis gaming - test")
