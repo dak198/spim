@@ -1,9 +1,14 @@
 from typing import Literal
+from time import sleep, strftime
 
 import discord
 from redbot.core import commands
 from redbot.core.bot import Red
 from redbot.core.config import Config
+
+from discord.ext import commands
+import boto3
+from botocore.exceptions import ClientError
 
 RequestType = Literal["discord_deleted_user", "owner", "user", "user_strict"]
 
@@ -25,10 +30,69 @@ class Spim(commands.Cog):
         # TODO: Replace this with the proper end user data removal handling.
         super().red_delete_data_for_user(requester=requester, user_id=user_id)
 
-    @commands.command()
-    async def foo(self, ctx):
-        await ctx.send("Hello World!")
+    # Get the list of all EC2 instances names, DNS names, and statuses with the given filters
+    #       Default to no filters
+    def get_server_list(filters=[]):
+        ec2 = boto3.client('ec2')
 
-    @commands.command()
-    async def bar(self, ctx):
-        await ctx.send("Bepis gaming - test2")
+        try:
+            ec2.describe_instances(Filters=filters, DryRun=True)
+        except ClientError as e:
+            if 'DryRunOperation' not in str(e):
+                raise
+        # Dry run succeeded, call describe_instances without dryrun
+        try:
+            response = ec2.describe_instances(Filters=filters, DryRun=False)
+        except ClientError as e:
+            print(e)
+
+        output = []
+        for reservation in response['Reservations']:
+            for instance in reservation['Instances']:
+                for tag in instance['Tags']:
+                    if tag['Key'] == 'Name':
+                        break
+                name = tag['Value']
+                status = instance['State']['Name']
+                url = instance['PublicDnsName']
+                inst_id = instance['InstanceId']
+                output += [(inst_id, name, status, url)]
+
+        return output
+
+
+    ## COMMANDS
+
+    # Check version of spim cog
+    @commands.command(name='spim-version')
+    async def version(self, ctx):
+        await ctx.send("Spim cog version: 0.1.0")
+
+    # Lists the status and URL for each server with the 'mc-server' Project Tag
+    @commands.command(name='server-list', help=' - Lists active and inactive servers')
+    async def server_status(self, ctx):
+        timer = 0
+        message = None
+        while timer < 10:
+            try:
+                text = 'Last Updated: {} UTC\n'
+                servers = self.get_server_list(filters = [ {
+                        'Name': 'tag:Project',
+                        'Values': [ 'mc-server' ] } ])
+                if servers:
+                    for _, name, status, url in servers:
+                        if not url: url = '—————'
+                        text += f'```Server: {name}\nStatus: {status}\nURL:\n{url}```'
+                else:
+                    text += '```No servers running.```'
+
+                if not message:
+                    message = await ctx.channel.send(text.format(strftime("%H:%M")))
+                else:
+                    await message.edit(content=text.format(strftime("%H:%M")))
+                timer += 1
+                sleep(1)
+                old_text = text
+            except Exception as e:
+                print(e)
+                break
