@@ -22,6 +22,7 @@ class Spim(commands.Cog):
     """
 
     def __init__(self, bot: Red) -> None:
+        self.data = json.load(open('home/ec2-user/data.json'))
         self.bot = bot
         self.config = Config.get_conf(
             self,
@@ -30,7 +31,7 @@ class Spim(commands.Cog):
         )
 
         self.boto_config = BotoConfig(
-            region_name = 'us-east-1'
+            region_name = self.data['region']
         )
 
 
@@ -139,10 +140,10 @@ class Spim(commands.Cog):
         while timer < 10:
             try:
                 server_dns = ''
-                data = json.load(open('home/ec2-user/data.json'))
-                for i in data['urls']:
+                for i in self.data['urls']:
                     if i['name'] == 'minecraft':
                         server_dns = i['url']
+                        break
                 text = 'Last Updated: {} UTC\n**NEW:** Try accessing the server by using `' + server_dns + '`\n'
                 servers = self.get_server_list(filters=Filters)
                 if servers:
@@ -153,7 +154,7 @@ class Spim(commands.Cog):
                         if not url: url = '—————'
                         text += f'```Server: {name}\nStatus: {status}\nURL:\n{url}```'
                 else:
-                    text += f'**ERROR: No servers found named `{server_name}`.**\nCommand usage:\n`{bot.command_prefix}server-start <server name>`\nUse `{bot.command_prefix}server-list` to list valid server names'
+                    text += f'**ERROR: No servers found named `{server_name}`.**\nCommand usage:\n`{self.bot.command_prefix}server-start <server name>`\nUse `{self.bot.command_prefix}server-list` to list valid server names'
 
                 if not message:
                     message = await ctx.channel.send(text.format(strftime("%H:%M")))
@@ -168,8 +169,8 @@ class Spim(commands.Cog):
     @commands.command(name='print-url', help='<name> - the name of the service to print the url for')
     async def print_url(self, ctx, name):
         server_dns = ''
-        data = json.load(open('home/ec2-user/data.json'))
-        for i in data['urls']:
+        for i in self.data['urls']:
             if i['name'] == name:
                 server_dns = i['url']
+                break
         await ctx.channel.send(content=server_dns)
