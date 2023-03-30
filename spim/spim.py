@@ -33,7 +33,7 @@ class Spim(commands.Cog):
     #       Default to no filters
     def get_server_list(filters=[]):
         ec2 = boto3.client('ec2')
-
+        print(f"Server list command running with filters: {filters}")
         try:
             ec2.describe_instances(Filters=filters, DryRun=True)
         except ClientError as e:
@@ -70,6 +70,7 @@ class Spim(commands.Cog):
     # Lists the status and URL for each server with the 'mc-server' Project Tag
     @commands.command(name='server-list', help=' - Lists active and inactive servers')
     async def server_status(self, ctx):
+        print("Command received: server-list")
         timer = 0
         message = None
         while timer < 10:
@@ -91,7 +92,6 @@ class Spim(commands.Cog):
                     await message.edit(content=text.format(strftime("%H:%M")))
                 timer += 1
                 sleep(1)
-                old_text = text
             except Exception as e:
                 print(e)
                 break
