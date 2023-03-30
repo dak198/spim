@@ -164,9 +164,9 @@ class Spim(commands.Cog):
             except Exception as e:
                 raise e
     
-    # Test for printing from the dns json file
-    @commands.command(name='print-dns', help='<name> - the name of the dns url to print')
-    async def print_dns(self, ctx, name):
+    # Print the dns url for the given service, stored in an external json file on the server running the bot
+    @commands.command(name='print-url', help='<name> - the name of the service to print the url for')
+    async def print_url(self, ctx, name):
         server_dns = ''
         dns_urls = json.load(open('home/ec2-user/dns-urls.json'))
         for i in dns_urls['urls']:
