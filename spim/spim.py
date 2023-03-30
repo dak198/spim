@@ -9,6 +9,7 @@ from redbot.core.config import Config
 
 import boto3
 from botocore.exceptions import ClientError
+from botocore.config import Config
 
 RequestType = Literal["discord_deleted_user", "owner", "user", "user_strict"]
 
@@ -26,7 +27,9 @@ class Spim(commands.Cog):
             force_registration=True,
         )
 
-        self.log_file = "spim.log"
+        self.boto_config = Config(
+            region_name = 'us-east-1'
+        )
 
 
     async def red_delete_data_for_user(self, *, requester: RequestType, user_id: int) -> None:
@@ -36,8 +39,8 @@ class Spim(commands.Cog):
     # Get the list of all EC2 instances names, DNS names, and statuses with the given filters
     #       Default to no filters
     def get_server_list(self, filters=[]):
-        ec2 = boto3.client('ec2')
-        print(f"Server list command running with filters: {filters}")
+        ec2 = boto3.client('ec2', config=self.boto_config)
+
         try:
             ec2.describe_instances(Filters=filters, DryRun=True)
         except ClientError as e:
@@ -74,7 +77,6 @@ class Spim(commands.Cog):
     # Lists the status and URL for each server with the 'mc-server' Project Tag
     @commands.command(name='server-list', help=' - Lists active and inactive servers')
     async def server_status(self, ctx):
-        print("Command received: server-list")
         timer = 0
         message = None
         while timer < 10:
