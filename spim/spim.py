@@ -11,6 +11,8 @@ import boto3
 from botocore.exceptions import ClientError
 from botocore.config import Config as BotoConfig
 
+import json
+
 RequestType = Literal["discord_deleted_user", "owner", "user", "user_strict"]
 
 
@@ -136,7 +138,12 @@ class Spim(commands.Cog):
         message = None
         while timer < 10:
             try:
-                text = 'Last Updated: {} UTC\n**NEW:** Try accessing the server by using `geargetaway.duckdns.org`\n'
+                dns_urls = json.load(open('home/ec2-user/dns-urls.json'))
+                server_dns = ''
+                for i in dns_urls:
+                    if i['name'] == 'minecraft':
+                        server_dns = i['url']
+                text = 'Last Updated: {} UTC\n**NEW:** Try accessing the server by using `' + server_dns + '`\n'
                 servers = self.get_server_list(filters=Filters)
                 if servers:
                     for inst_id, name, status, url in servers:
