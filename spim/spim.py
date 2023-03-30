@@ -170,6 +170,6 @@ class Spim(commands.Cog):
         server_dns = ''
         dns_urls = json.load(open('home/ec2-user/dns-urls.json'))
         for i in dns_urls:
-            if i['name'] == 'minecraft':
+            if i[name] == 'minecraft':
                 server_dns = i['url']
         await ctx.channel.send(content=server_dns)
