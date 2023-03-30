@@ -158,9 +158,17 @@ class Spim(commands.Cog):
                 raise e
     
     # Set activity status to playing the specified game
-    @commands.command(name='set-activity', help='<game> - set specified game as status')
-    async def set_activity(self, ctx, game):
+    @commands.command(name='set-game', help='<game> - set specified game as status')
+    async def set_game(self, ctx, game):
         try:
-            await self.bot.change_presence(status=discord.Status.idle, activity=discord.Game(game))
+            await self.bot.change_presence(activity=discord.Game(game))
+        except Exception as e:
+            raise e
+    
+    # Set custom activity status to the specified text
+    @commands.command(name='set-custom', help='<status> - the custom status to set')
+    async def set_activity(self, ctx, name):
+        try:
+            await self.bot.change_presence(activity=discord.CustomActivity(name))
         except Exception as e:
             raise e
