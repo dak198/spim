@@ -6,9 +6,8 @@ from redbot.core import commands
 from redbot.core.bot import Red
 from redbot.core.config import Config
 
-from discord.ext import commands
-# import boto3
-# from botocore.exceptions import ClientError
+import boto3
+from botocore.exceptions import ClientError
 
 RequestType = Literal["discord_deleted_user", "owner", "user", "user_strict"]
 
@@ -64,7 +63,7 @@ class Spim(commands.Cog):
     ## COMMANDS
 
     # Check version of spim cog
-    @commands.command()
+    @commands.command(name='spim-version')
     async def version(self, ctx):
         await ctx.send("Spim cog version: 0.1.0")
 
