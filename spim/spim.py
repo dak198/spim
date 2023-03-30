@@ -67,8 +67,8 @@ class Spim(commands.Cog):
         return output
 
     # Start the EC2 instance with the specified instance id
-    def start_instance(inst_id):
-        ec2 = boto3.client('ec2')
+    def start_instance(self, inst_id):
+        ec2 = boto3.client('ec2', config=self.boto_config)
 
         try:
             ec2.start_instances(InstanceIds=[inst_id], DryRun=True)
