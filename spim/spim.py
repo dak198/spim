@@ -139,8 +139,8 @@ class Spim(commands.Cog):
         while timer < 10:
             try:
                 server_dns = ''
-                dns_urls = json.load(open('home/ec2-user/dns-urls.json'))
-                for i in dns_urls:
+                data = json.load(open('home/ec2-user/data.json'))
+                for i in data['urls']:
                     if i['name'] == 'minecraft':
                         server_dns = i['url']
                 text = 'Last Updated: {} UTC\n**NEW:** Try accessing the server by using `' + server_dns + '`\n'
