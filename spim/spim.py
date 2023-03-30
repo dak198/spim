@@ -138,8 +138,8 @@ class Spim(commands.Cog):
         message = None
         while timer < 10:
             try:
-                dns_urls = json.load(open('home/ec2-user/dns-urls.json'))
                 server_dns = ''
+                dns_urls = json.load(open('home/ec2-user/dns-urls.json'))
                 for i in dns_urls:
                     if i['name'] == 'minecraft':
                         server_dns = i['url']
@@ -163,3 +163,13 @@ class Spim(commands.Cog):
                 sleep(1)
             except Exception as e:
                 raise e
+    
+    # Test for printing from the dns json file
+    @commands.command(name='print-dns', help='<name> - the name of the dns url to print')
+    async def print_dns(self, ctx, name)
+        server_dns = ''
+        dns_urls = json.load(open('home/ec2-user/dns-urls.json'))
+        for i in dns_urls:
+            if i['name'] == 'minecraft':
+                server_dns = i['url']
+        await ctx.channel.send(content=server_dns)
