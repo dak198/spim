@@ -106,6 +106,7 @@ class Spim(commands.Cog):
                     for _, name, status, url in servers:
                         if not url: url = '—————'
                         text += f'```Server: {name}\nStatus: {status}\nURL:\n{url}```'
+                        await self.bot.change_presence(status=discord.Status.idle, activity=discord.Game(name))
                 else:
                     text += '```No servers running.```'
 
