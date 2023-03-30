@@ -166,7 +166,7 @@ class Spim(commands.Cog):
     
     # Test for printing from the dns json file
     @commands.command(name='print-dns', help='<name> - the name of the dns url to print')
-    async def print_dns(self, ctx, name)
+    async def print_dns(self, ctx, name):
         server_dns = ''
         dns_urls = json.load(open('home/ec2-user/dns-urls.json'))
         for i in dns_urls:
