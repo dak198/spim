@@ -1,6 +1,7 @@
 from typing import Literal
 from time import sleep, strftime
 from datetime import datetime
+from json import load
 
 import discord
 from redbot.core import commands
@@ -11,8 +12,6 @@ import boto3
 from botocore.exceptions import ClientError
 from botocore.config import Config as BotoConfig
 
-import json
-
 RequestType = Literal["discord_deleted_user", "owner", "user", "user_strict"]
 
 
@@ -22,7 +21,7 @@ class Spim(commands.Cog):
     """
 
     def __init__(self, bot: Red) -> None:
-        self.data = json.load(open('home/ec2-user/data.json'))
+        self.data = load(open('home/ec2-user/data.json'))
         self.bot = bot
         self.config = Config.get_conf(
             self,
