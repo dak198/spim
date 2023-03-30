@@ -64,7 +64,7 @@ class Spim(commands.Cog):
     ## COMMANDS
 
     # Check version of spim cog
-    @commands.command(name='spim-version')
+    @commands.command()
     async def version(self, ctx):
         await ctx.send("Spim cog version: 0.1.0")
 
