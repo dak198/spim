@@ -156,7 +156,7 @@ class Spim(commands.Cog):
             except Exception as e:
                 raise e
     
-    # Test for setting the activity status
+    # Set activity status to playing the specified game
     @commands.command(name='set-activity', help='<game> - set specified game as status')
     async def set_activity(self, ctx, game):
         try:
