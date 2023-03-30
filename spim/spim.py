@@ -174,3 +174,8 @@ class Spim(commands.Cog):
                 server_dns = i['url']
                 break
         await ctx.channel.send(content=server_dns)
+
+    # Print the region used for boto3 config
+    @commands.command(name='print-url', help='<name> - the name of the region used in boto3 config')
+    async def print_region(self, ctx)
+        await ctx.channel.send(content=self.data['region'])
