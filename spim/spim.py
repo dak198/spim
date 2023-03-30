@@ -168,8 +168,8 @@ class Spim(commands.Cog):
     @commands.command(name='print-url', help='<name> - the name of the service to print the url for')
     async def print_url(self, ctx, name):
         server_dns = ''
-        dns_urls = json.load(open('home/ec2-user/dns-urls.json'))
-        for i in dns_urls['urls']:
+        data = json.load(open('home/ec2-user/data.json'))
+        for i in data['urls']:
             if i['name'] == name:
                 server_dns = i['url']
         await ctx.channel.send(content=server_dns)
