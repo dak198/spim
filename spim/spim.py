@@ -9,7 +9,7 @@ from redbot.core.config import Config
 
 import boto3
 from botocore.exceptions import ClientError
-from botocore.config import Config
+from botocore.config import Config as BotoConfig
 
 RequestType = Literal["discord_deleted_user", "owner", "user", "user_strict"]
 
@@ -27,7 +27,7 @@ class Spim(commands.Cog):
             force_registration=True,
         )
 
-        self.boto_config = Config(
+        self.boto_config = BotoConfig(
             region_name = 'us-east-1'
         )
 
