@@ -160,6 +160,6 @@ class Spim(commands.Cog):
     @commands.command(name='set-activity', help='<game> - set specified game as status')
     async def set_activity(self, ctx, game):
         try:
-            await self.change_presence(status=discord.Status.idle, activity=discord.Game(game))
+            await self.bot.change_presence(status=discord.Status.idle, activity=discord.Game(game))
         except Exception as e:
             raise e
