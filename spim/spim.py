@@ -7,8 +7,8 @@ from redbot.core.bot import Red
 from redbot.core.config import Config
 
 from discord.ext import commands
-import boto3
-from botocore.exceptions import ClientError
+# import boto3
+# from botocore.exceptions import ClientError
 
 RequestType = Literal["discord_deleted_user", "owner", "user", "user_strict"]
 
