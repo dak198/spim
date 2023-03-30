@@ -33,25 +33,21 @@ class Spim(commands.Cog):
         # TODO: Replace this with the proper end user data removal handling.
         super().red_delete_data_for_user(requester=requester, user_id=user_id)
 
-    def log(self, message):
-        with open(self.log_file, 'a+') as f:
-            f.write(f'[{datetime.now()}] {message}')
-
     # Get the list of all EC2 instances names, DNS names, and statuses with the given filters
     #       Default to no filters
     def get_server_list(self, filters=[]):
         ec2 = boto3.client('ec2')
-        self.log(f"Server list command running with filters: {filters}")
+        print(f"Server list command running with filters: {filters}")
         try:
             ec2.describe_instances(Filters=filters, DryRun=True)
         except ClientError as e:
             if 'DryRunOperation' not in str(e):
-                raise
+                raise e
         # Dry run succeeded, call describe_instances without dryrun
         try:
             response = ec2.describe_instances(Filters=filters, DryRun=False)
         except ClientError as e:
-            self.log(e)
+            raise e
 
         output = []
         for reservation in response['Reservations']:
@@ -78,7 +74,7 @@ class Spim(commands.Cog):
     # Lists the status and URL for each server with the 'mc-server' Project Tag
     @commands.command(name='server-list', help=' - Lists active and inactive servers')
     async def server_status(self, ctx):
-        self.log("Command received: server-list")
+        print("Command received: server-list")
         timer = 0
         message = None
         while timer < 10:
@@ -101,5 +97,4 @@ class Spim(commands.Cog):
                 timer += 1
                 sleep(1)
             except Exception as e:
-                self.log(e)
-                break
+                raise e
