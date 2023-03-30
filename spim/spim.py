@@ -31,33 +31,33 @@ class Spim(commands.Cog):
 
     # Get the list of all EC2 instances names, DNS names, and statuses with the given filters
     #       Default to no filters
-    # def get_server_list(filters=[]):
-    #     ec2 = boto3.client('ec2')
+    def get_server_list(filters=[]):
+        ec2 = boto3.client('ec2')
 
-    #     try:
-    #         ec2.describe_instances(Filters=filters, DryRun=True)
-    #     except ClientError as e:
-    #         if 'DryRunOperation' not in str(e):
-    #             raise
-    #     # Dry run succeeded, call describe_instances without dryrun
-    #     try:
-    #         response = ec2.describe_instances(Filters=filters, DryRun=False)
-    #     except ClientError as e:
-    #         print(e)
+        try:
+            ec2.describe_instances(Filters=filters, DryRun=True)
+        except ClientError as e:
+            if 'DryRunOperation' not in str(e):
+                raise
+        # Dry run succeeded, call describe_instances without dryrun
+        try:
+            response = ec2.describe_instances(Filters=filters, DryRun=False)
+        except ClientError as e:
+            print(e)
 
-    #     output = []
-    #     for reservation in response['Reservations']:
-    #         for instance in reservation['Instances']:
-    #             for tag in instance['Tags']:
-    #                 if tag['Key'] == 'Name':
-    #                     break
-    #             name = tag['Value']
-    #             status = instance['State']['Name']
-    #             url = instance['PublicDnsName']
-    #             inst_id = instance['InstanceId']
-    #             output += [(inst_id, name, status, url)]
+        output = []
+        for reservation in response['Reservations']:
+            for instance in reservation['Instances']:
+                for tag in instance['Tags']:
+                    if tag['Key'] == 'Name':
+                        break
+                name = tag['Value']
+                status = instance['State']['Name']
+                url = instance['PublicDnsName']
+                inst_id = instance['InstanceId']
+                output += [(inst_id, name, status, url)]
 
-    #     return output
+        return output
 
 
     ## COMMANDS
@@ -68,30 +68,30 @@ class Spim(commands.Cog):
         await ctx.send("Spim cog version: 0.1.0")
 
     # Lists the status and URL for each server with the 'mc-server' Project Tag
-    # @commands.command(name='server-list', help=' - Lists active and inactive servers')
-    # async def server_status(self, ctx):
-    #     timer = 0
-    #     message = None
-    #     while timer < 10:
-    #         try:
-    #             text = 'Last Updated: {} UTC\n'
-    #             servers = self.get_server_list(filters = [ {
-    #                     'Name': 'tag:Project',
-    #                     'Values': [ 'mc-server' ] } ])
-    #             if servers:
-    #                 for _, name, status, url in servers:
-    #                     if not url: url = '—————'
-    #                     text += f'```Server: {name}\nStatus: {status}\nURL:\n{url}```'
-    #             else:
-    #                 text += '```No servers running.```'
+    @commands.command(name='server-list', help=' - Lists active and inactive servers')
+    async def server_status(self, ctx):
+        timer = 0
+        message = None
+        while timer < 10:
+            try:
+                text = 'Last Updated: {} UTC\n'
+                servers = self.get_server_list(filters = [ {
+                        'Name': 'tag:Project',
+                        'Values': [ 'mc-server' ] } ])
+                if servers:
+                    for _, name, status, url in servers:
+                        if not url: url = '—————'
+                        text += f'```Server: {name}\nStatus: {status}\nURL:\n{url}```'
+                else:
+                    text += '```No servers running.```'
 
-    #             if not message:
-    #                 message = await ctx.channel.send(text.format(strftime("%H:%M")))
-    #             else:
-    #                 await message.edit(content=text.format(strftime("%H:%M")))
-    #             timer += 1
-    #             sleep(1)
-    #             old_text = text
-    #         except Exception as e:
-    #             print(e)
-    #             break
+                if not message:
+                    message = await ctx.channel.send(text.format(strftime("%H:%M")))
+                else:
+                    await message.edit(content=text.format(strftime("%H:%M")))
+                timer += 1
+                sleep(1)
+                old_text = text
+            except Exception as e:
+                print(e)
+                break
