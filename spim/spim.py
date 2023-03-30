@@ -66,6 +66,23 @@ class Spim(commands.Cog):
 
         return output
 
+    # Start the EC2 instance with the specified instance id
+    def start_instance(inst_id):
+        ec2 = boto3.client('ec2')
+
+        try:
+            ec2.start_instances(InstanceIds=[inst_id], DryRun=True)
+        except ClientError as e:
+            if 'DryRunOperation' not in str(e):
+                raise e
+        # Dry run succeeded, call start_instances without dryrun
+        try:
+            response = ec2.start_instances(InstanceIds=[inst_id], DryRun=False)
+        except ClientError as e:
+            raise e
+
+        return response
+
 
     ## COMMANDS
 
@@ -91,6 +108,44 @@ class Spim(commands.Cog):
                         text += f'```Server: {name}\nStatus: {status}\nURL:\n{url}```'
                 else:
                     text += '```No servers running.```'
+
+                if not message:
+                    message = await ctx.channel.send(text.format(strftime("%H:%M")))
+                else:
+                    await message.edit(content=text.format(strftime("%H:%M")))
+                timer += 1
+                sleep(1)
+            except Exception as e:
+                raise e
+
+
+    # Starts the server with the specified name.
+    #       Prints the status if the server is already started.
+    #       Keeps users updated of server status for a few minutes afterward.
+    @commands.command(name='server-start', help='<server name> - Starts the specified server')
+    async def server_start(self, ctx, server_name):
+        Filters = [ {
+            'Name': 'tag:Project',
+            'Values': [ 'mc-server' ]
+        }, {
+            'Name': 'tag:Name',
+            'Values': [ server_name ]
+        } ]
+
+        timer = 0
+        message = None
+        while timer < 10:
+            try:
+                text = 'Last Updated: {} UTC\n**NEW:** Try accessing the server by using `geargetaway.duckdns.org`\n'
+                servers = self.get_server_list(filters=Filters)
+                if servers:
+                    for inst_id, name, status, url in servers:
+                        if status == 'stopped':
+                            self.start_instance(inst_id)
+                        if not url: url = '—————'
+                        text += f'```Server: {name}\nStatus: {status}\nURL:\n{url}```'
+                else:
+                    text += f'**ERROR: No servers found named `{server_name}`.**\nCommand usage:\n`{bot.command_prefix}server-start <server name>`\nUse `{bot.command_prefix}server-list` to list valid server names'
 
                 if not message:
                     message = await ctx.channel.send(text.format(strftime("%H:%M")))
