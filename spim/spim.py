@@ -169,7 +169,7 @@ class Spim(commands.Cog):
     async def print_dns(self, ctx, name):
         server_dns = ''
         dns_urls = json.load(open('home/ec2-user/dns-urls.json'))
-        for i in dns_urls:
+        for i in dns_urls['urls']:
             if i['name'] == name:
                 server_dns = i['url']
         await ctx.channel.send(content=server_dns)
