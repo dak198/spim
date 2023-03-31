@@ -142,7 +142,7 @@ class Spim(commands.Cog):
     @commands.command(name='server-start', help='<server name> - Starts the specified server')
     async def server_start(self, ctx, *server_name):
         if not server_name:
-            ctx.send('Server start with no args')
+            await ctx.send('Server start with no args')
             return
 
         Filters = [ {
