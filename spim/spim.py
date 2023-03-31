@@ -110,53 +110,22 @@ class Spim(commands.Cog):
     async def print_region(self, ctx):
         await ctx.channel.send(content=self.data['region'])
 
-
-    # Lists the status and URL for each server with the 'Spim-Managed' Tag set to true
+    # Lists the list and URL for each server with the 'Spim-Managed' Tag set to true
     @commands.command(name='server-list', help=' - Lists active and inactive servers')
-    async def server_status(self, ctx):
-        timer = 0
-        message = None
-        while timer < 10:
-            try:
-                text = 'Last Updated: {} UTC\n'
-                servers = self.get_server_list(filters = [ {
-                        'Name': 'tag:Spim-Managed',
-                        'Values': [ 'true' ] } ])
-                if servers:
-                    for _, name, status, url in servers:
-                        if not url: url = '—————'
-                        text += f'```Server: {name}\nStatus: {status}\nURL:\n{url}```'
-                else:
-                    text += '```No servers running.```'
-
-                if not message:
-                    message = await ctx.channel.send(text.format(strftime("%H:%M")))
-                else:
-                    await message.edit(content=text.format(strftime("%H:%M")))
-                timer += 1
-                sleep(1)
-            except Exception as e:
-                raise e
-
-    # Starts the server with the specified name.
-    #       Prints the status if the server is already started.
-    #       Keeps users updated of server status for a few minutes afterward.
-    @commands.command(name='server-start', help='[server names...] - Starts the specified server')
-    async def server_start(self, ctx, *server_names):
-        if not server_names:
-            pass
+    async def server_list(self, ctx, *server_names):
+        if server_names:
+            Filters = [ {
+                'Name': 'tag:Spim-Managed',
+                'Values': [ 'true' ]
+            }, {
+                'Name': 'tag:Name',
+                'Values': server_names
+            } ]
         else:
-            self.server_names = server_names
-        if self.server_names:
-            await ctx.send(f"{', '.join(self.server_names)}")
-        return
-        Filters = [ {
-            'Name': 'tag:Spim-Managed',
-            'Values': [ 'true' ]
-        }, {
-            'Name': 'tag:Name',
-            'Values': server_names
-        } ]
+            Filters = [ {
+                'Name': 'tag:Spim-Managed',
+                'Values': [ 'true' ]
+            } ]
 
         timer = 0
         message = None
@@ -170,20 +139,57 @@ class Spim(commands.Cog):
                 text = 'Last Updated: {} UTC\n**NEW:** Try accessing the server by using `' + server_dns + '`\n'
                 servers = self.get_server_list(filters=Filters)
                 if servers:
-                    for inst_id, name, status, url in servers:
-                        if status == 'stopped':
-                            self.start_instance(inst_id)
-                            await self.bot.change_presence(status=discord.Status.idle, activity=discord.Game(name))
+                    for _, name, status, url in servers:
                         if not url: url = '—————'
                         text += f'```Server: {name}\nStatus: {status}\nURL:\n{url}```'
+                elif len(server_names) > 1:
+                    text += f'```No servers found with names:\n' + '\n'.join(server_names) + '```'
+                elif len(server_names) == 1:
+                    text += f'```No server found with names:\n' + '\n'.join(server_names) + '```'
                 else:
-                    text += f'**ERROR: No servers found with names: `{server_names}`.**\nCommand usage:\n`{self.bot.command_prefix}server-start [server names...]`\nUse `{self.bot.command_prefix}server-list` to list valid server names'
+                    text += '```No servers found.```'
 
                 if not message:
                     message = await ctx.channel.send(text.format(strftime("%H:%M")))
                 else:
                     await message.edit(content=text.format(strftime("%H:%M")))
                 timer += 1
-                sleep(1)
+                sleep(6)
             except Exception as e:
                 raise e
+
+    # Starts the server with the specified name.
+    #       Prints the status if the server is already started.
+    #       Keeps users updated of server status for a few minutes afterward.
+    @commands.command(name='server-start', help='[server names...] - Starts the specified server')
+    async def server_start(self, ctx, *server_names):
+        if not server_names:
+            if self.server_names:
+                server_names = self.server_names
+            else:
+                await ctx.send('You fool! No server names specified or in cache.')
+                return
+
+        Filters = [ {
+            'Name': 'tag:Spim-Managed',
+            'Values': [ 'true' ]
+        }, {
+            'Name': 'tag:Name',
+            'Values': server_names
+        } ]
+
+        try:
+            servers = self.get_server_list(filters=Filters)
+            if servers:
+                self.server_names = server_names
+                for inst_id, name, status, _ in servers:
+                    if status == 'stopped':
+                        self.start_instance(inst_id)
+                        await self.bot.change_presence(status=discord.Status.idle, activity=discord.Game(name))
+                await self.server_list(ctx, server_names)
+            elif len(server_names) > 1:
+                await ctx.send(f'```No servers found with names:\n' + '\n'.join(server_names) + '```')
+            else:
+                await ctx.send(f'```No server found with names:\n' + '\n'.join(server_names) + '```')
+        except Exception as e:
+            raise e
