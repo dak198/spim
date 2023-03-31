@@ -147,7 +147,8 @@ class Spim(commands.Cog):
             pass
         else:
             self.server_names = server_names
-        await ctx.send(f"{', '.join(self.server_names)}")
+        if self.server_names:
+            await ctx.send(f"{', '.join(self.server_names)}")
         return
         Filters = [ {
             'Name': 'tag:Spim-Managed',
