@@ -93,6 +93,22 @@ class Spim(commands.Cog):
     async def version(self, ctx):
         await ctx.send("Spim cog version: 0.1.0")
 
+    # Print the dns url for the given service, stored in an external json file on the server running the bot
+    @commands.command(name='print-url', help='<name> - the name of the service to print the url for')
+    async def print_url(self, ctx, name):
+        server_dns = ''
+        for i in self.data['urls']:
+            if i['name'] == name:
+                server_dns = i['url']
+                break
+        await ctx.channel.send(content=server_dns)
+
+    # Print the region used for boto3 config
+    @commands.command(name='print-region', help='<name> - the name of the region used in boto3 config')
+    async def print_region(self, ctx):
+        await ctx.channel.send(content=self.data['region'])
+
+
     # Lists the status and URL for each server with the 'mc-server' Project Tag
     @commands.command(name='server-list', help=' - Lists active and inactive servers')
     async def server_status(self, ctx):
@@ -120,6 +136,9 @@ class Spim(commands.Cog):
             except Exception as e:
                 raise e
 
+    @commands.command(name='server-start')
+    async def server_start(self, ctx):
+        ctx.send('Server start command with no args')
 
     # Starts the server with the specified name.
     #       Prints the status if the server is already started.
@@ -163,18 +182,3 @@ class Spim(commands.Cog):
                 sleep(1)
             except Exception as e:
                 raise e
-    
-    # Print the dns url for the given service, stored in an external json file on the server running the bot
-    @commands.command(name='print-url', help='<name> - the name of the service to print the url for')
-    async def print_url(self, ctx, name):
-        server_dns = ''
-        for i in self.data['urls']:
-            if i['name'] == name:
-                server_dns = i['url']
-                break
-        await ctx.channel.send(content=server_dns)
-
-    # Print the region used for boto3 config
-    @commands.command(name='print-region', help='<name> - the name of the region used in boto3 config')
-    async def print_region(self, ctx):
-        await ctx.channel.send(content=self.data['region'])
