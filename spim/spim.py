@@ -143,6 +143,7 @@ class Spim(commands.Cog):
     async def server_start(self, ctx, *server_name):
         if not server_name:
             ctx.send('Server start with no args')
+            return
 
         Filters = [ {
             'Name': 'tag:Project',
