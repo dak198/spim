@@ -6,7 +6,7 @@
     "end_user_data_statement": "This cog does not persistently store any data or metadata about users.",
     "install_msg": "Thank you for adding the spim repository",
     "author": [
-        "Author 1",
+        "dominic",
         "jack"
     ],
     "required_cogs": {},
