@@ -33,6 +33,8 @@ class Spim(commands.Cog):
             region_name = self.data['region']
         )
 
+        self.server_names = []
+
 
     async def red_delete_data_for_user(self, *, requester: RequestType, user_id: int) -> None:
         # TODO: Replace this with the proper end user data removal handling.
@@ -109,7 +111,7 @@ class Spim(commands.Cog):
         await ctx.channel.send(content=self.data['region'])
 
 
-    # Lists the status and URL for each server with the 'mc-server' Project Tag
+    # Lists the status and URL for each server with the 'Spim-Managed' Tag set to true
     @commands.command(name='server-list', help=' - Lists active and inactive servers')
     async def server_status(self, ctx):
         timer = 0
@@ -118,8 +120,8 @@ class Spim(commands.Cog):
             try:
                 text = 'Last Updated: {} UTC\n'
                 servers = self.get_server_list(filters = [ {
-                        'Name': 'tag:Project',
-                        'Values': [ 'mc-server' ] } ])
+                        'Name': 'tag:Spim-Managed',
+                        'Values': [ 'true' ] } ])
                 if servers:
                     for _, name, status, url in servers:
                         if not url: url = '—————'
@@ -142,12 +144,14 @@ class Spim(commands.Cog):
     @commands.command(name='server-start', help='[server names...] - Starts the specified server')
     async def server_start(self, ctx, *server_names):
         if not server_names:
-            await ctx.send('Server start with no args')
-            return
-
+            pass
+        else:
+            self.server_names = server_names
+        await ctx.send(f'{self.server_names}')
+        return
         Filters = [ {
-            'Name': 'tag:Project',
-            'Values': [ 'mc-server' ]
+            'Name': 'tag:Spim-Managed',
+            'Values': [ 'true' ]
         }, {
             'Name': 'tag:Name',
             'Values': server_names
