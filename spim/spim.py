@@ -139,9 +139,9 @@ class Spim(commands.Cog):
     # Starts the server with the specified name.
     #       Prints the status if the server is already started.
     #       Keeps users updated of server status for a few minutes afterward.
-    @commands.command(name='server-start', help='<server name> - Starts the specified server')
-    async def server_start(self, ctx, *server_name):
-        if not server_name:
+    @commands.command(name='server-start', help='[server names...] - Starts the specified server')
+    async def server_start(self, ctx, *server_names):
+        if not server_names:
             await ctx.send('Server start with no args')
             return
 
@@ -150,7 +150,7 @@ class Spim(commands.Cog):
             'Values': [ 'mc-server' ]
         }, {
             'Name': 'tag:Name',
-            'Values': [ server_name ]
+            'Values': server_names
         } ]
 
         timer = 0
@@ -172,7 +172,7 @@ class Spim(commands.Cog):
                         if not url: url = '—————'
                         text += f'```Server: {name}\nStatus: {status}\nURL:\n{url}```'
                 else:
-                    text += f'**ERROR: No servers found named `{server_name}`.**\nCommand usage:\n`{self.bot.command_prefix}server-start <server name>`\nUse `{self.bot.command_prefix}server-list` to list valid server names'
+                    text += f'**ERROR: No servers found with names: `{server_names}`.**\nCommand usage:\n`{self.bot.command_prefix}server-start [server names...]`\nUse `{self.bot.command_prefix}server-list` to list valid server names'
 
                 if not message:
                     message = await ctx.channel.send(text.format(strftime("%H:%M")))
