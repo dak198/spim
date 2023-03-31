@@ -136,15 +136,14 @@ class Spim(commands.Cog):
             except Exception as e:
                 raise e
 
-    @commands.command(name='server-start')
-    async def server_start(self, ctx):
-        ctx.send('Server start command with no args')
-
     # Starts the server with the specified name.
     #       Prints the status if the server is already started.
     #       Keeps users updated of server status for a few minutes afterward.
     @commands.command(name='server-start', help='<server name> - Starts the specified server')
-    async def server_start(self, ctx, server_name):
+    async def server_start(self, ctx, *server_name):
+        if not server_name:
+            ctx.send('Server start with no args')
+
         Filters = [ {
             'Name': 'tag:Project',
             'Values': [ 'mc-server' ]
