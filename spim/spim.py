@@ -143,6 +143,10 @@ class Spim(commands.Cog):
             await ctx.send(str(i+1))
             await asyncio.sleep(5)
 
+    @commands.group(name='server', help='commands for aws server management')
+    async def server(self, ctx):
+        pass
+
     # Print the dns url for the given service, stored in an external json file on the server running the bot
     @commands.command(name='print-url', help='<name> - the name of the service to print the url for')
     async def print_url(self, ctx, name):
@@ -154,68 +158,12 @@ class Spim(commands.Cog):
         await ctx.channel.send(content=server_dns)
 
     # Print the region used for boto3 config
-    @commands.command(name='print-region', help='<name> - the name of the region used in boto3 config')
+    @commands.command(name='region', parent=server, help='<name> - the name of the region used in boto3 config')
     async def print_region(self, ctx):
         await ctx.channel.send(content=self.data['region'])
 
-    @commands.group(name='server', help='commands for aws server management')
-    async def server(self, ctx):
-        pass
-
     # Lists the status and URL for each server with the 'Spim-Managed' Tag set to true
-    @commands.command(name='list', parent=server, help=' - Lists active and inactive servers')
-    async def server_list_subcommand(self, ctx, *server_names):
-        SLEEP_DURATION = 20
-        UPDATE_COUNT = 6
-
-        if server_names:
-            Filters = [ {
-                'Name': 'tag:Spim-Managed',
-                'Values': [ 'true' ]
-            }, {
-                'Name': 'tag:Name',
-                'Values': server_names
-            } ]
-        else:
-            Filters = [ {
-                'Name': 'tag:Spim-Managed',
-                'Values': [ 'true' ]
-            } ]
-
-        timer = 0
-        message = None
-        while timer < UPDATE_COUNT:
-            try:
-                server_dns = ''
-                for i in self.data['urls']:
-                    if i['name'] == 'minecraft':
-                        server_dns = i['url']
-                        break
-                text = 'Last Updated: {} UTC\n**NEW:** Try accessing the server by using `' + server_dns + '`\n'
-                servers = self.get_server_list(filters=Filters)
-                if servers:
-                    for _, name, status, url in servers:
-                        if not url: url = '—————'
-                        text += f'```Server: {name}\nStatus: {status}\nURL:\n{url}```'
-                elif len(server_names) > 1:
-                    text += f'```No servers found with names:\n' + '\n'.join(server_names) + '```'
-                elif len(server_names) == 1:
-                    text += f'```No server found with name:\n' + '\n'.join(server_names) + '```'
-                else:
-                    text += '```No servers found.```'
-
-                if not message:
-                    message = await ctx.channel.send(text.format(strftime("%H:%M")))
-                else:
-                    await message.edit(content=text.format(strftime("%H:%M")))
-                timer += 1
-                await asyncio.sleep(SLEEP_DURATION)
-            except Exception as e:
-                raise e
-
-
-    # Lists the status and URL for each server with the 'Spim-Managed' Tag set to true
-    @commands.command(name='server-list', help=' - Lists active and inactive servers')
+    @commands.command(name='list', parent=server, help='[server names...] - Lists active and inactive servers')
     async def server_list(self, ctx, *server_names):
         SLEEP_DURATION = 20
         UPDATE_COUNT = 6
@@ -268,7 +216,7 @@ class Spim(commands.Cog):
     # Starts the server with the specified name.
     #       Prints the status if the server is already started.
     #       Keeps users updated of server status for a few minutes afterward.
-    @commands.command(name='server-start', help='[server names...] - Starts the specified server')
+    @commands.command(name='start', parent=server, help='[server names...] - Starts the specified server')
     async def server_start(self, ctx, *server_names):
         if not server_names:
             if self.server_names:
