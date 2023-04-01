@@ -5,6 +5,7 @@ from datetime import datetime
 from json import load
 
 import discord
+from discord.ext import tasks
 from redbot.core import commands
 from redbot.core.bot import Red
 from redbot.core.config import Config
@@ -202,7 +203,7 @@ class Spim(commands.Cog):
         await ctx.send(' '.join(message))
         self.message = message
 
-    @discord.ext.tasks.loop(seconds=15.0)
+    @tasks.loop(seconds=15.0)
     async def repeat_message(self, ctx):
         if self.message:
             await ctx.send(' '.join(self.message))
