@@ -131,9 +131,9 @@ class Spim(commands.Cog):
         await ctx.send("```Servers no longer running```")
 
 
-    ############
-    # COMMANDS #
-    ############
+    ####################
+    # GENERAL COMMANDS #
+    ####################
 
     # Repeats a message "times" times
     @commands.command(name='count', help='<number> - Counts from 1 to <number> with messages every 5 seconds')
@@ -143,6 +143,12 @@ class Spim(commands.Cog):
             await ctx.send(str(i+1))
             await asyncio.sleep(5)
 
+
+    ###################
+    # SERVER COMMANDS #
+    ###################
+
+    # Group for server commands
     @commands.group(name='server', help='Commands for aws server management')
     async def server(self, ctx):
         pass
