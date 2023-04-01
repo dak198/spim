@@ -128,7 +128,7 @@ class Spim(commands.Cog):
             await asyncio.sleep(SLEEP_DURATION)
 
         await self.bot.change_presence(activity=None)
-        await ctx.send("Servers no longer running")
+        await ctx.send("```Servers no longer running```")
 
 
     ############
@@ -161,6 +161,9 @@ class Spim(commands.Cog):
     # Lists the status and URL for each server with the 'Spim-Managed' Tag set to true
     @commands.command(name='server-list', help=' - Lists active and inactive servers')
     async def server_list(self, ctx, *server_names):
+        SLEEP_DURATION = 20
+        UPDATE_COUNT = 6
+
         if server_names:
             Filters = [ {
                 'Name': 'tag:Spim-Managed',
@@ -177,7 +180,7 @@ class Spim(commands.Cog):
 
         timer = 0
         message = None
-        while timer < 10:
+        while timer < UPDATE_COUNT:
             try:
                 server_dns = ''
                 for i in self.data['urls']:
@@ -202,7 +205,7 @@ class Spim(commands.Cog):
                 else:
                     await message.edit(content=text.format(strftime("%H:%M")))
                 timer += 1
-                await asyncio.sleep(6)
+                await asyncio.sleep(SLEEP_DURATION)
             except Exception as e:
                 raise e
 
