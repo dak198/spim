@@ -119,7 +119,7 @@ class Spim(commands.Cog):
                 'Values': [ 'true' ]
             }, {
                 'Name': 'tag:Name',
-                'Values': list(server_names)
+                'Values': server_names
             } ]
         else:
             Filters = [ {
@@ -175,7 +175,7 @@ class Spim(commands.Cog):
             'Values': [ 'true' ]
         }, {
             'Name': 'tag:Name',
-            'Values': list(server_names)
+            'Values': server_names
         } ]
 
         try:
@@ -186,7 +186,7 @@ class Spim(commands.Cog):
                     if status == 'stopped':
                         self.start_instance(inst_id)
                         await self.bot.change_presence(status=discord.Status.idle, activity=discord.Game(name))
-                await self.server_list(ctx, server_names)
+                await self.server_list(ctx, *server_names)
             elif len(server_names) > 1:
                 await ctx.send(f'```No servers found with names:\n' + '\n'.join(server_names) + '```')
             else:
