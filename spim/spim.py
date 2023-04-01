@@ -145,7 +145,7 @@ class Spim(commands.Cog):
                 elif len(server_names) > 1:
                     text += f'```No servers found with names:\n' + '\n'.join(server_names) + '```'
                 elif len(server_names) == 1:
-                    text += f'```No server found with names:\n' + '\n'.join(server_names) + '```'
+                    text += f'```No server found with name:\n' + '\n'.join(server_names) + '```'
                 else:
                     text += '```No servers found.```'
 
@@ -190,6 +190,6 @@ class Spim(commands.Cog):
             elif len(server_names) > 1:
                 await ctx.send(f'```No servers found with names:\n' + '\n'.join(server_names) + '```')
             else:
-                await ctx.send(f'```No server found with names:\n' + '\n'.join(server_names) + '```')
+                await ctx.send(f'```No server found with name:\n' + '\n'.join(server_names) + '```')
         except Exception as e:
             raise e
