@@ -164,7 +164,7 @@ class Spim(commands.Cog):
 
     # Lists the status and URL for each server with the 'Spim-Managed' Tag set to true
     @commands.command(name='list', parent=server, help=' - Lists active and inactive servers')
-    async def server_list(self, ctx, *server_names):
+    async def server_list_subcommand(self, ctx, *server_names):
         SLEEP_DURATION = 20
         UPDATE_COUNT = 6
 
