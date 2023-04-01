@@ -143,7 +143,7 @@ class Spim(commands.Cog):
             await ctx.send(str(i+1))
             await asyncio.sleep(5)
 
-    @commands.group(name='server', help='commands for aws server management')
+    @commands.group(name='server', help='Commands for aws server management')
     async def server(self, ctx):
         pass
 
@@ -158,12 +158,12 @@ class Spim(commands.Cog):
         await ctx.channel.send(content=server_dns)
 
     # Print the region used for boto3 config
-    @commands.command(name='region', parent=server, help='print the name of the region used in boto3 config')
+    @commands.command(name='region', parent=server, help='Print the name of the region used in boto3 config')
     async def print_region(self, ctx):
         await ctx.channel.send(content=self.data['region'])
 
     # Lists the status and URL for each server with the 'Spim-Managed' Tag set to true
-    @commands.command(name='list', parent=server, help=' - Lists active and inactive servers')
+    @commands.command(name='list', parent=server, help='List active and inactive servers')
     async def server_list(self, ctx, *server_names):
         SLEEP_DURATION = 20
         UPDATE_COUNT = 6
@@ -216,7 +216,7 @@ class Spim(commands.Cog):
     # Starts the server with the specified name.
     #       Prints the status if the server is already started.
     #       Keeps users updated of server status for a few minutes afterward.
-    @commands.command(name='start', parent=server, help=' - Starts the specified server')
+    @commands.command(name='start', parent=server, help='Start the specified servers')
     async def server_start(self, ctx, *server_names):
         if not server_names:
             if self.server_names:
@@ -250,11 +250,3 @@ class Spim(commands.Cog):
                 ctx.send(f'```No Spot capacity available at the moment. Please try again in a few minutes.```')
             else:
                 raise error
-            
-    @commands.group(name='grouptest', help='test command groups')
-    async def grouptest(self, ctx):
-        pass
-
-    @commands.command(name='message', parent=grouptest, help='<message> - message to send as a subcommand of the grouptest command')
-    async def grouptest_message(self, ctx, message):
-        await ctx.send(message)
