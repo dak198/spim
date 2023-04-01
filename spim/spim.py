@@ -212,6 +212,5 @@ class Spim(commands.Cog):
             self.task.cancel()
             self.task = None
         else:
-            await ctx.send('Creating task...')
             self.task = asyncio.create_task(self.send_message(self, ctx, *message))
-            asyncio.run(self.task)
+            await ctx.send('Created task')
