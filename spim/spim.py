@@ -198,7 +198,7 @@ class Spim(commands.Cog):
     # Test for calling a function in the background on a timed interval
     @commands.command(name='repeat-message', help='<message> - will be sent every 15 seconds, leave blank to stop sending')
     async def repeat_message(self, ctx, *message):
-        await ctx.send(message[0])
+        await ctx.send(' '.join(message))
     #     next_message_time = time()
     #     while True:
     #         await ctx.send(message)
