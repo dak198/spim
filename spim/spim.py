@@ -248,7 +248,7 @@ class Spim(commands.Cog):
                 raise error
             
     @commands.group(name='grouptest', help='test command groups')
-    async def grouptest(self):
+    async def grouptest(self, ctx):
         pass
 
     @commands.command(name='message', parent=grouptest, help='<message> - message to send as a subcommand of the grouptest command')
