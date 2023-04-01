@@ -227,13 +227,13 @@ class Spim(commands.Cog):
 
         running = True
         while running:
+            await asyncio.sleep(SLEEP_DURATION)
             running = False
             servers = self.get_server_list(filters=Filters)
             for _, _, status, _ in servers:
                 if status == 'running':
                     running = True
                     break
-            sleep(SLEEP_DURATION)
 
         await self.bot.change_presence(activity=None)
         await ctx.send("Servers no longer running")
