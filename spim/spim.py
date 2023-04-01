@@ -92,12 +92,12 @@ class Spim(commands.Cog):
     ## COMMANDS
 
     # Repeats a message "times" times
-    @commands.command(name='count', help='<number> - Counts from 1 to <number> with messages every 15 seconds')
+    @commands.command(name='count', help='<number> - Counts from 1 to <number> with messages every 10 seconds')
     async def count(self, ctx, number):
         number = int(number)
         for i in range(number):
             await ctx.send(str(i+1))
-            await asyncio.sleep(15)
+            await asyncio.sleep(10)
 
     # Print the dns url for the given service, stored in an external json file on the server running the bot
     @commands.command(name='print-url', help='<name> - the name of the service to print the url for')
