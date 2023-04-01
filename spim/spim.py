@@ -1,5 +1,6 @@
 from typing import Literal
-from time import sleep, strftime
+from time import sleep, strftime, time
+from threading import Thread
 from datetime import datetime
 from json import load
 
@@ -193,3 +194,17 @@ class Spim(commands.Cog):
                 await ctx.send(f'```No server found with name:\n' + '\n'.join(server_names) + '```')
         except Exception as e:
             raise e
+        
+    # Test for calling a function in the background on a timed interval
+    @commands.command(name='repeat-message', help='<message> - will be sent every 15 seconds, leave blank to stop sending')
+    async def repeat_message(self, ctx, *message):
+        await ctx.send(message)
+    #     next_message_time = time()
+    #     while True:
+    #         await ctx.send(message)
+    #         next_message_time += 15
+    #         time.sleep(next_message_time-time())
+    
+    # message_thread = Thread(target=repeat_message, args=['self', 'ctx', 'message'])
+    # message_thread.daemon = True
+    # message_thread.start()
