@@ -185,7 +185,7 @@ class Spim(commands.Cog):
                 for inst_id, name, status, _ in servers:
                     if status == 'stopped':
                         self.start_instance(inst_id)
-                        await self.bot.change_presence(status=discord.Status.idle, activity=discord.Game(name))
+                        await self.bot.change_presence(activity=discord.Game(name))
                 await self.server_list(ctx, *server_names)
             elif len(server_names) > 1:
                 await ctx.send(f'```No servers found with names:\n' + '\n'.join(server_names) + '```')
