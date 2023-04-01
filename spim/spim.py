@@ -203,7 +203,7 @@ class Spim(commands.Cog):
         await ctx.send(' '.join(message))
         self.message = message
 
-    @tasks.loop(seconds=15.0)
+    @tasks.loop(seconds=15)
     async def repeat_message(self, ctx):
         if self.message:
             await ctx.send(' '.join(self.message))
