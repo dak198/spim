@@ -207,7 +207,7 @@ class Spim(commands.Cog):
         
     @commands.command(name='toggle-repeat', help='<message> - message to repeat every 15 seconds')
     async def toggle_repeat(self, ctx, *message):
-        while True:
+        for i in range(5):
             await ctx.send(' '.join(message))
             sleep(15)
         # if self.task:
