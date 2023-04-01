@@ -3,9 +3,9 @@ from time import sleep, strftime, time
 from threading import Thread
 from datetime import datetime
 from json import load
+import asyncio
 
 import discord
-from discord.ext import tasks
 from redbot.core import commands
 from redbot.core.bot import Red
 from redbot.core.config import Config
@@ -37,8 +37,7 @@ class Spim(commands.Cog):
 
         self.server_names = []
 
-        self.message = None
-
+        self.task = None
 
     async def red_delete_data_for_user(self, *, requester: RequestType, user_id: int) -> None:
         # TODO: Replace this with the proper end user data removal handling.
@@ -198,12 +197,17 @@ class Spim(commands.Cog):
         except Exception as e:
             raise e
         
+    async def send_message(self, ctx, *message):
+        try:
+            while True:
+                await ctx.send(' '.join(message))
+                await asyncio.sleep(15)
+        except asyncio.CancelledError:
+            await ctx.send('Done')
+        
     @commands.command(name='toggle-repeat', help='<message> - message to repeat every 15 seconds')
     async def toggle_repeat(self, ctx, *message):
-        await ctx.send(' '.join(message))
-        self.message = message
-
-    @tasks.loop(seconds=15)
-    async def repeat_message(self, ctx):
-        if self.message:
-            await ctx.send(' '.join(self.message))
+        if self.task:
+            self.task.cancel()
+        else:
+            self.task = asyncio.create_task(self.send_message(self, ctx, *message))
