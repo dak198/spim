@@ -158,6 +158,62 @@ class Spim(commands.Cog):
     async def print_region(self, ctx):
         await ctx.channel.send(content=self.data['region'])
 
+    @commands.group(name='server', help='commands for aws server management')
+    async def server(self, ctx):
+        pass
+
+    # Lists the status and URL for each server with the 'Spim-Managed' Tag set to true
+    @commands.command(name='list', parent=server, help=' - Lists active and inactive servers')
+    async def server_list(self, ctx, *server_names):
+        SLEEP_DURATION = 20
+        UPDATE_COUNT = 6
+
+        if server_names:
+            Filters = [ {
+                'Name': 'tag:Spim-Managed',
+                'Values': [ 'true' ]
+            }, {
+                'Name': 'tag:Name',
+                'Values': server_names
+            } ]
+        else:
+            Filters = [ {
+                'Name': 'tag:Spim-Managed',
+                'Values': [ 'true' ]
+            } ]
+
+        timer = 0
+        message = None
+        while timer < UPDATE_COUNT:
+            try:
+                server_dns = ''
+                for i in self.data['urls']:
+                    if i['name'] == 'minecraft':
+                        server_dns = i['url']
+                        break
+                text = 'Last Updated: {} UTC\n**NEW:** Try accessing the server by using `' + server_dns + '`\n'
+                servers = self.get_server_list(filters=Filters)
+                if servers:
+                    for _, name, status, url in servers:
+                        if not url: url = '—————'
+                        text += f'```Server: {name}\nStatus: {status}\nURL:\n{url}```'
+                elif len(server_names) > 1:
+                    text += f'```No servers found with names:\n' + '\n'.join(server_names) + '```'
+                elif len(server_names) == 1:
+                    text += f'```No server found with name:\n' + '\n'.join(server_names) + '```'
+                else:
+                    text += '```No servers found.```'
+
+                if not message:
+                    message = await ctx.channel.send(text.format(strftime("%H:%M")))
+                else:
+                    await message.edit(content=text.format(strftime("%H:%M")))
+                timer += 1
+                await asyncio.sleep(SLEEP_DURATION)
+            except Exception as e:
+                raise e
+
+
     # Lists the status and URL for each server with the 'Spim-Managed' Tag set to true
     @commands.command(name='server-list', help=' - Lists active and inactive servers')
     async def server_list(self, ctx, *server_names):
