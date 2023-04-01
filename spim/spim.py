@@ -210,11 +210,11 @@ class Spim(commands.Cog):
         for i in range(5):
             await ctx.send(' '.join(message))
             await asyncio.sleep(15)
-        # if self.task:
-        #     await ctx.send('Cancelling...')
-        #     self.task.cancel()
-        #     self.task = None
-        # else:
-        #     self.bot.loop.create_task()
-        #     self.task = asyncio.create_task(self.send_message(self, ctx, *message))
-        #     await ctx.send('Created task')
+
+    async def status_set(self):
+        running = True
+        while running:
+            await self.bot.change_presence(activity=discord.Streaming('servers'))
+            # TODO add check for runnning servers to set the value of 'running'
+            running = False
+        await self.bot.change_presence(activity=None)
