@@ -1,7 +1,5 @@
 from typing import Literal
-from time import sleep, strftime, time
-from threading import Thread
-from datetime import datetime
+from time import sleep, strftime
 from json import load
 import asyncio
 
