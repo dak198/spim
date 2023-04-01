@@ -188,8 +188,8 @@ class Spim(commands.Cog):
                 for inst_id, name, status, _ in servers:
                     if status == 'stopped':
                         self.start_instance(inst_id)
-                        await self.bot.change_presence(activity=discord.Game(name))
                 await self.server_list(ctx, *server_names)
+                await self.status_set(*server_names)
             elif len(server_names) > 1:
                 await ctx.send(f'```No servers found with names:\n' + '\n'.join(server_names) + '```')
             else:
@@ -211,7 +211,7 @@ class Spim(commands.Cog):
             await ctx.send(' '.join(message))
             await asyncio.sleep(15)
 
-    async def status_set(self):
+    async def status_set(self, *server_names):
         running = True
         while running:
             await self.bot.change_presence(activity=discord.Streaming('servers'))
