@@ -52,13 +52,13 @@ class Spim(commands.Cog):
 
         try:
             ec2.describe_instances(Filters=filters, DryRun=True)
-        except ClientError as e:
+        except botocore.exceptions.ClientError as e:
             if 'DryRunOperation' not in str(e):
                 raise e
         # Dry run succeeded, call describe_instances without dryrun
         try:
             response = ec2.describe_instances(Filters=filters, DryRun=False)
-        except ClientError as e:
+        except botocore.exceptions.ClientError as e:
             raise e
 
         output = []
@@ -81,13 +81,13 @@ class Spim(commands.Cog):
 
         try:
             ec2.start_instances(InstanceIds=[inst_id], DryRun=True)
-        except ClientError as e:
+        except botocore.exceptions.ClientError as e:
             if 'DryRunOperation' not in str(e):
                 raise e
         # Dry run succeeded, call start_instances without dryrun
         try:
             response = ec2.start_instances(InstanceIds=[inst_id], DryRun=False)
-        except ClientError as e:
+        except botocore.exceptions.ClientError as e:
             raise e
 
         return response
