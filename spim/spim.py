@@ -241,3 +241,11 @@ class Spim(commands.Cog):
                 ctx.send(f'```No Spot capacity available at the moment. Please try again in a few minutes.```')
             else:
                 raise error
+            
+    @commands.group(name='grouptest', help='test command groups')
+    async def grouptest():
+        pass
+
+    @commands.command(name='message', parent=grouptest, help='<message> - message to send as a subcommand of the grouptest command')
+    async def grouptest_message(self, ctx, message):
+        await ctx.send(message)
