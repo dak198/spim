@@ -158,12 +158,12 @@ class Spim(commands.Cog):
         await ctx.channel.send(content=server_dns)
 
     # Print the region used for boto3 config
-    @commands.command(name='region', parent=server, help='<name> - the name of the region used in boto3 config')
+    @commands.command(name='region', parent=server, help='print the name of the region used in boto3 config')
     async def print_region(self, ctx):
         await ctx.channel.send(content=self.data['region'])
 
     # Lists the status and URL for each server with the 'Spim-Managed' Tag set to true
-    @commands.command(name='list', parent=server, help='[server names...] - Lists active and inactive servers')
+    @commands.command(name='list', parent=server, help=' - Lists active and inactive servers')
     async def server_list(self, ctx, *server_names):
         SLEEP_DURATION = 20
         UPDATE_COUNT = 6
@@ -216,7 +216,7 @@ class Spim(commands.Cog):
     # Starts the server with the specified name.
     #       Prints the status if the server is already started.
     #       Keeps users updated of server status for a few minutes afterward.
-    @commands.command(name='start', parent=server, help='[server names...] - Starts the specified server')
+    @commands.command(name='start', parent=server, help=' - Starts the specified server')
     async def server_start(self, ctx, *server_names):
         if not server_names:
             if self.server_names:
