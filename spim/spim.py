@@ -36,6 +36,8 @@ class Spim(commands.Cog):
 
         self.server_names = []
 
+        self.message = None
+
 
     async def red_delete_data_for_user(self, *, requester: RequestType, user_id: int) -> None:
         # TODO: Replace this with the proper end user data removal handling.
@@ -195,16 +197,12 @@ class Spim(commands.Cog):
         except Exception as e:
             raise e
         
-    # Test for calling a function in the background on a timed interval
-    @commands.command(name='repeat-message', help='<message> - will be sent every 15 seconds, leave blank to stop sending')
-    async def repeat_message(self, ctx, *message):
+    @commands.command(name='toggle-repeat', help='<message> - message to repeat every 15 seconds')
+    async def toggle_repeat(self, ctx, *message):
         await ctx.send(' '.join(message))
-    #     next_message_time = time()
-    #     while True:
-    #         await ctx.send(message)
-    #         next_message_time += 15
-    #         time.sleep(next_message_time-time())
-    
-    # message_thread = Thread(target=repeat_message, args=['self', 'ctx', 'message'])
-    # message_thread.daemon = True
-    # message_thread.start()
+        self.message = message
+
+    @discord.tasks.loop(seconds=15.0)
+    async def repeat_message(self, ctx):
+        if self.message:
+            await ctx.send(' '.join(self.message))
