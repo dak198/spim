@@ -207,10 +207,14 @@ class Spim(commands.Cog):
         
     @commands.command(name='toggle-repeat', help='<message> - message to repeat every 15 seconds')
     async def toggle_repeat(self, ctx, *message):
-        if self.task:
-            await ctx.send('Cancelling...')
-            self.task.cancel()
-            self.task = None
-        else:
-            self.task = asyncio.create_task(self.send_message(self, ctx, *message))
-            await ctx.send('Created task')
+        while True:
+            await ctx.send(' '.join(message))
+            sleep(15)
+        # if self.task:
+        #     await ctx.send('Cancelling...')
+        #     self.task.cancel()
+        #     self.task = None
+        # else:
+        #     self.bot.loop.create_task()
+        #     self.task = asyncio.create_task(self.send_message(self, ctx, *message))
+        #     await ctx.send('Created task')
