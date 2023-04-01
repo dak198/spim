@@ -94,6 +94,7 @@ class Spim(commands.Cog):
     # Repeats a message "times" times
     @commands.command(name='say', help='<times> <message...> - repeats <message...> every 15 seconds <times> times')
     async def say(self, ctx, times, *message):
+        times = int(times)
         for i in range(times):
             await ctx.send(' '.join(message))
             await asyncio.sleep(15)
