@@ -114,18 +114,21 @@ class Spim(commands.Cog):
         # Set bot status to show that servers are running
         await self.bot.change_presence(activity=discord.Game('servers running'))
 
+        # Print server list to chat
+        await self.server_list(ctx, *server_names)
+
         running = True
         while running:
-            await asyncio.sleep(SLEEP_DURATION)
             running = False
             servers = self.get_server_list(filters=Filters)
             for _, _, status, _ in servers:
                 if status == 'running':
                     running = True
                     break
+            await asyncio.sleep(SLEEP_DURATION)
 
         await self.bot.change_presence(activity=None)
-        await ctx.send("Servers no longer running")
+        await ctx.send("```Servers no longer running```")
 
 
     ############
@@ -158,6 +161,9 @@ class Spim(commands.Cog):
     # Lists the status and URL for each server with the 'Spim-Managed' Tag set to true
     @commands.command(name='server-list', help=' - Lists active and inactive servers')
     async def server_list(self, ctx, *server_names):
+        SLEEP_DURATION = 20
+        UPDATE_COUNT = 6
+
         if server_names:
             Filters = [ {
                 'Name': 'tag:Spim-Managed',
@@ -174,7 +180,7 @@ class Spim(commands.Cog):
 
         timer = 0
         message = None
-        while timer < 10:
+        while timer < UPDATE_COUNT:
             try:
                 server_dns = ''
                 for i in self.data['urls']:
@@ -199,7 +205,7 @@ class Spim(commands.Cog):
                 else:
                     await message.edit(content=text.format(strftime("%H:%M")))
                 timer += 1
-                await asyncio.sleep(6)
+                await asyncio.sleep(SLEEP_DURATION)
             except Exception as e:
                 raise e
 
@@ -230,7 +236,6 @@ class Spim(commands.Cog):
                 for inst_id, _, status, _ in servers:
                     if status == 'stopped':
                         self.start_instance(inst_id)
-                await self.server_list(ctx, *server_names)
                 await self.set_status(ctx, *server_names)
             elif len(server_names) > 1:
                 await ctx.send(f'```No servers found with names:\n' + '\n'.join(server_names) + '```')
