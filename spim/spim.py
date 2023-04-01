@@ -41,6 +41,11 @@ class Spim(commands.Cog):
         # TODO: Replace this with the proper end user data removal handling.
         super().red_delete_data_for_user(requester=requester, user_id=user_id)
 
+
+    ####################
+    # HELPER FUNCTIONS #
+    ####################
+
     # Get the list of all EC2 instances names, DNS names, and statuses with the given filters
     #       Default to no filters
     def get_server_list(self, filters=[]):
@@ -88,8 +93,45 @@ class Spim(commands.Cog):
 
         return response
 
+    # Sets the bots status to "Streaming servers running" (it's a bit weird, but that's Discord for you)
+    #       Checks every 5 minutes if servers are still running, unsets the status if they aren't
+    async def set_status(self, ctx, *server_names):
+        SLEEP_DURATION = 5*60
 
-    ## COMMANDS
+        if server_names:
+            Filters = [ {
+                'Name': 'tag:Spim-Managed',
+                'Values': ['true']
+            }, {
+                'Name': 'tag:Name',
+                'Values': server_names
+            } ]
+        else:
+            Filters = [ {
+                'Name': 'tag:Spim-Managed',
+                'Values': ['true']
+            } ]
+
+        # Set bot status to show that servers are running
+        await self.bot.change_presence(activity=discord.Streaming('servers running'))
+
+        running = True
+        while running:
+            await asyncio.sleep(SLEEP_DURATION)
+            running = False
+            servers = self.get_server_list(filters=Filters)
+            for _, _, status, _ in servers:
+                if status == 'running':
+                    running = True
+                    break
+
+        await self.bot.change_presence(activity=None)
+        await ctx.send("Servers no longer running")
+
+
+    ############
+    # COMMANDS #
+    ############
 
     # Repeats a message "times" times
     @commands.command(name='count', help='<number> - Counts from 1 to <number> with messages every 10 seconds')
@@ -197,38 +239,3 @@ class Spim(commands.Cog):
                 await ctx.send(f'```No server found with name:\n' + '\n'.join(server_names) + '```')
         except Exception as e:
             raise e
-
-    # Sets the bots status to "Streaming servers running" (it's a bit weird, but that's Discord for you)
-    #       Checks every 5 minutes if servers are still running, unsets the status if they aren't
-    async def set_status(self, ctx, *server_names):
-        SLEEP_DURATION = 5*60
-
-        if server_names:
-            Filters = [ {
-                'Name': 'tag:Spim-Managed',
-                'Values': ['true']
-            }, {
-                'Name': 'tag:Name',
-                'Values': server_names
-            } ]
-        else:
-            Filters = [ {
-                'Name': 'tag:Spim-Managed',
-                'Values': ['true']
-            } ]
-
-        # Set bot status to show that servers are running
-        await self.bot.change_presence(activity=discord.Streaming('servers running'))
-
-        running = True
-        while running:
-            await asyncio.sleep(SLEEP_DURATION)
-            running = False
-            servers = self.get_server_list(filters=Filters)
-            for _, _, status, _ in servers:
-                if status == 'running':
-                    running = True
-                    break
-
-        await self.bot.change_presence(activity=None)
-        await ctx.send("Servers no longer running")
