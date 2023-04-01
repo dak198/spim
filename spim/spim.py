@@ -199,7 +199,7 @@ class Spim(commands.Cog):
                 else:
                     await message.edit(content=text.format(strftime("%H:%M")))
                 timer += 1
-                sleep(6)
+                await asyncio.sleep(6)
             except Exception as e:
                 raise e
 
@@ -227,7 +227,7 @@ class Spim(commands.Cog):
             servers = self.get_server_list(filters=Filters)
             if servers:
                 self.server_names = server_names
-                for inst_id, name, status, _ in servers:
+                for inst_id, _, status, _ in servers:
                     if status == 'stopped':
                         self.start_instance(inst_id)
                 await self.server_list(ctx, *server_names)
@@ -239,3 +239,5 @@ class Spim(commands.Cog):
         except botocore.exceptions.ClientError as error:
             if error.response['Error']['Code'] == 'IncorrectSpotRequestState':
                 ctx.send(f'```No Spot capacity available at the moment. Please try again in a few minutes.```')
+            else:
+                raise error
