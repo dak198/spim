@@ -114,15 +114,18 @@ class Spim(commands.Cog):
         # Set bot status to show that servers are running
         await self.bot.change_presence(activity=discord.Game('servers running'))
 
+        # Print server list to chat
+        await self.server_list(ctx, *server_names)
+
         running = True
         while running:
-            await asyncio.sleep(SLEEP_DURATION)
             running = False
             servers = self.get_server_list(filters=Filters)
             for _, _, status, _ in servers:
                 if status == 'running':
                     running = True
                     break
+            await asyncio.sleep(SLEEP_DURATION)
 
         await self.bot.change_presence(activity=None)
         await ctx.send("Servers no longer running")
@@ -230,7 +233,6 @@ class Spim(commands.Cog):
                 for inst_id, _, status, _ in servers:
                     if status == 'stopped':
                         self.start_instance(inst_id)
-                await self.server_list(ctx, *server_names)
                 await self.set_status(ctx, *server_names)
             elif len(server_names) > 1:
                 await ctx.send(f'```No servers found with names:\n' + '\n'.join(server_names) + '```')
