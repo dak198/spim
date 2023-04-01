@@ -9,8 +9,7 @@ from redbot.core.bot import Red
 from redbot.core.config import Config
 
 import boto3
-from botocore.exceptions import ClientError
-from botocore.config import Config as BotoConfig
+import botocore
 
 RequestType = Literal["discord_deleted_user", "owner", "user", "user_strict"]
 
@@ -29,7 +28,7 @@ class Spim(commands.Cog):
             force_registration=True,
         )
 
-        self.boto_config = BotoConfig(
+        self.boto_config = botocore.config.Config(
             region_name = self.data['region']
         )
 
@@ -237,5 +236,6 @@ class Spim(commands.Cog):
                 await ctx.send(f'```No servers found with names:\n' + '\n'.join(server_names) + '```')
             else:
                 await ctx.send(f'```No server found with name:\n' + '\n'.join(server_names) + '```')
-        except Exception as e:
-            raise e
+        except botocore.exceptions.ClientError as error:
+            if error.response['Error']['Code'] == 'IncorrectSpotRequestState':
+                ctx.send(f'```No Spot capacity available at the moment. Please try again in a few minutes.```')
