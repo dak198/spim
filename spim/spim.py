@@ -91,6 +91,13 @@ class Spim(commands.Cog):
 
     ## COMMANDS
 
+    # Repeats a message "times" times
+    @commands.command(name='say', help='<times> <message...> - repeats <message...> every 15 seconds <times> times')
+    async def say(self, ctx, times, *message):
+        for i in range(times):
+            await ctx.send(' '.join(message))
+            await asyncio.sleep(15)
+
     # Check version of spim cog
     @commands.command(name='spim-version')
     async def version(self, ctx):
@@ -194,13 +201,6 @@ class Spim(commands.Cog):
                 await ctx.send(f'```No server found with name:\n' + '\n'.join(server_names) + '```')
         except Exception as e:
             raise e
-
-    # Repeats a message "times" times
-    @commands.command(name='repeat', help='<times> <message...> - repeats <message...> every 15 seconds <times> times')
-    async def repeat(self, ctx, times, *message):
-        for i in range(times):
-            await ctx.send(' '.join(message))
-            await asyncio.sleep(15)
 
     # Sets the bots status to "Streaming servers running" (it's a bit weird, but that's Discord for you)
     #       Checks every 5 minutes if servers are still running, unsets the status if they aren't
