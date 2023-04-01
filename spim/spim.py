@@ -119,7 +119,7 @@ class Spim(commands.Cog):
                 'Values': [ 'true' ]
             }, {
                 'Name': 'tag:Name',
-                'Values': server_names
+                'Values': list(server_names)
             } ]
         else:
             Filters = [ {
@@ -175,7 +175,7 @@ class Spim(commands.Cog):
             'Values': [ 'true' ]
         }, {
             'Name': 'tag:Name',
-            'Values': server_names
+            'Values': list(server_names)
         } ]
 
         try:
