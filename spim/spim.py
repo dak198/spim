@@ -148,7 +148,7 @@ class Spim(commands.Cog):
         pass
 
     # Print the dns url for the given service, stored in an external json file on the server running the bot
-    @commands.command(name='url', parent=server, help='<name> - the name of the server to print the url for')
+    @commands.command(name='url', parent=server, help='Print the url for the server with the given name')
     async def print_url(self, ctx, name):
         server_dns = ''
         for i in self.data['urls']:
