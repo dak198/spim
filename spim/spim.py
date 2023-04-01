@@ -92,17 +92,12 @@ class Spim(commands.Cog):
     ## COMMANDS
 
     # Repeats a message "times" times
-    @commands.command(name='say', help='<times> <message...> - repeats <message...> every 15 seconds <times> times')
-    async def say(self, ctx, times, *message):
-        times = int(times)
-        for i in range(times):
-            await ctx.send(' '.join(message))
+    @commands.command(name='count', help='<number> - Counts from 1 to <number> with messages every 15 seconds')
+    async def count(self, ctx, number):
+        number = int(number)
+        for i in range(number):
+            await ctx.send(str(i+1))
             await asyncio.sleep(15)
-
-    # Check version of spim cog
-    @commands.command(name='spim-version')
-    async def version(self, ctx):
-        await ctx.send("Spim cog version: 0.1.0")
 
     # Print the dns url for the given service, stored in an external json file on the server running the bot
     @commands.command(name='print-url', help='<name> - the name of the service to print the url for')
