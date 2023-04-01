@@ -209,7 +209,7 @@ class Spim(commands.Cog):
     async def toggle_repeat(self, ctx, *message):
         for i in range(5):
             await ctx.send(' '.join(message))
-            sleep(15)
+            asyncio.sleep(15)
         # if self.task:
         #     await ctx.send('Cancelling...')
         #     self.task.cancel()
