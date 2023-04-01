@@ -156,7 +156,7 @@ class Spim(commands.Cog):
     async def print_region(self, ctx):
         await ctx.channel.send(content=self.data['region'])
 
-    # Lists the list and URL for each server with the 'Spim-Managed' Tag set to true
+    # Lists the status and URL for each server with the 'Spim-Managed' Tag set to true
     @commands.command(name='server-list', help=' - Lists active and inactive servers')
     async def server_list(self, ctx, *server_names):
         if server_names:
