@@ -194,7 +194,7 @@ class Spim(commands.Cog):
             try:
                 server_dns = ''
                 for i in self.data['urls']:
-                    if i['name'] == 'minecraft':
+                    if i['name'] == '1.18.2-modded':
                         server_dns = i['url']
                         break
                 text = 'Last Updated: {} UTC\n**NEW:** Try accessing the server by using `' + server_dns + '`\n'
