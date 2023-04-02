@@ -154,13 +154,9 @@ class Spim(commands.Cog):
         pass
 
     # Print the dns url for the given service, stored in an external json file on the server running the bot
-    @commands.command(name='url', parent=server, help='Print the url for the server with the given name')
-    async def print_url(self, ctx, name):
-        server_dns = ''
-        for i in self.data['urls']:
-            if i['name'] == name:
-                server_dns = i['url']
-                break
+    @commands.command(name='url', parent=server, help='Print the url currently used for servers managed by Spim')
+    async def print_url(self, ctx):
+        server_dns = self.data['url']
         await ctx.channel.send(server_dns)
 
     # Print the region used for boto3 config
