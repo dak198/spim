@@ -104,8 +104,6 @@ class Spim(commands.Cog):
 
         return response
 
-    # 
-    #       
     async def set_status(self, ctx, *server_names):
         """Sets the bots status to "Streaming servers running" (it's a bit weird, but that's Discord for you)
             Checks every 5 minutes if servers are still running, unsets the status if they aren't
