@@ -188,11 +188,7 @@ class Spim(commands.Cog):
         message = None
         while timer < UPDATE_COUNT:
             try:
-                server_dns = ''
-                for i in self.data['urls']:
-                    if i['name'] == '1.18.2-modded':
-                        server_dns = i['url']
-                        break
+                server_dns =  self.data['url']
                 text = 'Last Updated: {} UTC\n**NEW:** Try accessing the server by using `' + server_dns + '`\n'
                 servers = self.get_server_list(filters=Filters)
                 if servers:
