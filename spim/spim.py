@@ -45,9 +45,15 @@ class Spim(commands.Cog):
     # HELPER FUNCTIONS #
     ####################
 
-    # Get the list of all EC2 instances names, DNS names, and statuses with the given filters
-    #       Default to no filters
+
     def get_server_list(self, filters=[]):
+        """Get the list of all EC2 instances names, DNS names, and statuses with the given filters
+        
+        Keyword arguments:
+        filters -- array of filters, defaults to no filters
+        Return: list of servers
+        """
+        
         ec2 = boto3.client('ec2', config=self.boto_config)
 
         try:
@@ -75,8 +81,14 @@ class Spim(commands.Cog):
 
         return output
 
-    # Start the EC2 instance with the specified instance id
     def start_instance(self, inst_id):
+        """Start the EC2 instance with the specified instance id
+        
+        Keyword arguments:
+        inst_id -- the id of the instance to start
+        Return: the response of ec2.start_instances for the given instance id
+        """
+        
         ec2 = boto3.client('ec2', config=self.boto_config)
 
         try:
@@ -92,9 +104,16 @@ class Spim(commands.Cog):
 
         return response
 
-    # Sets the bots status to "Streaming servers running" (it's a bit weird, but that's Discord for you)
-    #       Checks every 5 minutes if servers are still running, unsets the status if they aren't
+    # 
+    #       
     async def set_status(self, ctx, *server_names):
+        """Sets the bots status to "Streaming servers running" (it's a bit weird, but that's Discord for you)
+            Checks every 5 minutes if servers are still running, unsets the status if they aren't
+        
+        Keyword arguments:
+        server_names -- optional list of running servers to print to chat
+        """
+        
         SLEEP_DURATION = 5*60
 
         if server_names:
@@ -135,9 +154,14 @@ class Spim(commands.Cog):
     # GENERAL COMMANDS #
     ####################
 
-    # Repeats a message "times" times
     @commands.command(name='count', help='<number> - Counts from 1 to <number> with messages every 5 seconds')
     async def count(self, ctx, number):
+        """Repeats a message every five seconds for a given number of times
+        
+        Keyword arguments:
+        number -- number of times to repeat the message
+        """
+        
         number = int(number)
         for i in range(number):
             await ctx.send(str(i+1))
@@ -148,25 +172,30 @@ class Spim(commands.Cog):
     # SERVER COMMANDS #
     ###################
 
-    # Group for server commands
     @commands.group(name='server', help='Commands for aws server management')
     async def server(self, ctx):
+        """Group for server commands"""
         pass
 
-    # Print the dns url for the given service, stored in an external json file on the server running the bot
     @commands.command(name='url', parent=server, help='Print the url currently used for servers managed by Spim')
     async def print_url(self, ctx):
+        """Print the dns url for the given service, stored in an external json file on the server running the bot"""
         server_dns = self.data['url']
         await ctx.channel.send(f'`{server_dns}`')
 
-    # Print the region used for boto3 config
     @commands.command(name='region', parent=server, help='Print the name of the region used in boto3 config')
     async def print_region(self, ctx):
+        """Print the region used for boto3 config"""
         await ctx.channel.send(content=self.data['region'])
 
-    # Lists the status and URL for each server with the 'Spim-Managed' Tag set to true
     @commands.command(name='list', parent=server, help='List active and inactive servers')
     async def server_list(self, ctx, *server_names):
+        """Lists the status and URL for each server with the 'Spim-Managed' Tag set to true
+        
+        Keyword arguments:
+        server_names -- optional list of server names to list
+        """
+        
         SLEEP_DURATION = 20
         UPDATE_COUNT = 6
 
@@ -215,11 +244,15 @@ class Spim(commands.Cog):
             except Exception as e:
                 raise e
 
-    # Starts the server with the specified name.
-    #       Prints the status if the server is already started.
-    #       Keeps users updated of server status for a few minutes afterward.
     @commands.command(name='start', parent=server, help='Start the specified servers')
     async def server_start(self, ctx, *server_names):
+        """Starts the server with the specified name
+            Prints the status if the server is already started.
+            Keeps users updated of server status for a few minutes afterward.
+        Keyword arguments:
+        server_names -- optional list of server names to attempt to start
+        """
+        
         if not server_names:
             if self.server_names:
                 server_names = self.server_names
