@@ -157,7 +157,7 @@ class Spim(commands.Cog):
     @commands.command(name='url', parent=server, help='Print the url currently used for servers managed by Spim')
     async def print_url(self, ctx):
         server_dns = self.data['url']
-        await ctx.channel.send(server_dns)
+        await ctx.channel.send(f'`{server_dns}`')
 
     # Print the region used for boto3 config
     @commands.command(name='region', parent=server, help='Print the name of the region used in boto3 config')
