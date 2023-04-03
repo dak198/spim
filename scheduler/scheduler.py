@@ -1,5 +1,4 @@
 import datetime
-from scheduler import Scheduler
 
 import discord
 from redbot.core import commands
