@@ -36,6 +36,7 @@ class Scheduler(commands.Cog):
         def check(reaction):
             return str(reaction.emoji == '👍')
         
+        await message.ctx.send(message)
         await Red.wait_for('reaction_add', check=check)
         await ctx.send('You reacted to the message')
 
