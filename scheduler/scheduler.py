@@ -23,7 +23,7 @@ class Scheduler(commands.Cog):
     async def schedule_message(self, ctx, message, time_string):
         send_time = time.strptime(time_string, '%H:%M')
         send_delay = time.mktime(send_time) - time.mktime(datetime.datetime.now().timetuple())
-        await ctx.send(f"sending '{message}' in 10 seconds")
+        await ctx.send(f"sending '{message}' at {time_string}")
         await asyncio.sleep(send_delay)
         await ctx.send(message)
 
