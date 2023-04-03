@@ -1,3 +1,6 @@
+import datetime
+from scheduler import Scheduler
+
 import discord
 from redbot.core import commands
 from redbot.core.bot import Red
@@ -9,6 +12,10 @@ class Scheduler(commands.Cog):
     def __init__(self, bot: Red) -> None:
         self.bot = bot
 
-    @commands.command(name='test')
-    async def test(self, ctx):
-        await ctx.send('test')
+    @commands.group(name='schedule', help='Commands for scheduling events and reminders')
+    async def schedule(self, ctx):
+        pass
+
+    @commands.command(name='message', parent='schedule', help='Schedule a message to send in 15 seconds')
+    async def schedule_message(self, ctx, message):
+        Scheduler.schedule_message(ctx, message, datetime.timedelta(seconds=15))

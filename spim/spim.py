@@ -168,7 +168,7 @@ class Spim(commands.Cog):
     # SERVER COMMANDS #
     ###################
 
-    @commands.group(name='server', help='Commands for aws server management')
+    @commands.group(name='server', help='Commands for AWS server management')
     async def server(self, ctx):
         """Group for server commands"""
         pass
