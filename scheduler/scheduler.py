@@ -2,6 +2,7 @@ import datetime
 import time
 import sched
 import asyncio
+from dateutil import parser
 
 import discord
 from redbot.core import commands
@@ -21,8 +22,9 @@ class Scheduler(commands.Cog):
 
     @commands.command(name='message', parent=schedule, help='Schedule a message to send at specified time using `HH:MM` format')
     async def schedule_message(self, ctx, message, time_string):
+        send_time = parser.parse(time_string)
         current_time = datetime.datetime.now()
-        send_time = datetime.datetime.combine(datetime.datetime.today(), datetime.datetime.strptime(time_string, '%H:%M').time())
+        # send_time = datetime.datetime.combine(datetime.datetime.today(), datetime.datetime.strptime(time_string, '%H:%M').time())
         send_delay = (send_time - current_time).total_seconds()
         await ctx.send(f"It is {current_time.time().isoformat('auto')}. Sending '{message}' at {send_time.time().isoformat('auto')} in {send_delay} seconds")
         await asyncio.sleep(send_delay)
