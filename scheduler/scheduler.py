@@ -28,3 +28,18 @@ class Scheduler(commands.Cog):
         await ctx.send(f"It is {current_time.time().isoformat('auto')}. Sending '{message}' at {send_time.time().isoformat('auto')} in {send_delay} seconds")
         await asyncio.sleep(send_delay)
         await ctx.send(message)
+
+    @commands.command(name='react-test', help='Send a message and print any reactions that are added')
+    async def react_test(self, ctx):
+        await ctx.send('React to this message with something')
+
+    @Red.event
+    async def on_message(message):
+
+        ctx=message.ctx
+
+        def check(reaction):
+            return str(reaction.emoji == '👍')
+        
+        await Red.wait_for('reaction_add', check=check)
+        
