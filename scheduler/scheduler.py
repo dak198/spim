@@ -22,7 +22,7 @@ class Scheduler(commands.Cog):
     @commands.command(name='message', parent=schedule, help='Schedule a message to send in 10 seconds')
     async def schedule_message(self, ctx, message):
         await ctx.send(f"sending '{message}' in 10 seconds")
-        send_time = time.mktime((datetime.datetime.now() - datetime.timedelta(seconds=10)).time())
+        send_time = time.mktime((datetime.datetime.now() - datetime.timedelta(seconds=10)).timetuple())
         scheduler_e = self.scheduler.enterabs(send_time, 1, self.send_message, (ctx, message))
         self.scheduler.run()
 
