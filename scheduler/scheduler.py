@@ -10,7 +10,6 @@ class Scheduler(commands.Cog):
     
     def __init__(self, bot: Red) -> None:
         self.bot = bot
-        self.scheduler = Scheduler(bot)
 
     @commands.group(name='schedule', help='Commands for scheduling events and reminders')
     async def schedule(self, ctx):
