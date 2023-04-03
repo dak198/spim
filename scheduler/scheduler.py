@@ -11,7 +11,7 @@ from redbot.core.config import Config
 
 class Scheduler(commands.Cog):
     """Scheduler for events and reminders"""
-    
+
     def __init__(self, bot: Red) -> None:
         self.bot = bot
         self.scheduler = sched.scheduler(time.time, asyncio.sleep)
@@ -28,7 +28,7 @@ class Scheduler(commands.Cog):
         await ctx.send(f"It is {current_time.time().isoformat('auto')}. Sending '{message}' at {send_time.time().isoformat('auto')} in {send_delay} seconds")
         await asyncio.sleep(send_delay)
         await ctx.send(message)
-        
+
     @commands.command(name='react-test', help='Send a message and print any reactions that are added')
     async def react_test(self, ctx):
 
