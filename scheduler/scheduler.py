@@ -24,12 +24,7 @@ class Scheduler(commands.Cog):
     async def schedule_message(self, ctx, message, time_string):
         send_time = parser.parse(time_string)
         current_time = datetime.datetime.now()
-        # send_time = datetime.datetime.combine(datetime.datetime.today(), datetime.datetime.strptime(time_string, '%H:%M').time())
-        send_delay = (send_time - current_time).total_seconds()
+        send_delay = (send_time - datetime.datetime.now()).total_seconds()
         await ctx.send(f"It is {current_time.time().isoformat('auto')}. Sending '{message}' at {send_time.time().isoformat('auto')} in {send_delay} seconds")
         await asyncio.sleep(send_delay)
         await ctx.send(message)
-
-    async def send_message(self, ctx, message):
-        await ctx.send(message)
-
