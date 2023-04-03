@@ -15,9 +15,7 @@ RequestType = Literal["discord_deleted_user", "owner", "user", "user_strict"]
 
 
 class Spim(commands.Cog):
-    """
-    Cogs for Red-DiscordBot V3 for use in Gear Getaway
-    """
+    """Cogs for Red-DiscordBot V3 for use in Gear Getaway"""
 
     def __init__(self, bot: Red) -> None:
         self.data = load(open('home/ec2-user/data.json'))
