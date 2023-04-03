@@ -22,7 +22,7 @@ class Scheduler(commands.Cog):
 
     @commands.command(name='message', parent=schedule, help='Schedule a message to send at specified time using `HH:MM` format')
     async def schedule_message(self, ctx, message, *time_string):
-        send_time = parser.parse(timestr=time_string, fuzzy=True)
+        send_time = parser.parse(timestr=' '.join(time_string), fuzzy=True)
         current_time = datetime.datetime.now()
         send_delay = (send_time - datetime.datetime.now()).total_seconds()
         await ctx.send(f"It is {current_time.time().isoformat('auto')}. Sending '{message}' at {send_time.time().isoformat('auto')} in {send_delay} seconds")
