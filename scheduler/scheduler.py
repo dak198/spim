@@ -32,7 +32,8 @@ class Scheduler(commands.Cog):
     @commands.command(name='react-test', help='Send a message and print any reactions that are added')
     async def react_test(self, ctx):
 
-        def check(reaction):
+        async def check(*reaction):
+            await ctx.send(str(reaction))
             return str(reaction.emoji == '👍')
 
         message = 'React to this message with something'
