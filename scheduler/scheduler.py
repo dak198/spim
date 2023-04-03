@@ -37,5 +37,5 @@ class Scheduler(commands.Cog):
 
         message = 'React to this message with something'
         await ctx.send(message)
-        await Red.wait_for('reaction_add', check=check)
+        await self.bot.wait_for('reaction_add', check=check)
         await ctx.send('You reacted to the message')
