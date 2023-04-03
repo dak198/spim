@@ -29,19 +29,16 @@ class Scheduler(commands.Cog):
         await asyncio.sleep(send_delay)
         await ctx.send(message)
 
-    async def on_message(self, message):
-
-        ctx=message.ctx
+    async def on_message(self, ctx, message):
 
         def check(reaction):
             return str(reaction.emoji == '👍')
         
-        await message.ctx.send(message)
+        await ctx.send(message)
         await Red.wait_for('reaction_add', check=check)
         await ctx.send('You reacted to the message')
 
     @commands.command(name='react-test', help='Send a message and print any reactions that are added')
     async def react_test(self, ctx):
         message = 'React to this message with something'
-        self.on_message(message)
-        
+        self.on_message(ctx, message)
