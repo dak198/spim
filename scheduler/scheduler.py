@@ -33,7 +33,7 @@ class Scheduler(commands.Cog):
     async def react_test(self, ctx):
 
         def check(reaction, user):
-            return str(reaction.emoji) == '👍'
+            return str(reaction.emoji) == '<:spimPog:772261869858848779>'
 
         message = 'React to this message with something'
         await ctx.send(message)
