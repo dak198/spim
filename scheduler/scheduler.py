@@ -29,7 +29,7 @@ class Scheduler(commands.Cog):
         await asyncio.sleep(send_delay)
         await ctx.send(message)
 
-    async def on_message(message):
+    async def on_message(self, message):
 
         ctx=message.ctx
 
