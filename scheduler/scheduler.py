@@ -17,4 +17,5 @@ class Scheduler(commands.Cog):
 
     @commands.command(name='message', parent='schedule', help='Schedule a message to send in 15 seconds')
     async def schedule_message(self, ctx, message):
+        await ctx.send(f"sending '{message}' in 15 seconds")
         Scheduler.schedule_message(ctx, message, datetime.timedelta(seconds=15))
