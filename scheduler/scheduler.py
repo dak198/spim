@@ -32,12 +32,12 @@ class Scheduler(commands.Cog):
 
     @commands.command(name='react-test', help='Send a message and print any reactions that are added')
     async def react_test(self, ctx):
+        message_string = 'React to this message with something'
+        message = await ctx.send(message_string)
 
         def check(reaction, user):
-            return str(reaction.emoji) == '<:spimPog:772261869858848779>'
-
-        message = 'React to this message with something'
-        await ctx.send(message)
+            return str(reaction.emoji) == '<:spimPog:772261869858848779>' and reaction.message == message
+        
         try:
             reaction, user = await self.bot.wait_for('reaction_add', check=check)
         finally:
