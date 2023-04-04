@@ -16,7 +16,6 @@ class Scheduler(commands.Cog):
         self.bot = bot
         self.scheduler = sched.scheduler(time.time, asyncio.sleep)
         self.events = {}
-        self.bot.intents.reactions = True
 
     @commands.group(name='schedule', help='Commands for scheduling events and reminders')
     async def schedule(self, ctx):
@@ -59,7 +58,10 @@ class Scheduler(commands.Cog):
         await message.add_reaction('<:spimPog:772261869858848779>')
         await message.add_reaction('<:spimPause:987933390110089216>')
         for _ in range(5):
-            await ctx.send(str(message.reactions))
+            await ctx.send('Printing reaction list...')
+            for e in message.reactions:
+                await ctx.send(str(e.emoji))
+            await ctx.send('Done')
             await asyncio.sleep(5)
 
         def check(reaction, user):
