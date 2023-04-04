@@ -59,6 +59,6 @@ class Scheduler(commands.Cog):
     async def cancel_event(self, ctx, name):
         event = self.events.pop(name, None)
         if event:
-            ctx.send(f"Removed {event['name']}")
+            await ctx.send(f"Removed {event['name']}")
         else:
-            ctx.send(f'{name} not found in events list')
+            await ctx.send(f'{name} not found in events list')
