@@ -15,6 +15,7 @@ class Scheduler(commands.Cog):
     def __init__(self, bot: Red) -> None:
         self.bot = bot
         self.scheduler = sched.scheduler(time.time, asyncio.sleep)
+        self.events = {}
 
     @commands.group(name='schedule', help='Commands for scheduling events and reminders')
     async def schedule(self, ctx):
@@ -42,3 +43,22 @@ class Scheduler(commands.Cog):
         finally:
             await ctx.send(f'{user} reacted to the message with {reaction}')
             # I am in your walls 😳
+
+    @commands.command(name='event', parent=schedule, help='Schedule a new event')
+    async def schedule_event(self, ctx, name, *time_string):
+        self.events[name] = {
+            'time': parser.parse(timestr=' '.join(time_string), fuzzy=True),
+            'attending': [],
+            'absent': []
+        }
+
+        send_delay = (self.events[name]['time'] - datetime.datetime.now()).total_seconds()
+        await ctx.send(f"Scheduling {name} at {self.events[name]['time'].time().isoformat('auto')}")
+
+    @commands.command(name='cancel', parent=schedule, help='Cancel a scheduled event')
+    async def cancel_event(self, ctx, name):
+        event = self.events.pop(name, None)
+        if event:
+            ctx.send(f"Removed {event['name']}")
+        else:
+            ctx.send(f'{name} not found in events list')
