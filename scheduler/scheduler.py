@@ -56,6 +56,7 @@ class Scheduler(commands.Cog):
 
         message = await ctx.send(f"Scheduling {name} at {self.events[name]['time'].time().isoformat('auto')}")
         await message.add_reaction('<:spimPog:772261869858848779>')
+        await ctx.send(message.reactions)
         spimPog_react = list(filter(lambda i: str(i.emoji) == '<:spimPog:772261869858848779>', message.reactions))[0]
         await message.add_reaction('<:spimPause:987933390110089216>')
         spimPause_react = list(filter(lambda i: str(i.emoji) == '<:spimPause:987933390110089216>', message.reactions))[0]
