@@ -66,5 +66,7 @@ class Scheduler(commands.Cog):
         else:
             await ctx.send(f'{name} not found in events list')
 
-    async def on_reaction_add(self, ctx):
-        await ctx.send('Reaction added')
+    async def on_message(self, message):
+        if message.author == self.user:
+            return
+        await message.channel.send('Message sent')
