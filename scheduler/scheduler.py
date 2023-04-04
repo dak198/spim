@@ -50,8 +50,6 @@ class Scheduler(commands.Cog):
     async def schedule_event(self, ctx, name, *time_string):
         self.events[name] = {
             'time': parser.parse(timestr=' '.join(time_string), fuzzy=True),
-            'attending': [],
-            'absent': []
         }
 
         message = await ctx.send(f"Scheduling {name} at {self.events[name]['time'].time().isoformat('auto')}")
@@ -69,10 +67,8 @@ class Scheduler(commands.Cog):
             await reaction.message.clear_reaction(emoji)
         else:
             if emoji == '<:spimPog:772261869858848779>':
-                self.events[name]['attending'].push(user)
                 await ctx.send(f'{user} is attending {name}')
             else:
-                self.events[name]['absent'].push(user)
                 await ctx.send(f'{user} is not attending {name}')
 
     @commands.command(name='cancel', parent=schedule, help='Cancel a scheduled event')
