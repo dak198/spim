@@ -56,29 +56,25 @@ class Scheduler(commands.Cog):
 
         message = await ctx.send(f"Scheduling {name} at {self.events[name]['time'].time().isoformat('auto')}")
         await message.add_reaction('<:spimPog:772261869858848779>')
-        await ctx.send(message.reactions)
-        spimPog_react = list(filter(lambda i: str(i.emoji) == '<:spimPog:772261869858848779>', message.reactions))[0]
         await message.add_reaction('<:spimPause:987933390110089216>')
-        spimPause_react = list(filter(lambda i: str(i.emoji) == '<:spimPause:987933390110089216>', message.reactions))[0]
+        await ctx.send(message.reactions)
 
         def check(reaction, user):
             return (str(reaction.emoji) == '<:spimPog:772261869858848779>' or str(reaction.emoji) == '<:spimPause:987933390110089216>') and reaction.message == message
 
         send_delay = (self.events[name]['time'] - datetime.datetime.now()).total_seconds()
-
-        while spimPog_react.count + spimPause_react.count < 4:
-            try:
-                reaction, user = await self.bot.wait_for('reaction_add', check=check)
-                emoji = str(reaction.emoji)
-            except emoji != '<:spimPog:772261869858848779>' and emoji != '<:spimPause:987933390110089216>':
-                await reaction.message.clear_reaction(emoji)
+        try:
+            reaction, user = await self.bot.wait_for('reaction_add', check=check)
+            emoji = str(reaction.emoji)
+        except emoji != '<:spimPog:772261869858848779>' and emoji != '<:spimPause:987933390110089216>':
+            await reaction.message.clear_reaction(emoji)
+        else:
+            if emoji == '<:spimPog:772261869858848779>':
+                self.events[name]['attending'].push(user)
+                await ctx.send(f'{user} is attending {name}')
             else:
-                if emoji == '<:spimPog:772261869858848779>':
-                    self.events[name]['attending'].push(user)
-                    await ctx.send(f'{user} is attending {name}')
-                else:
-                    self.events[name]['absent'].push(user)
-                    await ctx.send(f'{user} is not attending {name}')
+                self.events[name]['absent'].push(user)
+                await ctx.send(f'{user} is not attending {name}')
 
     @commands.command(name='cancel', parent=schedule, help='Cancel a scheduled event')
     async def cancel_event(self, ctx, name):
