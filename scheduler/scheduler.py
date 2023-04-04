@@ -65,9 +65,3 @@ class Scheduler(commands.Cog):
             await ctx.send(f"Removed {name}")
         else:
             await ctx.send(f'{name} not found in events list')
-
-    @Red.event
-    async def on_message(self, message):
-        if message.author == self.user:
-            return
-        await message.channel.send('Message sent')
