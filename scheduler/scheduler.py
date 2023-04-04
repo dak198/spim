@@ -66,6 +66,7 @@ class Scheduler(commands.Cog):
         else:
             await ctx.send(f'{name} not found in events list')
 
+    @Red.event
     async def on_message(self, message):
         if message.author == self.user:
             return
