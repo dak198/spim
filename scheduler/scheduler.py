@@ -16,6 +16,7 @@ class Scheduler(commands.Cog):
         self.bot = bot
         self.scheduler = sched.scheduler(time.time, asyncio.sleep)
         self.events = {}
+        self.bot.intents.reactions = True
 
     @commands.group(name='schedule', help='Commands for scheduling events and reminders')
     async def schedule(self, ctx):
