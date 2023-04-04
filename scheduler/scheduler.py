@@ -56,10 +56,11 @@ class Scheduler(commands.Cog):
 
         message = await ctx.send(f"Scheduling {name} at {self.events[name]['time'].time().isoformat('auto')}")
         await message.add_reaction('<:spimPog:772261869858848779>')
-        spimPog_react = [list(filter(lambda i: i.emoji == '<:spimPog:772261869858848779>', message.reactions('<:spimPog:772261869858848779>')))][0]
-        await ctx.send(spimPog_react)
+        spimPog_react = filter(lambda i: i.emoji == '<:spimPog:772261869858848779>', message.reactions('<:spimPog:772261869858848779>'))
+        await ctx.send(list(spimPog_react))
         await message.add_reaction('<:spimPause:987933390110089216>')
-        spimPause_react = [list(filter(lambda i: i.emoji == '<:spimPause:987933390110089216>', message.reactions('<:spimPog:772261869858848779>')))][0]
+        spimPause_react = filter(lambda i: i.emoji == '<:spimPause:987933390110089216>', message.reactions('<:spimPog:772261869858848779>'))
+        await ctx.send(list(spimPause_react))
 
         def check(reaction, user):
             return (str(reaction.emoji) == '<:spimPog:772261869858848779>' or str(reaction.emoji) == '<:spimPause:987933390110089216>') and reaction.message == message
