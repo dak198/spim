@@ -42,7 +42,8 @@ class Scheduler(commands.Cog):
             reaction, user = await self.bot.wait_for('reaction_add', check=check)
         finally:
             await ctx.send(f'{user} reacted to the message with {reaction}')
-            await ctx.send(f'{reaction.message}')
+            await reaction.message.add_reaction('<:spimPog:772261869858848779>')
+            # await ctx.send(f'{reaction.message}')
             # I am in your walls 😳
 
     @commands.command(name='event', parent=schedule, help='Schedule a new event')
