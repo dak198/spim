@@ -1,6 +1,7 @@
 from typing import Literal
 from time import strftime
 from json import load
+from random import shuffle
 import asyncio
 
 import discord
@@ -160,6 +161,14 @@ class Spim(commands.Cog):
         for i in range(number):
             await ctx.send(str(i+1))
             await asyncio.sleep(5)
+
+    @commands.command(name='spimify', help='Reacts with every Spim emote to a message you reply to with this command')
+    async def spimify(self, ctx):
+        spims = shuffle(['<:spimPog:772261869858848779>', '<:spimPogR:775434707231047680>', '<:spimBall:1066624826086793366>', '<:spimPride:988519886479327242>', '<:spimThink:949780590121607209>', '<:spinta:1041857241600507924>'])
+        channel = ctx.channel
+        message = await channel.fetch_message(ctx.message.reference.message_id)
+        for s in spims:
+            await message.add_reaction(s)
 
 
     ###################
