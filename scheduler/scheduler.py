@@ -2,6 +2,7 @@ import datetime
 import time
 import sched
 import asyncio
+import shlex
 from dateutil import parser
 
 import discord
@@ -16,6 +17,11 @@ class Scheduler(commands.Cog):
         self.bot = bot
         self.scheduler = sched.scheduler(time.time, asyncio.sleep)
         self.events = {}
+
+    @commands.command(name='flags-test', help='Test parsing arguments with flags')
+    async def flags_test(self, ctx, *, options: str):
+        options = shlex.split(options)
+        await ctx.send(options)
 
     @commands.group(name='schedule', help='Commands for scheduling events and reminders')
     async def schedule(self, ctx):
@@ -68,6 +74,5 @@ class Scheduler(commands.Cog):
 
     # @commands.Cog.listener()
     # async def on_raw_reaction_add(self, payload):
-    #     pass
     #     channel = await self.bot.fetch_channel(payload.channel_id)
     #     await channel.send('Reaction was added')
