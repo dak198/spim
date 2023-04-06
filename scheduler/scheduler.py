@@ -66,6 +66,6 @@ class Scheduler(commands.Cog):
         else:
             await ctx.send(f'{name} not found in events list')
 
-    @commands.Cog.listener()
-    async def on_reaction_add(self, ctx):
+    @commands.Cog.listener(name='reaction_add')
+    async def reaction_add(self, ctx):
         await ctx.send('Reaction was added')
