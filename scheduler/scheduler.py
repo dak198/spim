@@ -3,6 +3,7 @@ import time
 import sched
 import asyncio
 import shlex
+from iteration_utilities import grouper
 from dateutil import parser
 
 import discord
@@ -25,7 +26,8 @@ class Scheduler(commands.Cog):
 
     @commands.command(name='args-test', help='Testing the effect of double quotes on argument separation')
     async def args_test(self, ctx, *args: str):
-        for flag, arg in args:
+        for group in grouper(args, 2, fillvalue=None):
+            flag, arg = group
             if flag.startswith('--'):
                 await ctx.send(f'Flag: {flag}\nArguments: {arg}')
             else:
