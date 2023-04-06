@@ -66,7 +66,8 @@ class Scheduler(commands.Cog):
         else:
             await ctx.send(f'{name} not found in events list')
 
-    @commands.Cog.listener()
-    async def on_raw_reaction_add(self, payload):
-        channel = await self.bot.fetch_channel(payload.channel_id)
-        await channel.send('Reaction was added')
+    # @commands.Cog.listener()
+    # async def on_raw_reaction_add(self, payload):
+    #     pass
+    #     channel = await self.bot.fetch_channel(payload.channel_id)
+    #     await channel.send('Reaction was added')
