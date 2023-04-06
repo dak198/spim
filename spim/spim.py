@@ -170,7 +170,7 @@ class Spim(commands.Cog):
         message = await channel.fetch_message(ctx.message.reference.message_id)
         for s in spims:
             await message.add_reaction(s)
-        ctx.message.delete()
+        await ctx.message.delete()
 
 
     ###################
