@@ -171,6 +171,16 @@ class Spim(commands.Cog):
         await ctx.message.delete()
         for s in spims:
             await message.add_reaction(s)
+    
+    @commands.command(name='spimpoll', help='Creates a poll with <:spimPog:772261869858848779> <:spimPause:987933390110089216> <:spon:922922345134424116>')
+    async def spimpoll(self, ctx, *poll_text):
+        spims = ['<:spimPog:772261869858848779>', '<:spimPause:987933390110089216>', '<:spon:922922345134424116>']
+        channel = ctx.channel
+        if poll_text:
+            await ctx.message.delete()
+            poll_message = await ctx.send(' '.join(poll_text))
+            for s in spims:
+                await poll_message.add_reaction(s)
 
 
     ###################
