@@ -168,9 +168,9 @@ class Spim(commands.Cog):
         shuffle(spims)
         channel = ctx.channel
         message = await channel.fetch_message(ctx.message.reference.message_id)
+        await ctx.message.delete()
         for s in spims:
             await message.add_reaction(s)
-        await ctx.message.delete()
 
 
     ###################
