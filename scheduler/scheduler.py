@@ -23,6 +23,10 @@ class Scheduler(commands.Cog):
         options = shlex.split(options)
         await ctx.send(options)
 
+    @commands.command(name='args-test', help='Testing the effect of double quotes on argument separation')
+    async def args_test(self, ctx, *args):
+        await ctx.send(args)
+
     @commands.group(name='schedule', help='Commands for scheduling events and reminders')
     async def schedule(self, ctx):
         pass
