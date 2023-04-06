@@ -24,8 +24,13 @@ class Scheduler(commands.Cog):
         await ctx.send(options)
 
     @commands.command(name='args-test', help='Testing the effect of double quotes on argument separation')
-    async def args_test(self, ctx, *args):
-        await ctx.send(args)
+    async def args_test(self, ctx, *args: str):
+        for flag, arg in args:
+            if flag.startswith('--'):
+                await ctx.send(f'Flag: {flag}\nArguments: {arg}')
+            else:
+                await ctx.send('Invalid argument syntax')
+            
 
     @commands.group(name='schedule', help='Commands for scheduling events and reminders')
     async def schedule(self, ctx):
