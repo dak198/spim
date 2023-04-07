@@ -147,12 +147,12 @@ class Scheduler(commands.Cog):
     @commands.command(name='list', parent=event, help='List scheduled events')
     async def event_list(self, ctx, *event_names):
         if self.events:
-            text = '```No events scheduled```'
-        else:
             text = '```Currently scheduled events:```'
             for name in self.events:
             # text += f"```\n{name}\nTime: {event['time']}\nRepeat every: {event['repeat']} seconds\nReminds {event['remind']} seconds in advance```"
                 text += f"```{name}```"
+        else:
+            text = '```No events scheduled```'
         await ctx.send(text)
 
         
