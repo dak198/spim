@@ -148,7 +148,7 @@ class Scheduler(commands.Cog):
     async def event_list(self, ctx, *event_names):
         text = 'Currently scheduled events:'
         for name, event in self.events:
-            text += f"```\n{event}\nTime: {event['time']}\nRepeat every: {event['repeat']} seconds\nReminds {event['remind']} seconds in advance```"
+            text += f"```\n{name}\nTime: {event['time']}\nRepeat every: {event['repeat']} seconds\nReminds {event['remind']} seconds in advance```"
         await ctx.send(text)
 
         
