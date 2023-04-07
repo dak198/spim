@@ -116,8 +116,8 @@ class Scheduler(commands.Cog):
         await ctx.send(message_string)
 
         while name in self.events:
-            reminder_string = f"{name} at {parser.parse(timestr=self.events[name]['time'], fuzzy=True)}"
-            event_string = f'{name} starting now'
+            reminder_string = f"**{name}** at {parser.parse(timestr=self.events[name]['time'], fuzzy=True)}"
+            event_string = f'**{name}** starting now'
             event_delay = (parser.parse(timestr=self.events[name]['time'], fuzzy=True) - datetime.datetime.now()).total_seconds()
             remind_delay = event_delay - self.events[name]['remind']
             await asyncio.sleep(remind_delay)
