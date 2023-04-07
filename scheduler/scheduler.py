@@ -6,6 +6,7 @@ import shlex
 from pytimeparse import parse
 from iteration_utilities import grouper
 from dateutil import parser
+import json
 
 import discord
 from redbot.core import commands
@@ -18,7 +19,7 @@ class Scheduler(commands.Cog):
     def __init__(self, bot: Red) -> None:
         self.bot = bot
         self.scheduler = sched.scheduler(time.time, asyncio.sleep)
-        self.events = {}
+        self.events = load(open('home/ec2-user/events.json'))
 
     @commands.command(name='flags-test', help='Test parsing arguments with flags')
     async def flags_test(self, ctx, *, options: str):
@@ -102,6 +103,8 @@ class Scheduler(commands.Cog):
             'repeat': repeat,
             'remind': remind
         }
+        with open('home/ec2-user/events.json', 'w') as json_file:
+            json.dump(self.events, json_file, indent=4)
         message_string = f"Scheduling `{name}` at `{self.events[name]['time'].time().isoformat('auto')}`."
         if self.events[name]['repeat']:
             message_string += f' Repeating every `{repeat}` seconds.'
@@ -110,14 +113,17 @@ class Scheduler(commands.Cog):
         await ctx.send(message_string)
 
         while name in self.events:
+            reminder_string = f"**{name}** {self.events[name]['time']}"
+            event_string = f'{name} starting now'
             event_delay = (self.events[name]['time'] - datetime.datetime.now()).total_seconds()
             remind_delay = event_delay - self.events[name]['remind']
-            reminder_string = f"**{name}** {self.events[name]['time']}"
             await asyncio.sleep(remind_delay)
-            message = await ctx.send(reminder_string)
+            if remind_delay > 0:
+                message = await ctx.send(reminder_string)
             await message.add_reaction('<:spimPog:772261869858848779>')
             await message.add_reaction('<:spimPause:987933390110089216>')
             await asyncio.sleep(self.events[name]['remind'])
+            await ctx.send(event_string)
             if not self.events[name]['repeat']:
                 self.events.pop(name, None)
 
