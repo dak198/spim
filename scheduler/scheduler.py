@@ -103,9 +103,9 @@ class Scheduler(commands.Cog):
             'remind': remind
         }
         message_string = f"Scheduling {name} at {self.events[name]['time'].time().isoformat('auto')}."
-        if self.events['repeat']:
+        if self.events[name]['repeat']:
             message_string += f' Repeating every {repeat} seconds.'
-        if self.events['remind']:
+        if self.events[name]['remind']:
             message_string += f' Sending reminder {remind} seconds before event.'
         message = await ctx.send(message_string)
         await message.add_reaction('<:spimPog:772261869858848779>')
