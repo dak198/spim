@@ -121,14 +121,18 @@ class Scheduler(commands.Cog):
             event_delay = (parser.parse(timestr=self.events[name]['time'], fuzzy=True) - datetime.datetime.now()).total_seconds()
             remind_delay = event_delay - self.events[name]['remind']
             await asyncio.sleep(remind_delay)
-            if remind_delay > 0:
-                message = await ctx.send(reminder_string)
-            await message.add_reaction('<:spimPog:772261869858848779>')
-            await message.add_reaction('<:spimPause:987933390110089216>')
+            if name in self.events:
+                if remind_delay > 0:
+                    message = await ctx.send(reminder_string)
+                    await message.add_reaction('<:spimPog:772261869858848779>')
+                    await message.add_reaction('<:spimPause:987933390110089216>')
             await asyncio.sleep(self.events[name]['remind'])
-            await ctx.send(event_string)
-            if not self.events[name]['repeat']:
-                self.events.pop(name, None)
+            if name in self.events:
+                await ctx.send(event_string)
+                if not self.events[name]['repeat']:
+                    self.events.pop(name, None)
+                    with open('home/ec2-user/events.json', 'w') as json_file:
+                        json.dump(self.events, json_file, indent=4)
 
     @commands.command(name='cancel', parent=event, help='Cancel a scheduled event')
     async def cancel_event(self, ctx, name):
@@ -139,6 +143,15 @@ class Scheduler(commands.Cog):
                 json.dump(self.events, json_file, indent=4)
         else:
             await ctx.send(f'{name} not found in events list')
+
+    @commands.command(name='list', parent=event, help='List scheduled events')
+    async def event_list(self, ctx, *event_names):
+        text = 'Currently scheduled events:'
+        for event in self.events:
+            text += f"```\n{event}\nTime: {event['time']}\nRepeat every: {event['repeat']} seconds\nReminds {event['remind']} seconds in advance```"
+        await ctx.send(text)
+
+        
 
     # @commands.Cog.listener()
     # async def on_raw_reaction_add(self, payload):
