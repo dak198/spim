@@ -48,11 +48,11 @@ class Scheduler(commands.Cog):
                 raise SyntaxError(args)
         return args_dict
 
-    @commands.group(name='schedule', help='Commands for scheduling events and reminders')
-    async def schedule(self, ctx):
+    @commands.group(name='event', help='Commands for managing events and reminders')
+    async def event(self, ctx):
         pass
 
-    @commands.command(name='message', parent=schedule, help='Schedule a message to send at specified time using `HH:MM` format')
+    @commands.command(name='message', parent=event, help='Schedule a message to send at specified time using `HH:MM` format')
     async def schedule_message(self, ctx, message, *time_string):
         send_time = parser.parse(timestr=' '.join(time_string), fuzzy=True)
         current_time = datetime.datetime.now()
@@ -77,8 +77,8 @@ class Scheduler(commands.Cog):
             # await ctx.send(f'{reaction.message}')
             # I am in your walls 😳
 
-    @commands.command(name='event', parent=schedule, help='Schedule a new event')
-    async def schedule_event(self, ctx, *args):
+    @commands.command(name='schedule', parent=event, help='Schedule a new event')
+    async def event_schedule(self, ctx, *args):
         options = self.parse_args(*args)
         if options['--name']:
             name = options['--name']
@@ -130,7 +130,7 @@ class Scheduler(commands.Cog):
             if not self.events[name]['repeat']:
                 self.events.pop(name, None)
 
-    @commands.command(name='cancel', parent=schedule, help='Cancel a scheduled event')
+    @commands.command(name='cancel', parent=event, help='Cancel a scheduled event')
     async def cancel_event(self, ctx, name):
         event = self.events.pop(name, None)
         if event:
