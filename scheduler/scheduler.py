@@ -3,6 +3,7 @@ import time
 import sched
 import asyncio
 import shlex
+from pytimeparse import parse
 from iteration_utilities import grouper
 from dateutil import parser
 
@@ -32,7 +33,16 @@ class Scheduler(commands.Cog):
                 await ctx.send(f'Flag: {flag}\nArguments: {arg}')
             else:
                 await ctx.send('Invalid argument syntax')
-            
+
+    def parse_args(*args: str):
+        args_dict = {}
+        for group in grouper(args, 2, fillvalue=None):
+            flag, arg = group
+            if flag.startswith('--'):
+                args_dict[flag] = arg
+            else:
+                raise SyntaxError
+        return args_dict
 
     @commands.group(name='schedule', help='Commands for scheduling events and reminders')
     async def schedule(self, ctx):
@@ -64,12 +74,40 @@ class Scheduler(commands.Cog):
             # I am in your walls 😳
 
     @commands.command(name='event', parent=schedule, help='Schedule a new event')
-    async def schedule_event(self, ctx, name, *time_string):
+    async def schedule_event(self, ctx, *args):
+        options = self.parse_args(args)
+        if options['--name']:
+            name = options['--name']
+            if self.events[name]:
+                await ctx.send[f'Event with that name already exists']
+                return
+        else:
+            await ctx.send('Must specify event name')
+            return
+        if options['--time']:
+            event_time = options['--time']
+        else:
+            await ctx.send('No time specified, defaulting to Saturday at 3:00pm')
+            event_time = 'Saturday at 3:00pm'
+        if options['--repeat']:
+            repeat = parse(options['--repeat'], granularity='minutes')
+        else:
+            repeat = None
+        if options['--remind']:
+            remind = parse(options['--remind'], granularity='minutes')
+        else:
+            remind = None
         self.events[name] = {
-            'time': parser.parse(timestr=' '.join(time_string), fuzzy=True),
+            'time': parser.parse(timestr=event_time, fuzzy=True),
+            'repeat': repeat,
+            'remind': remind
         }
-
-        message = await ctx.send(f"Scheduling {name} at {self.events[name]['time'].time().isoformat('auto')}")
+        message_string = f"Scheduling {name} at {self.events[name]['time'].time().isoformat('auto')}."
+        if self.events['repeat']:
+            message_string += f' Repeating every {repeat} seconds.'
+        if self.events['remind']:
+            message_string += f' Sending reminder {remind} seconds before event.'
+        message = await ctx.send(message_string)
         await message.add_reaction('<:spimPog:772261869858848779>')
         await message.add_reaction('<:spimPause:987933390110089216>')
 
