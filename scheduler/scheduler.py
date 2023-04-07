@@ -41,7 +41,7 @@ class Scheduler(commands.Cog):
             if str(flag).startswith('--'):
                 args_dict[flag] = arg
             else:
-                raise SyntaxError('test')
+                raise SyntaxError(args)
         return args_dict
 
     @commands.group(name='schedule', help='Commands for scheduling events and reminders')
