@@ -34,7 +34,7 @@ class Scheduler(commands.Cog):
             else:
                 await ctx.send('Invalid argument syntax')
 
-    def parse_args(*args):
+    def parse_args(self, *args):
         args_dict = {}
         for group in grouper(args, 2, fillvalue=None):
             flag, arg = group
