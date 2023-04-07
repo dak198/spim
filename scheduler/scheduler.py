@@ -41,6 +41,7 @@ class Scheduler(commands.Cog):
             if str(flag).startswith('--'):
                 args_dict[str(flag)] = str(arg)
             else:
+                print(flag)
                 raise SyntaxError
         return args_dict
 
