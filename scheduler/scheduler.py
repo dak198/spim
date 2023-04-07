@@ -116,7 +116,7 @@ class Scheduler(commands.Cog):
         await ctx.send(message_string)
 
         while name in self.events:
-            reminder_string = f"**{name}** {parser.parse(timestr=self.events[name]['time'], fuzzy=True)}"
+            reminder_string = f"{name} at {parser.parse(timestr=self.events[name]['time'], fuzzy=True)}"
             event_string = f'{name} starting now'
             event_delay = (parser.parse(timestr=self.events[name]['time'], fuzzy=True) - datetime.datetime.now()).total_seconds()
             remind_delay = event_delay - self.events[name]['remind']
@@ -135,6 +135,8 @@ class Scheduler(commands.Cog):
         event = self.events.pop(name, None)
         if event:
             await ctx.send(f"Removed {name}")
+            with open('home/ec2-user/events.json', 'w') as json_file:
+                json.dump(self.events, json_file, indent=4)
         else:
             await ctx.send(f'{name} not found in events list')
 
