@@ -78,8 +78,8 @@ class Scheduler(commands.Cog):
         options = self.parse_args(*args)
         if options['--name']:
             name = options['--name']
-            if self.events[name]:
-                await ctx.send[f'Event with that name already exists']
+            if name in self.events:
+                await ctx.send['Event with that name already exists']
                 return
         else:
             await ctx.send('Must specify event name')
