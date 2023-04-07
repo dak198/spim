@@ -19,7 +19,7 @@ class Scheduler(commands.Cog):
     def __init__(self, bot: Red) -> None:
         self.bot = bot
         self.scheduler = sched.scheduler(time.time, asyncio.sleep)
-        self.events = json.load(open('home/ec2-user/events.json'))
+        self.events = json.load(open('home/ec2-user/events.json', 'w+'))
 
     @commands.command(name='flags-test', help='Test parsing arguments with flags')
     async def flags_test(self, ctx, *, options: str):
