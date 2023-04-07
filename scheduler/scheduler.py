@@ -34,14 +34,14 @@ class Scheduler(commands.Cog):
             else:
                 await ctx.send('Invalid argument syntax')
 
-    def parse_args(*args: str):
+    def parse_args(*args):
         args_dict = {}
         for group in grouper(args, 2, fillvalue=None):
             flag, arg = group
             if str(flag).startswith('--'):
                 args_dict[flag] = arg
             else:
-                raise SyntaxError(str(flag))
+                raise SyntaxError('test')
         return args_dict
 
     @commands.group(name='schedule', help='Commands for scheduling events and reminders')
