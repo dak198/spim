@@ -112,7 +112,7 @@ class Scheduler(commands.Cog):
         while name in self.events:
             event_delay = (self.events[name]['time'] - datetime.datetime.now()).total_seconds()
             remind_delay = event_delay - self.events[name]['remind']
-            reminder_string = f"**{self.events[name]}** {self.events[name]['time']}"
+            reminder_string = f"**{name}** {self.events[name]['time']}"
             await asyncio.sleep(remind_delay)
             message = await ctx.send(reminder_string)
             await message.add_reaction('<:spimPog:772261869858848779>')
