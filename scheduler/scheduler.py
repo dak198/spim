@@ -107,11 +107,19 @@ class Scheduler(commands.Cog):
             message_string += f' Repeating every `{repeat}` seconds.'
         if self.events[name]['remind']:
             message_string += f' Sending reminder `{remind}` seconds before event.'
-        message = await ctx.send(message_string)
-        await message.add_reaction('<:spimPog:772261869858848779>')
-        await message.add_reaction('<:spimPause:987933390110089216>')
+        await ctx.send(message_string)
 
-        send_delay = (self.events[name]['time'] - datetime.datetime.now()).total_seconds()
+        while name in self.events:
+            event_delay = (self.events[name]['time'] - datetime.datetime.now()).total_seconds()
+            remind_delay = event_delay - self.events[name]['remind']
+            reminder_string = f"**{self.events[name]}** {self.events[name]['time']}"
+            await asyncio.sleep(remind_delay)
+            message = await ctx.send(reminder_string)
+            await message.add_reaction('<:spimPog:772261869858848779>')
+            await message.add_reaction('<:spimPause:987933390110089216>')
+            await asyncio.sleep(self.events[name]['remind'])
+            if not self.events[name]['repeat']:
+                self.events.pop(name, None)
 
     @commands.command(name='cancel', parent=schedule, help='Cancel a scheduled event')
     async def cancel_event(self, ctx, name):
