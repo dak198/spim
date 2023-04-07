@@ -149,7 +149,7 @@ class Scheduler(commands.Cog):
         text = 'Currently scheduled events:'
         for name in self.events:
             # text += f"```\n{name}\nTime: {event['time']}\nRepeat every: {event['repeat']} seconds\nReminds {event['remind']} seconds in advance```"
-            ctx.send(name)
+            await ctx.send(name)
         await ctx.send(text)
 
         
