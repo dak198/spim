@@ -150,9 +150,9 @@ class Scheduler(commands.Cog):
             text = '```No events scheduled```'
         else:
             text = '```Currently scheduled events:```'
-        for name in self.events:
+            for name in self.events:
             # text += f"```\n{name}\nTime: {event['time']}\nRepeat every: {event['repeat']} seconds\nReminds {event['remind']} seconds in advance```"
-            text += f"```{name}```"
+                text += f"```{name}```"
         await ctx.send(text)
 
         
