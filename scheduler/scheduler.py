@@ -102,13 +102,13 @@ class Scheduler(commands.Cog):
         else:
             remind = None
         self.events[name] = {
-            'time': parser.parse(timestr=event_time, fuzzy=True),
+            'time': event_time,
             'repeat': repeat,
             'remind': remind
         }
         with open('home/ec2-user/events.json', 'w') as json_file:
             json.dump(self.events, json_file, indent=4)
-        message_string = f"Scheduling `{name}` at `{self.events[name]['time'].time().isoformat('auto')}`."
+        message_string = f"Scheduling `{name}` at `{parser.parse(timestr=self.events[name]['time'], fuzzy=True).time().isoformat('auto')}`."
         if self.events[name]['repeat']:
             message_string += f' Repeating every `{repeat}` seconds.'
         if self.events[name]['remind']:
@@ -116,9 +116,9 @@ class Scheduler(commands.Cog):
         await ctx.send(message_string)
 
         while name in self.events:
-            reminder_string = f"**{name}** {self.events[name]['time']}"
+            reminder_string = f"**{name}** {parser.parse(timestr=self.events[name]['time'], fuzzy=True)}"
             event_string = f'{name} starting now'
-            event_delay = (self.events[name]['time'] - datetime.datetime.now()).total_seconds()
+            event_delay = (parser.parse(timestr=self.events[name]['time'], fuzzy=True) - datetime.datetime.now()).total_seconds()
             remind_delay = event_delay - self.events[name]['remind']
             await asyncio.sleep(remind_delay)
             if remind_delay > 0:
