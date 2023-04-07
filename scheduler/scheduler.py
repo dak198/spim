@@ -39,7 +39,7 @@ class Scheduler(commands.Cog):
         for group in grouper(args, 2, fillvalue=None):
             flag, arg = group
             if str(flag).startswith('--'):
-                args_dict[str(flag)] = str(arg)
+                args_dict[flag] = arg
             else:
                 raise SyntaxError(str(flag))
         return args_dict
@@ -75,7 +75,7 @@ class Scheduler(commands.Cog):
 
     @commands.command(name='event', parent=schedule, help='Schedule a new event')
     async def schedule_event(self, ctx, *args):
-        options = self.parse_args(args)
+        options = self.parse_args(*args)
         if options['--name']:
             name = options['--name']
             if self.events[name]:
