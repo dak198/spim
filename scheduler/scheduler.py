@@ -38,8 +38,8 @@ class Scheduler(commands.Cog):
         args_dict = {}
         for group in grouper(args, 2, fillvalue=None):
             flag, arg = group
-            if flag.startswith('--'):
-                args_dict[flag] = arg
+            if str(flag).startswith('--'):
+                args_dict[str(flag)] = str(arg)
             else:
                 raise SyntaxError
         return args_dict
