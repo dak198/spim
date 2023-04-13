@@ -75,5 +75,6 @@ class Roller(commands.Cog):
                     result = 0
                     for i in range(a):
                         result += random.randint(1, b)
+                    return result
                 else:
                     raise ValueError(f"Unsupported op '{self.op}'")
