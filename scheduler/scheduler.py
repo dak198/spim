@@ -129,7 +129,9 @@ class Scheduler(commands.Cog):
             await asyncio.sleep(self.events[name]['remind'])
             if name in self.events:
                 await ctx.send(event_string)
-                if not self.events[name]['repeat']:
+                if self.events[name]['repeat']:
+                    self.events[name]['time'] = parser.parse(timestr=self.events[name]['time'], fuzzy=True) + datetime.timedelta(seconds=self.events[name]['repeat'])
+                else:
                     self.events.pop(name, None)
                     with open('home/ec2-user/events.json', 'w') as json_file:
                         json.dump(self.events, json_file, indent=4)
@@ -147,10 +149,10 @@ class Scheduler(commands.Cog):
     @commands.command(name='list', parent=event, help='List scheduled events')
     async def event_list(self, ctx, *event_names):
         if self.events:
-            text = '```Currently scheduled events:```'
+            text = 'Currently scheduled events:'
             for name in self.events:
-            # text += f"```\n{name}\nTime: {event['time']}\nRepeat every: {event['repeat']} seconds\nReminds {event['remind']} seconds in advance```"
-                text += f"```{name}```"
+                event = self.events[name]
+                text += f"```\n{name}\nTime: {event['time']}\nRepeats interval: {event['repeat']} seconds\nReminder: {event['remind']} seconds prior```"
         else:
             text = '```No events scheduled```'
         await ctx.send(text)
