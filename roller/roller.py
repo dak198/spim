@@ -72,6 +72,7 @@ class Roller(commands.Cog):
                 elif self.op == '^':
                     return pow(a, b)
                 elif self.op == 'd':
-                    return a * random.randint(1, b)
+                    for i in range(a):
+                        result += random.randint(1, b)
                 else:
                     raise ValueError(f"Unsupported op '{self.op}'")
