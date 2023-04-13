@@ -72,6 +72,7 @@ class Roller(commands.Cog):
                 elif self.op == '^':
                     return pow(a, b)
                 elif self.op == 'd':
+                    result = 0
                     for i in range(a):
                         result += random.randint(1, b)
                 else:
