@@ -1,5 +1,6 @@
 import random
 import re
+import math
 
 import discord
 from redbot.core import commands
@@ -63,8 +64,14 @@ class Roller(commands.Cog):
                 elif self.op == '*':
                     return a * b
                 elif self.op == '/':
-                    return a / b
+                    result = a / b
+                    if result == math.ceil(result):
+                        return math.ceil(result)
+                    else:
+                        return result
                 elif self.op == '^':
                     return pow(a, b)
+                elif self.op == 'd':
+                    return a * random.randint(1, b)
                 else:
                     raise ValueError(f"Unsupported op '{self.op}'")
