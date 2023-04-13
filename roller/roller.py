@@ -43,6 +43,12 @@ class Roller(commands.Cog):
                 self.const = None
             else:
                 raise TypeError(f"__init__() takes 1 or 3 arguments but {len(args)} were given")
+        
+        def __repr__(self):
+            if self.const:
+                return repr(self.const)
+            else:
+                return f"{repr(self.a)}{self.op}{repr(self.b)}"
 
         def evaluate(self):
             if self.const:
