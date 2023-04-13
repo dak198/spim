@@ -16,8 +16,8 @@ class Roller(commands.Cog):
 
     @commands.command(name="roll", help="output a random roll for a given combination of dice")
     async def roll(self, ctx, *input_string):
-        a = input_string[0]
-        b = input_string[2]
+        a = self.Expression(int(input_string[0]))
+        b = self.Expression(int(input_string[2]))
         op = input_string[1]
         expression = self.Expression(a, b, op)
         result = expression.evaluate()
