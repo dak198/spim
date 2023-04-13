@@ -28,6 +28,7 @@ class Roller(commands.Cog):
         def __init__(self, *args):
             if len(args) == 1:
                 self.const = args[0]
+                self.a = self.b = self.op = None
             elif len(args) == 3:
                 a = args[0]
                 b = args[1]
@@ -39,6 +40,7 @@ class Roller(commands.Cog):
                 self.op = op
                 self.a = a
                 self.b = b
+                self.const = None
             else:
                 raise TypeError(f"__init__() takes 1 or 3 arguments but {len(args)} were given")
 
