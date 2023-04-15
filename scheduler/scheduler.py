@@ -24,20 +24,6 @@ class Scheduler(commands.Cog):
         except FileNotFoundError:
             self.events = {}
 
-    @commands.command(name='flags-test', help='Test parsing arguments with flags')
-    async def flags_test(self, ctx, *, options: str):
-        options = shlex.split(options)
-        await ctx.send(options)
-
-    @commands.command(name='args-test', help='Testing the effect of double quotes on argument separation')
-    async def args_test(self, ctx, *args: str):
-        for group in grouper(args, 2, fillvalue=None):
-            flag, arg = group
-            if flag.startswith('--'):
-                await ctx.send(f'Flag: {flag}\nArguments: {arg}')
-            else:
-                await ctx.send('Invalid argument syntax')
-
     def parse_args(self, *args):
         args_dict = {}
         for group in grouper(args, 2, fillvalue=None):
@@ -60,22 +46,6 @@ class Scheduler(commands.Cog):
         await ctx.send(f"It is {current_time.time().isoformat('auto')}. Sending '{message}' at {send_time.time().isoformat('auto')} in {send_delay} seconds")
         await asyncio.sleep(send_delay)
         await ctx.send(message)
-
-    @commands.command(name='react-test', help='Send a message and print any reactions that are added')
-    async def react_test(self, ctx):
-        message_string = 'React to this message with something'
-        message = await ctx.send(message_string)
-
-        def check(reaction, user):
-            return str(reaction.emoji) == '<:spimPog:772261869858848779>' and reaction.message == message
-        
-        try:
-            reaction, user = await self.bot.wait_for('reaction_add', check=check)
-        finally:
-            await ctx.send(f'{user} reacted to the message with {reaction}')
-            await reaction.message.add_reaction('<:spimPog:772261869858848779>')
-            # await ctx.send(f'{reaction.message}')
-            # I am in your walls 😳
 
     @commands.command(name='schedule', parent=event, help='Schedule a new event')
     async def event_schedule(self, ctx, *args):
