@@ -105,8 +105,8 @@ class Scheduler(commands.Cog):
             'time': event_time,
             'repeat': repeat,
             'remind': remind,
-            'attending': [],
-            'absent': []
+            'attending': {},
+            'absent': {}
         }
         with open('home/ec2-user/events.json', 'w') as json_file:
             json.dump(self.events, json_file, indent=4)
@@ -170,7 +170,7 @@ class Scheduler(commands.Cog):
         message_id = payload.message_id
         message = await self.bot.get_channel(payload.channel_id).fetch_message(message_id)
         # await message.channel.send(f"{emoji} added by {user} to message {message_id}")
-        if user != self.bot.user:
+        if user_id != self.bot.user.id:
             for name in self.events:
                 # await message.channel.send(name)
                 event = self.events[name]
@@ -178,18 +178,18 @@ class Scheduler(commands.Cog):
                     # await message.channel.send('message-id matches')
                     if emoji.name == 'spimPog':
                         # await message.channel.send('<:spimPog:772261869858848779>')
-                        if user in event['absent']:
-                            event['absent'].remove(user)
+                        if user.id in event['absent']:
+                            event['absent'].pop(user.id)
                             await message.remove_reaction('<:spon:922922345134424116>', user)
-                        if not user in event['attending']:
-                            event['attending'].append(user)
+                        if not user.id in event['attending']:
+                            event['attending'][user.id] = user.display_name
                     elif emoji.name == 'spon':
                         # await message.channel.send('<:spon:922922345134424116>')
-                        if user in event['attending']:
-                            event['attending'].remove(user)
+                        if user.id in event['attending']:
+                            event['attending'].pop(user.id)
                             await message.remove_reaction('<:spon:922922345134424116>', user)
-                        if not user in self.events['absent']:
-                            event['absent'].append(user)
+                        if not user.id in self.events['absent']:
+                            event['absent'][user.id] = user.display_name
                     # else:
                         # await message.channel.send(f"`{emoji.name} != spimPog or spon`")
                     with open('home/ec2-user/events.json', 'w') as json_file:
