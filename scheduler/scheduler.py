@@ -158,7 +158,13 @@ class Scheduler(commands.Cog):
             text = 'Currently scheduled events:'
             for name in self.events:
                 event = self.events[name]
-                text += f"```\n{name}\nTime: {event['time']}\nRepeats interval: {event['repeat']} seconds\nReminder: {event['remind']} seconds prior```"
+                attend_string = None
+                for user_id, display_name in event['attending']:
+                    attend_string += f"\n{display_name}"
+                absent_string = None
+                for user_id, display_name in event['absent']:
+                    absent_string += f"\n{display_name}"
+                text += f"```\n{name}\nTime: {event['time']}\nRepeats interval: {event['repeat']} seconds\nReminder: {event['remind']} seconds prior\nAttending: {attend_string}\nAbsent: {absent_string}```"
         else:
             text = '```No events scheduled```'
         await ctx.send(text)
