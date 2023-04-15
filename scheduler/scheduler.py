@@ -171,6 +171,7 @@ class Scheduler(commands.Cog):
         message = await self.bot.get_channel(payload.channel_id).fetch_message(message_id)
         # await message.channel.send(f"{emoji} added by {user} to message {message_id}")
         for name in self.events:
+            await message.channel.send(name)
             event = self.events[name]
             if message_id == event['message-id']:
                 if emoji == '<:spimPog:772261869858848779>':
