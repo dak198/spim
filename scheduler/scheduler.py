@@ -128,6 +128,8 @@ class Scheduler(commands.Cog):
                     message = await ctx.send(reminder_string)
                     message_id = message.id
                     self.events[name]['message-id'] = message_id
+                    with open('home/ec2-user/events.json', 'w') as json_file:
+                        json.dump(self.events, json_file, indent=4)
                     await message.add_reaction('<:spimPog:772261869858848779>')
                     await message.add_reaction('<:spimPause:987933390110089216>')
             await asyncio.sleep(self.events[name]['remind'])
@@ -167,19 +169,20 @@ class Scheduler(commands.Cog):
         emoji = payload.emoji
         message_id = payload.message_id
         message = await self.bot.get_channel(payload.channel_id).fetch_message(message_id)
-        await message.channel.send(f"{emoji} added by {user} to message {message_id}")
+        # await message.channel.send(f"{emoji} added by {user} to message {message_id}")
         for name in self.events:
-            if message_id == self.events[name]['message-id']:
+            event = self.events[name]
+            if message_id == event['message-id']:
                 if emoji == '<:spimPog:772261869858848779>':
-                    if user in self.events[name]['absent']:
-                        self.events[name]['absent'].remove(user)
+                    if user in event['absent']:
+                        event['absent'].remove(user)
                         await message.remove_reaction('<:spon:922922345134424116>', user)
-                    if not user in self.events[name]['attending']:
-                        self.events[name]['attending'].append(user)
+                    if not user in event['attending']:
+                        event['attending'].append(user)
                 elif emoji == '<:spon:922922345134424116>':
-                    if user in self.events[name]['attending']:
-                        self.events[name]['attending'].remove(user)
+                    if user in event['attending']:
+                        event['attending'].remove(user)
                         await message.remove_reaction('<:spon:922922345134424116>', user)
                     if not user in self.events['absent']:
-                        self.events[name]['absent'].append(user)
+                        event['absent'].append(user)
                         
