@@ -131,7 +131,7 @@ class Scheduler(commands.Cog):
                     with open('home/ec2-user/events.json', 'w') as json_file:
                         json.dump(self.events, json_file, indent=4)
                     await message.add_reaction('<:spimPog:772261869858848779>')
-                    await message.add_reaction('<:spimPause:987933390110089216>')
+                    await message.add_reaction('<:spon:922922345134424116>')
             await asyncio.sleep(self.events[name]['remind'])
             if name in self.events:
                 await ctx.send(event_string)
@@ -169,7 +169,7 @@ class Scheduler(commands.Cog):
         emoji = payload.emoji
         message_id = payload.message_id
         message = await self.bot.get_channel(payload.channel_id).fetch_message(message_id)
-        await message.channel.send(f"{emoji} added by {user} to message {message_id}")
+        # await message.channel.send(f"{emoji} added by {user} to message {message_id}")
         for name in self.events:
             event = self.events[name]
             if message_id == event['message-id']:
@@ -179,10 +179,13 @@ class Scheduler(commands.Cog):
                         await message.remove_reaction('<:spon:922922345134424116>', user)
                     if not user in event['attending']:
                         event['attending'].append(user)
+                    with open('home/ec2-user/events.json', 'w') as json_file:
+                        json.dump(self.events, json_file, indent=4)
                 elif emoji == '<:spon:922922345134424116>':
                     if user in event['attending']:
                         event['attending'].remove(user)
                         await message.remove_reaction('<:spon:922922345134424116>', user)
                     if not user in self.events['absent']:
                         event['absent'].append(user)
-                        
+                    with open('home/ec2-user/events.json', 'w') as json_file:
+                            json.dump(self.events, json_file, indent=4)
