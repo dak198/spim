@@ -93,7 +93,7 @@ class Scheduler(commands.Cog):
         else:
             await ctx.send('No time specified, defaulting to Saturday at 3:00pm')
             event_time = 'Saturday at 3:00pm'
-        if options['--repeat']:
+        if '--repeat' in options:
             repeat = parse(options['--repeat'], granularity='minutes')
         else:
             repeat = None
