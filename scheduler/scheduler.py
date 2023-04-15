@@ -174,7 +174,7 @@ class Scheduler(commands.Cog):
             for name in self.events:
                 # await message.channel.send(name)
                 event = self.events[name]
-                if message_id == event['message-id']
+                if message_id == event['message-id']:
                     # await message.channel.send('message-id matches')
                     if emoji.name == 'spimPog':
                         await message.channel.send('<:spimPog:772261869858848779>')
