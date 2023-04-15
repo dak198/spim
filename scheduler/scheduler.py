@@ -166,7 +166,7 @@ class Scheduler(commands.Cog):
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         user = payload.member
-        emoji = payload.emoji.name
+        emoji = payload.emoji
         message_id = payload.message_id
         message = await self.bot.get_channel(payload.channel_id).fetch_message(message_id)
         # await message.channel.send(f"{emoji} added by {user} to message {message_id}")
@@ -174,7 +174,7 @@ class Scheduler(commands.Cog):
             # await message.channel.send(name)
             event = self.events[name]
             if message_id == event['message-id']:
-                await message.channel.send('message-id matches')
+                # await message.channel.send('message-id matches')
                 if emoji == '<:spimPog:772261869858848779>':
                     await message.channel.send('<:spimPog:772261869858848779>')
                     if user in event['absent']:
@@ -194,6 +194,6 @@ class Scheduler(commands.Cog):
                     with open('home/ec2-user/events.json', 'w') as json_file:
                             json.dump(self.events, json_file, indent=4)
                 else:
-                    await message.channel.send(f"{emoji} != <:spimPog:772261869858848779> or <:spon:922922345134424116>")
+                    await message.channel.send(f"`{emoji} != <:spimPog:772261869858848779> or <:spon:922922345134424116>"`)
             else:
-                await message.channel.send(f"{message_id} != {event['message-id']}")
+                # await message.channel.send(f"{message_id} != {event['message-id']}")
