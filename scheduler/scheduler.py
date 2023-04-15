@@ -171,7 +171,7 @@ class Scheduler(commands.Cog):
         message = await self.bot.get_channel(payload.channel_id).fetch_message(message_id)
         # await message.channel.send(f"{emoji} added by {user} to message {message_id}")
         for name in self.events:
-            await message.channel.send(name)
+            # await message.channel.send(name)
             event = self.events[name]
             if message_id == event['message-id']:
                 await message.channel.send('message-id matches')
@@ -193,5 +193,7 @@ class Scheduler(commands.Cog):
                         event['absent'].append(user)
                     with open('home/ec2-user/events.json', 'w') as json_file:
                             json.dump(self.events, json_file, indent=4)
+                else:
+                    await message.channel.send(f"{emoji} != <:spimPog:772261869858848779> or <:spon:922922345134424116>")
             else:
                 await message.channel.send(f"{message_id} != {event['message-id']}")
