@@ -187,7 +187,7 @@ class Scheduler(commands.Cog):
                         # await message.channel.send('<:spon:922922345134424116>')
                         if user.id in event['attending']:
                             event['attending'].pop(user.id)
-                            await message.remove_reaction('<:spon:922922345134424116>', user)
+                            await message.remove_reaction('<:spimPog:772261869858848779>', user)
                         if not user.id in event['absent']:
                             event['absent'][user.id] = user.display_name
                     # else:
