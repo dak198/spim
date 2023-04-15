@@ -169,7 +169,7 @@ class Scheduler(commands.Cog):
         emoji = payload.emoji
         message_id = payload.message_id
         message = await self.bot.get_channel(payload.channel_id).fetch_message(message_id)
-        # await message.channel.send(f"{emoji} added by {user} to message {message_id}")
+        await message.channel.send(f"{emoji} added by {user} to message {message_id}")
         for name in self.events:
             event = self.events[name]
             if message_id == event['message-id']:
