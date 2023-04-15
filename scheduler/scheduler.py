@@ -175,7 +175,7 @@ class Scheduler(commands.Cog):
             event = self.events[name]
             if message_id == event['message-id']:
                 # await message.channel.send('message-id matches')
-                if emoji == '<:spimPog:772261869858848779>':
+                if emoji.name == 'spimPog':
                     await message.channel.send('<:spimPog:772261869858848779>')
                     if user in event['absent']:
                         event['absent'].remove(user)
@@ -184,7 +184,7 @@ class Scheduler(commands.Cog):
                         event['attending'].append(user)
                     with open('home/ec2-user/events.json', 'w') as json_file:
                         json.dump(self.events, json_file, indent=4)
-                elif emoji == '<:spon:922922345134424116>':
+                elif emoji.name == 'spon':
                     await message.channel.send('<:spon:922922345134424116>')
                     if user in event['attending']:
                         event['attending'].remove(user)
@@ -194,6 +194,6 @@ class Scheduler(commands.Cog):
                     with open('home/ec2-user/events.json', 'w') as json_file:
                             json.dump(self.events, json_file, indent=4)
                 else:
-                    await message.channel.send(f"`{emoji} != <:spimPog:772261869858848779> or <:spon:922922345134424116>`")
+                    await message.channel.send(f"`{emoji.name} != spimPog or spon`")
             # else:
                 # await message.channel.send(f"{message_id} != {event['message-id']}")
