@@ -169,30 +169,37 @@ class Scheduler(commands.Cog):
         emoji = payload.emoji
         message_id = payload.message_id
         message = await self.bot.get_channel(payload.channel_id).fetch_message(message_id)
-        # await message.channel.send(f"{emoji} added by {user} to message {message_id}")
         if user.id != self.bot.user.id:
             for name in self.events:
-                # await message.channel.send(name)
                 event = self.events[name]
                 if message_id == event['message-id']:
-                    # await message.channel.send('message-id matches')
                     if emoji.name == 'spimPog':
-                        # await message.channel.send('<:spimPog:772261869858848779>')
                         if user.id in event['absent']:
                             event['absent'].pop(user.id)
                             await message.remove_reaction('<:spon:922922345134424116>', user)
                         if not user.id in event['attending']:
                             event['attending'][user.id] = user.display_name
                     elif emoji.name == 'spon':
-                        # await message.channel.send('<:spon:922922345134424116>')
                         if user.id in event['attending']:
                             event['attending'].pop(user.id)
                             await message.remove_reaction('<:spimPog:772261869858848779>', user)
                         if not user.id in event['absent']:
                             event['absent'][user.id] = user.display_name
-                    # else:
-                        # await message.channel.send(f"`{emoji.name} != spimPog or spon`")
                     with open('home/ec2-user/events.json', 'w') as json_file:
                                 json.dump(self.events, json_file, indent=4)
-                # else:
-                    # await message.channel.send(f"{message_id} != {event['message-id']}")
+
+    @commands.Cog.listener()
+    async def on_raw_reaction_remove(self, payload):
+        user = payload.member
+        emoji = payload.emoji
+        message_id = payload.message_id
+        if user.id != self.bot.user.id:
+            for name in self.events:
+                event = self.events[name]
+                if message_id == event['message-id']:
+                    if emoji.name == 'spimPog':
+                        event['attending'].pop(user.id)
+                    elif emoji.name == 'spon':
+                        event['absent'].pop(user.id)
+                    with open('home/ec2-user/events.json', 'w') as json_file:
+                                json.dump(self.events, json_file, indent=4)
