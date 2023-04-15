@@ -188,7 +188,7 @@ class Scheduler(commands.Cog):
                         if user.id in event['attending']:
                             event['attending'].pop(user.id)
                             await message.remove_reaction('<:spon:922922345134424116>', user)
-                        if not user.id in self.events['absent']:
+                        if not user.id in event['absent']:
                             event['absent'][user.id] = user.display_name
                     # else:
                         # await message.channel.send(f"`{emoji.name} != spimPog or spon`")
