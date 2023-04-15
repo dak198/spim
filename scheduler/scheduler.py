@@ -158,11 +158,11 @@ class Scheduler(commands.Cog):
             text = 'Currently scheduled events:'
             for name in self.events:
                 event = self.events[name]
-                attend_string = None
+                attend_string = ""
                 for user_id in event['attending']:
                     display_name = event['attending'][user_id]
                     attend_string += f"\n- {display_name}"
-                absent_string = None
+                absent_string = ""
                 for user_id in event['absent']:
                     display_name = event['absent'][user_id]
                     absent_string += f"\n- {display_name}"
