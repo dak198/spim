@@ -126,7 +126,7 @@ class Scheduler(commands.Cog):
             if name in self.events:
                 if remind_delay > 0:
                     message = await ctx.send(reminder_string)
-                    message_id = message.reference.message_id
+                    message_id = message.message_id
                     self.events[name]['message-id'] = message_id
                     await message.add_reaction('<:spimPog:772261869858848779>')
                     await message.add_reaction('<:spimPause:987933390110089216>')
