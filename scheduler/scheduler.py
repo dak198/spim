@@ -194,6 +194,6 @@ class Scheduler(commands.Cog):
                     with open('home/ec2-user/events.json', 'w') as json_file:
                             json.dump(self.events, json_file, indent=4)
                 else:
-                    await message.channel.send(f"`{emoji} != <:spimPog:772261869858848779> or <:spon:922922345134424116>"`)
+                    await message.channel.send(f"`{emoji} != <:spimPog:772261869858848779> or <:spon:922922345134424116>`")
             else:
                 # await message.channel.send(f"{message_id} != {event['message-id']}")
