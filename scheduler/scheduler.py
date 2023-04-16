@@ -71,10 +71,16 @@ class Scheduler(commands.Cog):
             remind = parse(options['--remind'], granularity='minutes')
         else:
             remind = None
+        if '--notify' in options:
+            if options['notify'].lower() == 'true':
+                notify = True
+            else:
+                notify = False
         self.events[name] = {
             'time': event_time,
             'repeat': repeat,
             'remind': remind,
+            'notify': notify,
             'attending': {},
             'absent': {}
         }
@@ -88,13 +94,14 @@ class Scheduler(commands.Cog):
         await ctx.send(message_string)
 
         while name in self.events:
-            reminder_string = f"**{name}** at {parser.parse(timestr=self.events[name]['time'], fuzzy=True)}"
-            event_string = f'**{name}** starting now'
             event_delay = (parser.parse(timestr=self.events[name]['time'], fuzzy=True) - datetime.datetime.now()).total_seconds()
             remind_delay = event_delay - self.events[name]['remind']
             await asyncio.sleep(remind_delay)
             if name in self.events:
                 if remind_delay > 0:
+                    reminder_string = f"**{name}** at {parser.parse(timestr=self.events[name]['time'], fuzzy=True)}"
+                    if self.events[name]['notify']:
+                        reminder_string = '@everyone ' + reminder_string
                     message = await ctx.send(reminder_string)
                     message_id = message.id
                     self.events[name]['message-id'] = message_id
@@ -104,6 +111,7 @@ class Scheduler(commands.Cog):
                     await message.add_reaction('<:spon:922922345134424116>')
             await asyncio.sleep(self.events[name]['remind'])
             if name in self.events:
+                event_string = f'**{name}** starting now'
                 await ctx.send(event_string)
                 if self.events[name]['repeat']:
                     self.events[name]['time'] = parser.parse(timestr=self.events[name]['time'], fuzzy=True) + datetime.timedelta(seconds=self.events[name]['repeat'])
