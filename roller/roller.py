@@ -51,6 +51,8 @@ class Expression:
             self.op = '/'
         elif expr_string.find('d') >= 0:
             expr = expr_string.split('d', 1)
+            if expr[0] == '':
+                expr[0] = '1'
             self.a = Expression(expr[0])
             self.b = Expression(expr[1])
             self.op = 'd'
