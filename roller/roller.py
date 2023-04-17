@@ -19,6 +19,7 @@ class Roller(commands.Cog):
     async def roll(self, ctx, *input_string):
         # remove all whitespace from input string
         input_string = ''.join(input_string)
+        await ctx.send(input_string)
         expression = self.Expression(input_string)
         await ctx.send(expression)
         result = expression.evaluate()
