@@ -158,21 +158,22 @@ class Scheduler(commands.Cog):
         if user.id != self.bot.user.id:
             for name in self.events:
                 event = self.events[name]
-                if message_id == event['message-id']:
-                    if emoji.name == 'spimPog':
-                        if user.id in event['absent']:
-                            event['absent'].pop(user.id)
-                            await message.remove_reaction('<:spon:922922345134424116>', user)
-                        if not user.id in event['attending']:
-                            event['attending'][user.id] = user.display_name
-                    elif emoji.name == 'spon':
-                        if user.id in event['attending']:
-                            event['attending'].pop(user.id)
-                            await message.remove_reaction('<:spimPog:772261869858848779>', user)
-                        if not user.id in event['absent']:
-                            event['absent'][user.id] = user.display_name
-                    with open('home/ec2-user/events.json', 'w') as json_file:
-                                json.dump(self.events, json_file, indent=4)
+                if 'message-id' in event:
+                    if message_id == event['message-id']:
+                        if emoji.name == 'spimPog':
+                            if user.id in event['absent']:
+                                event['absent'].pop(user.id)
+                                await message.remove_reaction('<:spon:922922345134424116>', user)
+                            if not user.id in event['attending']:
+                                event['attending'][user.id] = user.display_name
+                        elif emoji.name == 'spon':
+                            if user.id in event['attending']:
+                                event['attending'].pop(user.id)
+                                await message.remove_reaction('<:spimPog:772261869858848779>', user)
+                            if not user.id in event['absent']:
+                                event['absent'][user.id] = user.display_name
+                        with open('home/ec2-user/events.json', 'w') as json_file:
+                                    json.dump(self.events, json_file, indent=4)
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
