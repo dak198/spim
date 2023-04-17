@@ -26,27 +26,27 @@ class Roller(commands.Cog):
     class Expression:
 
         def __init__(self, expr_string: str):
-            if expr_string.find('+'):
+            if expr_string.find('+') >= 0:
                 expr = expr_string.split('+', 1)
                 self.a = self.__init__(expr[0])
                 self.b = self.__init__(expr[1])
                 self.op = '+'
-            elif expr_string.find('-'):
+            elif expr_string.find('-') >= 0:
                 expr = expr_string.split('-', 1)
                 self.a = self.__init__(expr[0])
                 self.b = self.__init__(expr[1])
                 self.op = '-'
-            elif expr_string.find('*'):
+            elif expr_string.find('*') >= 0:
                 expr = expr_string.split('*', 1)
                 self.a = self.__init__(expr[0])
                 self.b = self.__init__(expr[1])
                 self.op = '*'
-            elif expr_string.find('/'):
+            elif expr_string.find('/') >= 0:
                 expr = expr_string.split('/', 1)
                 self.a = self.__init__(expr[0])
                 self.b = self.__init__(expr[1])
                 self.op = '/'
-            elif expr_string.find('d'):
+            elif expr_string.find('d') >= 0:
                 expr = expr_string.split('d', 1)
                 self.a = self.__init__(expr[0])
                 self.b = self.__init__(expr[1])
