@@ -18,10 +18,10 @@ class Roller(commands.Cog):
     @commands.command(name="roll", help="output a random roll for a given combination of dice")
     async def roll(self, ctx, *input_string):
         # remove all whitespace from input string
-        expr_string = ''.join(expr_string.split())
+        input_string = ''.join(input_string)
         expression = self.Expression(input_string)
         result = expression.evaluate()
-        await ctx.send(f'{a} {op} {b} = {result}')
+        await ctx.send(result)
 
     class Expression:
 
