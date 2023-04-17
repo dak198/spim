@@ -20,6 +20,7 @@ class Roller(commands.Cog):
         # remove all whitespace from input string
         input_string = ''.join(input_string)
         expression = self.Expression(input_string)
+        await ctx.send(expression)
         result = expression.evaluate()
         await ctx.send(result)
 
