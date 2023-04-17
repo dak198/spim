@@ -183,10 +183,11 @@ class Scheduler(commands.Cog):
         if user_id != self.bot.user.id:
             for name in self.events:
                 event = self.events[name]
-                if message_id == event['message-id']:
-                    if emoji.name == 'spimPog':
-                        event['attending'].pop(user_id, None)
-                    elif emoji.name == 'spon':
-                        event['absent'].pop(user_id, None)
-                    with open('home/ec2-user/events.json', 'w') as json_file:
-                                json.dump(self.events, json_file, indent=4)
+                if 'message-id' in event:
+                    if message_id == event['message-id']:
+                        if emoji.name == 'spimPog':
+                            event['attending'].pop(user_id, None)
+                        elif emoji.name == 'spon':
+                            event['absent'].pop(user_id, None)
+                        with open('home/ec2-user/events.json', 'w') as json_file:
+                                    json.dump(self.events, json_file, indent=4)
