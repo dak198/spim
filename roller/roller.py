@@ -28,6 +28,7 @@ class Roller(commands.Cog):
 class Expression:
 
     def __init__(self, expr_string: str):
+        self.const = None
         if expr_string.find('+') >= 0:
             expr = expr_string.split('+', 1)
             self.a = Expression(expr[0])
