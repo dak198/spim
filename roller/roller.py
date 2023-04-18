@@ -23,31 +23,64 @@ class Roller(commands.Cog):
         result = expression.evaluate()
         await ctx.send(result)
 
+def inside_paren(expr_string: str, index: int):
+    """Determines if a given index in a string is inside a set of parentheses
+    
+    Keyword arguments:
+    expr_string -- string that may contain parentheses
+    index -- index to check
+    Return: True if index is inside at least one set of parentheses, False otherwise
+    """
+    
+    leading = {
+        # number of '(' characters before the index
+        '(': expr_string.count('(', 0, index - 1),
+        # number of ')' characters before the index
+        ')': expr_string.count(')', 0, index - 1)
+    }
+    trailing = {
+        # number of '(' characters after the index
+        '(': expr_string.count('(', index + 1, len(expr_string) - 1),
+        # number of ')' characters after the index
+        ')': expr_string.count(')', index + 1, len(expr_string) -1)
+    }
+    # if there is at least 1 unpaired open paren before the index and at least one unpaired closing paren after the index, then the index is inside parentheses
+    return leading['('] - leading[')'] >= 1 and trailing[')'] - trailing['('] >= 1
+
 class Expression:
 
     def __init__(self, expr_string: str):
         self.const = None
-        if expr_string.find('+') >= 0:
+        # remove all leading and trailing parentheses from expression string
+        expr_string.strip('()')
+        ops = {
+            '+': expr_string.find('+'),
+            '-': expr_string.find('-'),
+            '*': expr_string.find('*'),
+            '/': expr_string.find('/'),
+            'd': expr_string.find('d')
+        }
+        if ops['+'] >= 0 and not inside_paren(expr_string, ops['+']):
             expr = expr_string.split('+', 1)
             self.a = Expression(expr[0])
             self.b = Expression(expr[1])
             self.op = '+'
-        elif expr_string.find('-') >= 0:
+        elif ops['-'] >= 0 and not inside_paren(expr_string, ops['-']):
             expr = expr_string.split('-', 1)
             self.a = Expression(expr[0])
             self.b = Expression(expr[1])
             self.op = '-'
-        elif expr_string.find('*') >= 0:
+        elif ops['*'] >= 0 and not inside_paren(expr_string, ops['*']):
             expr = expr_string.split('*', 1)
             self.a = Expression(expr[0])
             self.b = Expression(expr[1])
             self.op = '*'
-        elif expr_string.find('/') >= 0:
+        elif ops['/'] >= 0 and not inside_paren(expr_string, ops['/']):
             expr = expr_string.split('/', 1)
             self.a = Expression(expr[0])
             self.b = Expression(expr[1])
             self.op = '/'
-        elif expr_string.find('d') >= 0:
+        elif ops['d'] >= 0 and not inside_paren(expr_string, ops['d']):
             expr = expr_string.split('d', 1)
             if expr[0] == '':
                 expr[0] = '1'
@@ -62,24 +95,6 @@ class Expression:
         else:
             raise ValueError(f"No operator or constant found in string '{expr_string}'")
 
-        # if len(args) == 1:
-        #     self.const = args[0]
-        #     self.a = self.b = self.op = None
-        # elif len(args) == 3:
-        #     a = args[0]
-        #     b = args[1]
-        #     op = args[2]
-        #     if not isinstance(a, type(self)):
-        #         raise TypeError(f"Invalid argument: {type(a)} is not instance of Expression")
-        #     if not isinstance(b, type(self)):
-        #         raise TypeError(f"Invalid argument: {type(b)} is not instance of Expression")
-        #     self.op = op
-        #     self.a = a
-        #     self.b = b
-        #     self.const = None
-        # else:
-        #     raise TypeError(f"__init__() takes 1 or 3 arguments but {len(args)} were given")
-
     def __repr__(self):
         if self.const:
             return repr(self.const)
@@ -93,23 +108,24 @@ class Expression:
             a = self.a.evaluate()
             b = self.b.evaluate()
             if self.op == '+':
-                return a + b
+                result = a + b
             elif self.op == '-':
-                return a - b
+                result = a - b
             elif self.op == '*':
-                return a * b
+                result = a * b
             elif self.op == '/':
                 result = a / b
-                if result == math.ceil(result):
-                    return math.ceil(result)
-                else:
-                    return result
             elif self.op == '^':
-                return pow(a, b)
+                result = pow(a, b)
             elif self.op == 'd':
                 result = 0
                 for i in range(a):
                     result += random.randint(1, b)
-                return result
             else:
                 raise ValueError(f"Unsupported op '{self.op}'")
+            
+            # represent float as int if result is integer
+            if result == math.ceil(result):
+                    return math.ceil(result)
+            else:
+                return result
