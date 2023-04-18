@@ -52,7 +52,7 @@ class Expression:
     def __init__(self, expr_string: str):
         self.const = None
         # remove all leading and trailing parentheses from expression string
-        expr_string.strip('()')
+        expr_string = expr_string.strip('()')
         ops = {
             '+': expr_string.find('+'),
             '-': expr_string.find('-'),

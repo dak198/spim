@@ -72,7 +72,7 @@ class Scheduler(commands.Cog):
         else:
             remind = None
         if '--notify' in options:
-            if options['notify'].lower() == 'true':
+            if options['--notify'].lower() == 'true':
                 notify = True
             else:
                 notify = False
