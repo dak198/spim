@@ -47,12 +47,29 @@ def inside_paren(expr_string: str, index: int):
     # if there is at least 1 unpaired open paren before the index and at least one unpaired closing paren after the index, then the index is inside parentheses
     return leading['('] - leading[')'] >= 1 and trailing[')'] - trailing['('] >= 1
 
+def validate_parens(string: str):
+    stack = []
+
+    for c in string:
+        if c == '(':
+            stack.append('(')
+        elif c == ')':
+            if len(stack) > 0:
+                stack.pop()
+            else:
+                return False
+
+    return len(stack) == 0
+
 class Expression:
 
     def __init__(self, expr_string: str):
         self.const = None
+
         # remove all leading and trailing parentheses from expression string
-        expr_string = expr_string.strip('()')
+        while expr_string[0] == '(' and expr_string[-1] == ')' and validate_parens(expr_string[1:-1]):
+            expr_string = expr_string[1:-1]
+
         ops = {
             '+': expr_string.find('+'),
             '-': expr_string.find('-'),
