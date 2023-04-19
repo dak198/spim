@@ -74,7 +74,7 @@ class Expression:
             expr_string = expr_string[1:-1]
 
         # list of supported operators
-        ops = ['+', '-', '*', '/', 'd']
+        ops = ['+', '-', '*', '/', '^', 'd']
         # loop through operations in order of precedence
         for op in ops:
             # find an instance of the operator that is not inside parentheses if possible
