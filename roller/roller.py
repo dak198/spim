@@ -20,7 +20,7 @@ class Roller(commands.Cog):
         input_string = ''.join(input_string)
         expression = Expression(input_string)
         result = expression.evaluate()
-        message_string = result['res']
+        message_string = str(result['res'])
         for die in result['rolls']:
             message_string += f"\n{die}: {' '.join(result['rolls'][die])}"
         await ctx.send(message_string)
