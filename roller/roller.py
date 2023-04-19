@@ -21,9 +21,8 @@ class Roller(commands.Cog):
         expression = Expression(input_string)
         result = expression.evaluate()
         message_string = result
-        if result['rolls']:
-            for die in result['rolls']:
-                message_string += f"\n{die}: {' '.join(result['rolls'][die])}"
+        for die in result['rolls']:
+            message_string += f"\n{die}: {' '.join(result['rolls'][die])}"
         await ctx.send(message_string)
 
 def inside_paren(expr_string: str, index: int):
@@ -139,4 +138,4 @@ class Expression:
             # represent float as int if result is integer
             if result['res'] == math.ceil(result['res']):
                 result['res'] = math.ceil(result['res'])
-            return result
+        return result
