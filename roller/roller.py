@@ -21,7 +21,7 @@ class Roller(commands.Cog):
         expression = Expression(input_string)
         rolls = {}
         result = expression.evaluate(rolls)
-        message_string = result
+        message_string = str(result)
         for die in rolls:
             message_string += f"\n{die}: {' '.join(rolls[die])}"
         await ctx.send(message_string)
