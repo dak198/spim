@@ -5,6 +5,7 @@ class Token:
         self.type = type
         self.value = value
 
+# TODO: implement inserting parentheses in the list to indicate order of operations
 
 def tokenize(input: str):
     i = 0
@@ -22,3 +23,4 @@ def tokenize(input: str):
                 j += 1
             tokens.append(Token('NUM', num))
             i = j
+        # TODO: finish tokenize function to check for ops and parentheses
