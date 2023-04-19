@@ -128,7 +128,7 @@ class Expression:
                     result += roll
                     if not die in rolls:
                         rolls[die] = []
-                    rolls[die].append(str(roll))
+                    rolls[die].append(f"`{str(roll)}`")
             else:
                 raise ValueError(f"Unsupported op '{self.op}'")
             
