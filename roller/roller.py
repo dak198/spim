@@ -111,8 +111,8 @@ class Expression:
         if self.const:
             result['res'] = self.const
         else:
-            a = self.a.evaluate()
-            b = self.b.evaluate()
+            a = self.a.evaluate()['res']
+            b = self.b.evaluate()['res']
             if self.op == '+':
                 result['res'] = a + b
             elif self.op == '-':
