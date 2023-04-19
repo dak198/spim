@@ -7,6 +7,7 @@ from redbot.core import commands
 from redbot.core.bot import Red
 from redbot.core.config import Config
 
+MESSAGE_LENGTH_LIMIT = 2000
 
 class Roller(commands.Cog):
     """Cogs for Red-DiscordBot V3 for use in Gear Getaway"""
@@ -27,7 +28,7 @@ class Roller(commands.Cog):
             for die in rolls:
                 message_string += f"\n{die}: {' '.join(rolls[die])}"
 
-        if len(message_string) > 2000:
+        if len(message_string) > MESSAGE_LENGTH_LIMIT:
             message_string = str(result)
         await ctx.send(message_string)
 
@@ -141,8 +142,7 @@ class Expression:
                     if rolls is not None:
                         if not die in rolls:
                             rolls[die] = []
-
-                        if len(rolls[die]) > 2000:
+                        if len(rolls[die]) > MESSAGE_LENGTH_LIMIT:
                             rolls = None
                         else:
                             rolls[die].append(f"`{str(roll)}`")
