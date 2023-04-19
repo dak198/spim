@@ -206,4 +206,3 @@ class Scheduler(commands.Cog):
     async def repeat_message(self):
         channel = self.bot.get_channel(661373412400431104)
         await channel.send("Test")
-        raise SystemError("Task executed")
