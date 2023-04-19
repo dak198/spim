@@ -95,41 +95,6 @@ class Expression:
         else:
             raise ValueError(f"No operator or constant found in string '{expr_string}'")
 
-        # if ops['+'] >= 0 and not inside_paren(expr_string, ops['+']):
-        #     expr = expr_string.split('+', 1)
-        #     self.a = Expression(expr[0])
-        #     self.b = Expression(expr[1])
-        #     self.op = '+'
-        # elif ops['-'] >= 0 and not inside_paren(expr_string, ops['-']):
-        #     expr = expr_string.split('-', 1)
-        #     self.a = Expression(expr[0])
-        #     self.b = Expression(expr[1])
-        #     self.op = '-'
-        # elif ops['*'] >= 0 and not inside_paren(expr_string, ops['*']):
-        #     expr = expr_string.split('*', 1)
-        #     self.a = Expression(expr[0])
-        #     self.b = Expression(expr[1])
-        #     self.op = '*'
-        # elif ops['/'] >= 0 and not inside_paren(expr_string, ops['/']):
-        #     expr = expr_string.split('/', 1)
-        #     self.a = Expression(expr[0])
-        #     self.b = Expression(expr[1])
-        #     self.op = '/'
-        # elif ops['d'] >= 0 and not inside_paren(expr_string, ops['d']):
-        #     expr = expr_string.split('d', 1)
-        #     if expr[0] == '':
-        #         expr[0] = '1'
-        #     self.a = Expression(expr[0])
-        #     self.b = Expression(expr[1])
-        #     self.op = 'd'
-        # elif expr_string.replace('.', '').isdigit():
-        #     if float(expr_string) == int(expr_string):
-        #         self.const = int(expr_string)
-        #     else:
-        #         self.const = float(expr_string)
-        # else:
-        #     raise ValueError(f"No operator or constant found in string '{expr_string}'")
-
     def __repr__(self):
         if self.const:
             return repr(self.const)
