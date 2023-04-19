@@ -98,10 +98,11 @@ class Expression:
                 return
         # if no supported operators are found, attempt to process the expression as a constant
         if expr_string.replace('.', '').isdigit():
-            if float(expr_string) == int(expr_string):
-                self.const = int(expr_string)
+            value = float(expr_string)
+            if value == math.ceil(value):
+                self.const = int(math.ceil(value))
             else:
-                self.const = float(expr_string)
+                self.const = value
         # if there are no operators found and the expression is not a constant, raise an error
         else:
             raise ValueError(f"No operator or constant found in string '{expr_string}'")
