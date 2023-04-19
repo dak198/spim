@@ -91,10 +91,10 @@ class Expression:
             # if there is an instance of the operator outside parentheses, split the expression
             # into two new expressions that are linked by the operator
             if op_index > 0:
+                raise ValueError(f"{expr_string[:op_index]}\n{op}\n{expr_string[op_index + 1:]}")
                 self.a = Expression(expr_string[:op_index])
                 self.b = Expression(expr_string[op_index + 1:])
                 self.op = op
-                raise ValueError(f"{self.a}\n{self.op}\n{self.b}")
                 return
             # handle case where no leading number is present before d operator
             elif op_index == 0 and op == 'd':
