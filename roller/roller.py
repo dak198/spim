@@ -83,7 +83,12 @@ class Expression:
                 op_index = expr_string.find(op, op_index + 1, len(expr_string) - 1)
             # if there is an instance of the operator outside parentheses, split the expression
             # into two new expressions that are linked by the operator
-            if op_index >= 0:
+            if op_index == 0 and op == 'd':
+                self.a = Expression('1')
+                self.b = Expression(expr_string[op_index + 1:])
+                self.op = op
+                return
+            elif op_index > 0:
                 self.a = Expression(expr_string[:op_index])
                 self.b = Expression(expr_string[op_index + 1:])
                 self.op = op
