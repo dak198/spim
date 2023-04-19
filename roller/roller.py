@@ -131,7 +131,7 @@ class Expression:
                     if not b in result['rolls']:
                         die = 'd' + str(b)
                         result['rolls'][die] = []
-                    result['rolls'][die].append(roll)
+                    result['rolls'][die].append(str(roll))
             else:
                 raise ValueError(f"Unsupported op '{self.op}'")
             
