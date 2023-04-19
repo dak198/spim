@@ -19,9 +19,10 @@ class Roller(commands.Cog):
         # remove all whitespace from input string
         input_string = ''.join(input_string)
         expression = Expression(input_string)
-        result = expression.evaluate()
-        message_string = str(result['res'])
-        for die in result['rolls']:
+        rolls = {}
+        result = expression.evaluate(rolls)
+        message_string = result
+        for die in rolls:
             message_string += f"\n{die}: {' '.join(result['rolls'][die])}"
         await ctx.send(message_string)
 
@@ -103,39 +104,36 @@ class Expression:
         else:
             return f"{repr(self.a)}{self.op}{repr(self.b)}"
 
-    def evaluate(self):
-        result = {
-            'res': None,
-            'rolls': {}
-        }
+    def evaluate(self, rolls: dict = {}):
         if self.const:
-            result['res'] = self.const
+            result = self.const
         else:
-            a = self.a.evaluate()['res']
-            b = self.b.evaluate()['res']
+            a = self.a.evaluate(rolls)
+            b = self.b.evaluate(rolls)
             if self.op == '+':
-                result['res'] = a + b
+                result = a + b
             elif self.op == '-':
-                result['res'] = a - b
+                result = a - b
             elif self.op == '*':
                 result = a * b
             elif self.op == '/':
-                result['res'] = a / b
+                result = a / b
             elif self.op == '^':
-                result['res'] = pow(a, b)
+                result = pow(a, b)
             elif self.op == 'd':
-                result['res'] = 0
+                result = 0
+                die = 'd' + str(b)
                 for i in range(a):
                     roll = random.randint(1, b)
-                    result['res'] += roll
-                    die = 'd' + str(b)
-                    if not die in result['rolls']:
-                        result['rolls'][die] = []
-                    result['rolls'][die].append(str(roll))
+                    result += roll
+                    if rolls:
+                        if not die in rolls:
+                            rolls['die'] = []
+                        rolls[die].append(str(roll))
             else:
                 raise ValueError(f"Unsupported op '{self.op}'")
             
             # represent float as int if result is integer
-            if result['res'] == math.ceil(result['res']):
-                result['res'] = math.ceil(result['res'])
+            if result == math.ceil(result):
+                result = math.ceil(result)
         return result
