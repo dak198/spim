@@ -14,14 +14,16 @@ class Roller(commands.Cog):
     def __init__(self, bot: Red) -> None:
         self.bot = bot
 
-
     @commands.command(name="roll", help="output a random roll for a given combination of dice")
     async def roll(self, ctx, *input_string):
         # remove all whitespace from input string
         input_string = ''.join(input_string)
         expression = Expression(input_string)
         result = expression.evaluate()
-        await ctx.send(result)
+        message_string = result
+        for die in result['rolls']:
+            message_string += f"\n{die}: {' '.join(result['rolls'][die])}"
+        await ctx.send(message_string)
 
 def inside_paren(expr_string: str, index: int):
     """Determines if a given index in a string is inside a set of parentheses
@@ -102,30 +104,38 @@ class Expression:
             return f"{repr(self.a)}{self.op}{repr(self.b)}"
 
     def evaluate(self):
+        result = {
+            'res': None,
+            'rolls': {}
+        }
         if self.const:
-            return self.const
+            result['res'] = self.const
         else:
             a = self.a.evaluate()
             b = self.b.evaluate()
             if self.op == '+':
-                result = a + b
+                result['res'] = a + b
             elif self.op == '-':
-                result = a - b
+                result['res'] = a - b
             elif self.op == '*':
                 result = a * b
             elif self.op == '/':
-                result = a / b
+                result['res'] = a / b
             elif self.op == '^':
-                result = pow(a, b)
+                result['res'] = pow(a, b)
             elif self.op == 'd':
-                result = 0
+                result['res'] = 0
                 for i in range(a):
-                    result += random.randint(1, b)
+                    roll = random.randint(1, b)
+                    result['res'] += roll
+                    if not b in result['rolls']:
+                        die = 'd' + b
+                        result['rolls'][die] = []
+                    result['rolls'][die].append(roll)
             else:
                 raise ValueError(f"Unsupported op '{self.op}'")
             
             # represent float as int if result is integer
-            if result == math.ceil(result):
-                    return math.ceil(result)
-            else:
-                return result
+            if result['res'] == math.ceil(result['res']):
+                result['res'] = math.ceil(result['res'])
+            return result
