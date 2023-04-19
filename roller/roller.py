@@ -128,8 +128,8 @@ class Expression:
                 for i in range(a):
                     roll = random.randint(1, b)
                     result['res'] += roll
-                    if not b in result['rolls']:
-                        die = 'd' + str(b)
+                    die = 'd' + str(b)
+                    if not die in result['rolls']:
                         result['rolls'][die] = []
                     result['rolls'][die].append(str(roll))
             else:
