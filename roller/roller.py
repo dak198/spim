@@ -77,7 +77,7 @@ class Expression:
             # find an instance of the operator that is not inside parentheses if possible
             op_index = expr_string.find(op)
             while inside_paren(expr_string, op_index) and op_index >= 0:
-                op_index = expr_string.find(op, op_index, len(expr_string) - 1)
+                op_index = expr_string.find(op, op_index + 1, len(expr_string) - 1)
             # if there is an instance of the operator outside parentheses, split the expression
             # into two new expressions that are linked by the operator
             if op_index >= 0:
