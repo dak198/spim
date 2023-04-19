@@ -81,7 +81,7 @@ class Expression:
             # if there is an instance of the operator outside parentheses, split the expression
             # into two new expressions that are linked by the operator
             if op_index >= 0:
-                self.a = Expression(expr_string[:op_index - 1])
+                self.a = Expression(expr_string[:op_index])
                 self.b = Expression(expr_string[op_index + 1:])
                 self.op = op
                 return
