@@ -23,4 +23,11 @@ def tokenize(input: str):
                 j += 1
             tokens.append(Token('NUM', num))
             i = j
-        # TODO: finish tokenize function to check for ops and parentheses
+        elif input[i] in 'd*/+-':
+            tokens.append(Token('OP', input[i]))
+            i += 1
+        elif input[i] in '()':
+            tokens.append(Token('PAREN', '('))
+            i += 1
+        else:
+            raise ValueError(f"Unrecognized character '{input[i]}' at index {i}")
