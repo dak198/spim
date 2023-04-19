@@ -54,6 +54,7 @@ def inside_paren(expr_string: str, index: int):
         # number of ')' characters after the index
         ')': expr_string.count(')', index + 1, len(expr_string) -1)
     }
+    raise ValueError(f"{leading}\n{trailing}")
     # if there is at least 1 unpaired open paren before the index and at least one unpaired closing paren after the index, then the index is inside parentheses
     return leading['('] - leading[')'] >= 1 and trailing[')'] - trailing['('] >= 1
 
