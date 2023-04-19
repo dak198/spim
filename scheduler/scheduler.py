@@ -9,6 +9,7 @@ from dateutil import parser
 import json
 
 import discord
+from discord.ext import tasks
 from redbot.core import commands
 from redbot.core.bot import Red
 from redbot.core.config import Config
@@ -191,3 +192,8 @@ class Scheduler(commands.Cog):
                             event['absent'].pop(user_id, None)
                         with open('home/ec2-user/events.json', 'w') as json_file:
                                     json.dump(self.events, json_file, indent=4)
+
+    @tasks.loop(seconds=30.0)
+    async def repeat_message(self):
+        channel = self.bot.get_channel(661373412400431104)
+        await channel.send("Test")
