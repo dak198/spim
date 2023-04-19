@@ -22,7 +22,7 @@ class Roller(commands.Cog):
         result = expression.evaluate()
         message_string = result
         for die in result['rolls']:
-            message_string += f"\n{die}: {' '.join(result['rolls'][die])}"
+            message_string += f"\n{die}: {' '.join(str(result['rolls'][die]))}"
         await ctx.send(message_string)
 
 def inside_paren(expr_string: str, index: int):
