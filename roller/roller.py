@@ -94,6 +94,7 @@ class Expression:
                 self.a = Expression(expr_string[:op_index])
                 self.b = Expression(expr_string[op_index + 1:])
                 self.op = op
+                raise ValueError(f"{self.a}\n{self.op}\n{self.b}")
                 return
             # handle case where no leading number is present before d operator
             elif op_index == 0 and op == 'd':
