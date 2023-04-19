@@ -22,8 +22,11 @@ class Roller(commands.Cog):
         rolls = {}
         result = expression.evaluate(rolls)
         message_string = str(result)
-        for die in rolls:
-            message_string += f"\n{die}: {' '.join(rolls[die])}"
+
+        if rolls:
+            for die in rolls:
+                message_string += f"\n{die}: {' '.join(rolls[die])}"
+
         if len(message_string) > 2000:
             message_string = str(result)
         await ctx.send(message_string)
@@ -132,12 +135,17 @@ class Expression:
             elif self.op == 'd':
                 result = 0
                 die = 'd' + str(b)
-                for i in range(a):
+                for _ in range(a):
                     roll = random.randint(1, b)
                     result += roll
-                    if not die in rolls:
-                        rolls[die] = []
-                    rolls[die].append(f"`{str(roll)}`")
+                    if rolls is not None:
+                        if not die in rolls:
+                            rolls[die] = []
+
+                        if len(rolls[die]) > 2000:
+                            rolls = None
+                        else:
+                            rolls[die].append(f"`{str(roll)}`")
             else:
                 raise ValueError(f"Unsupported op '{self.op}'")
             
