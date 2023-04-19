@@ -54,7 +54,6 @@ def inside_paren(expr_string: str, index: int):
         # number of ')' characters after the index
         ')': expr_string.count(')', index + 1, len(expr_string))
     }
-    raise ValueError(f"{leading}\n{trailing}")
     # if there is at least 1 unpaired open paren before the index and at least one unpaired closing paren after the index, then the index is inside parentheses
     return leading['('] - leading[')'] >= 1 and trailing[')'] - trailing['('] >= 1
 
@@ -92,7 +91,6 @@ class Expression:
             # if there is an instance of the operator outside parentheses, split the expression
             # into two new expressions that are linked by the operator
             if op_index > 0:
-                raise ValueError(f"{expr_string[:op_index]}\n{op}\n{expr_string[op_index + 1:]}")
                 self.a = Expression(expr_string[:op_index])
                 self.b = Expression(expr_string[op_index + 1:])
                 self.op = op
