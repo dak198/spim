@@ -24,6 +24,8 @@ class Roller(commands.Cog):
         message_string = str(result)
         for die in rolls:
             message_string += f"\n{die}: {' '.join(rolls[die])}"
+        if len(message_string) > 2000:
+            message_string = str(result)
         await ctx.send(message_string)
 
 def inside_paren(expr_string: str, index: int):
