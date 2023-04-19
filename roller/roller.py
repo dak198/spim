@@ -143,7 +143,7 @@ class Expression:
                     if not rolls['TOO_BIG']:
                         if not die in rolls:
                             rolls[die] = []
-                        if len(rolls[die]) > MESSAGE_LENGTH_LIMIT//100:
+                        if len(rolls[die]) >= MESSAGE_LENGTH_LIMIT:
                             rolls['TOO_BIG'] = True
                         else:
                             rolls[die].append(f"`{str(roll)}`")
