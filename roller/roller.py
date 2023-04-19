@@ -44,15 +44,15 @@ def inside_paren(expr_string: str, index: int):
     
     leading = {
         # number of '(' characters before the index
-        '(': expr_string.count('(', 0, index - 1),
+        '(': expr_string.count('(', 0, index),
         # number of ')' characters before the index
-        ')': expr_string.count(')', 0, index - 1)
+        ')': expr_string.count(')', 0, index)
     }
     trailing = {
         # number of '(' characters after the index
-        '(': expr_string.count('(', index + 1, len(expr_string) - 1),
+        '(': expr_string.count('(', index + 1, len(expr_string)),
         # number of ')' characters after the index
-        ')': expr_string.count(')', index + 1, len(expr_string) -1)
+        ')': expr_string.count(')', index + 1, len(expr_string))
     }
     raise ValueError(f"{leading}\n{trailing}")
     # if there is at least 1 unpaired open paren before the index and at least one unpaired closing paren after the index, then the index is inside parentheses
