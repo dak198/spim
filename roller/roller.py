@@ -129,7 +129,7 @@ class Expression:
                     roll = random.randint(1, b)
                     result['res'] += roll
                     if not b in result['rolls']:
-                        die = 'd' + b
+                        die = 'd' + str(b)
                         result['rolls'][die] = []
                     result['rolls'][die].append(roll)
             else:
