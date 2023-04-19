@@ -7,7 +7,7 @@ from redbot.core import commands
 from redbot.core.bot import Red
 from redbot.core.config import Config
 
-MESSAGE_LENGTH_LIMIT = 2000
+MESSAGE_LENGTH_LIMIT = 20
 
 class Roller(commands.Cog):
     """Cogs for Red-DiscordBot V3 for use in Gear Getaway"""
