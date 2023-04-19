@@ -126,10 +126,9 @@ class Expression:
                 for i in range(a):
                     roll = random.randint(1, b)
                     result += roll
-                    if rolls:
-                        if not die in rolls:
-                            rolls['die'] = []
-                        rolls[die].append(str(roll))
+                    if not die in rolls:
+                        rolls['die'] = []
+                    rolls[die].append(str(roll))
             else:
                 raise ValueError(f"Unsupported op '{self.op}'")
             
