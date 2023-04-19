@@ -20,11 +20,11 @@ class Roller(commands.Cog):
         # remove all whitespace from input string
         input_string = ''.join(input_string)
         expression = Expression(input_string)
-        rolls = {}
+        rolls = {'TOO_BIG': False}
         result = expression.evaluate(rolls)
         message_string = str(result)
 
-        if rolls:
+        if not rolls['TOO_BIG']:
             for die in rolls:
                 message_string += f"\n{die}: {' '.join(rolls[die])}"
 
@@ -139,11 +139,11 @@ class Expression:
                 for _ in range(a):
                     roll = random.randint(1, b)
                     result += roll
-                    if rolls is not None:
+                    if not rolls['TOO_BIG']:
                         if not die in rolls:
                             rolls[die] = []
                         if len(rolls[die]) > MESSAGE_LENGTH_LIMIT//100:
-                            rolls = None
+                            rolls['TOO_BIG'] = True
                         else:
                             rolls[die].append(f"`{str(roll)}`")
             else:
