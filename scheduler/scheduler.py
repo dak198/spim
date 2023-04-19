@@ -150,6 +150,15 @@ class Scheduler(commands.Cog):
             text = '```No events scheduled```'
         await ctx.send(text)
 
+    @commands.command(name='repeat-message')
+    async def set_repeat_message(self, ctx, state):
+        if state == 'start':
+            self.repeat_message.start()
+            await ctx.send('Started repeat message')
+        elif state == 'stop':
+            self.repeat_message.stop()
+            await ctx.send('Stopped repeat message')
+
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         user = payload.member
@@ -193,7 +202,7 @@ class Scheduler(commands.Cog):
                         with open('home/ec2-user/events.json', 'w') as json_file:
                                     json.dump(self.events, json_file, indent=4)
 
-    @tasks.loop(seconds=30.0)
+    @tasks.loop(seconds=15.0)
     async def repeat_message(self):
         channel = self.bot.get_channel(661373412400431104)
         await channel.send("Test")
