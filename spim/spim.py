@@ -182,6 +182,14 @@ class Spim(commands.Cog):
             for s in spims:
                 await poll_message.add_reaction(s)
 
+    @commands.command(name='say', help='Enter a message for Spim to say')
+    async def say(self, ctx, *message_text):
+        await ctx.message.delete()
+        if message_text:
+            await ctx.send(' '.join(message_text))
+        else:
+            await ctx.send('<:spimPog:772261869858848779>')
+
 
     ###################
     # SERVER COMMANDS #
