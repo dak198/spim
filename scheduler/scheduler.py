@@ -49,9 +49,9 @@ class Scheduler(commands.Cog):
         # print event info to the chat
         message_string = f"Scheduling `{name}` at `{parser.parse(timestr=self.events[name]['time'], fuzzy=True).time().isoformat('auto')}`."
         if self.events[name]['repeat']:
-            message_string += f" Repeating every `{self.events['repeat']}` seconds."
+            message_string += f" Repeating every `{self.events[name]['repeat']}` seconds."
         if self.events[name]['remind']:
-            message_string += f" Sending reminder `{self.events['remind']}` seconds before event."
+            message_string += f" Sending reminder `{self.events[name]['remind']}` seconds before event."
         if self.events[name]['notify']:
             message_string += 'Notifying with `@everyone`'
         await ctx.send(message_string)
