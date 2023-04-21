@@ -185,6 +185,8 @@ class Scheduler(commands.Cog):
                 # update the event with the parameters that were specified in options (excluding --name)
                 for flag in options:
                     event[flag] = options[flag]
+                # generate a new id for the event so that the previous version will be ignored
+                event['id'] = uuid4().hex
                 # add the event back to the list
                 await self.add_event(ctx, name, event)
             else:
