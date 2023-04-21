@@ -136,7 +136,7 @@ class Scheduler(commands.Cog):
         
         # create an empty event with default values and a unique id
         event = {
-            'id': uuid.uuid4(),
+            'id': uuid.uuid4().hex,
             'message-id': None,
             'time': 'Saturday at 3:00pm',
             'repeat': None,
