@@ -95,7 +95,9 @@ class Scheduler(commands.Cog):
             # make sure event still exists when done waiting
             if name in self.events:
                 # announce start of event
-                event_string = f'**{name}** starting now'
+                event_string = f"**{name}** starting now"
+                if self.events[name]['notify']:
+                    event_string = '@everyone ' + event_string
                 await ctx.send(event_string)
                 # unlink the old reminder message
                 self.events[name]['message-id'] = None
