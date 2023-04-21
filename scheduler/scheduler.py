@@ -1,14 +1,13 @@
-import datetime
-import time
-import sched
+from datetime import datetime, timedelta
+from time import time
+from sched import scheduler
 import asyncio
-import uuid
+from uuid import uuid4
 from pytimeparse import parse
 from iteration_utilities import grouper
 from dateutil import parser
-import json
+from json import load, dump
 
-import discord
 from discord.ext import tasks
 from redbot.core import commands
 from redbot.core.bot import Red
@@ -22,9 +21,9 @@ class Scheduler(commands.Cog):
 
     def __init__(self, bot: Red) -> None:
         self.bot = bot
-        self.scheduler = sched.scheduler(time.time, asyncio.sleep)
+        self.scheduler = scheduler(time, asyncio.sleep)
         try:
-            self.events = json.load(open(FILE_PATH))
+            self.events = load(open(FILE_PATH))
         except FileNotFoundError:
             self.events = {}
 
@@ -43,7 +42,7 @@ class Scheduler(commands.Cog):
         self.events[name] = event
         # update event list in external file
         with open(FILE_PATH, 'w') as json_file:
-            json.dump(self.events, json_file, indent=4)
+            dump(self.events, json_file, indent=4)
             json_file.close()
 
         # print event info to the chat
@@ -59,14 +58,14 @@ class Scheduler(commands.Cog):
         # loop in case of repeated event
         while name in self.events:
             # calculate wait times
-            event_delay = (parser.parse(timestr=self.events[name]['time'], fuzzy=True) - datetime.datetime.now()).total_seconds()
+            event_delay = (parser.parse(timestr=self.events[name]['time'], fuzzy=True) - datetime.now()).total_seconds()
             remind_delay = event_delay - self.events[name]['remind']
             # skip waiting for the reminder if it is before the event time
             if remind_delay > 0:
                 # sleep thread until reminder time
                 await asyncio.sleep(remind_delay)
                 # update events list from file in case of changes during sleep
-                self.events = json.load(open(FILE_PATH))
+                self.events = load(open(FILE_PATH))
                 # make sure event is still exists when done waiting
                 # validate id as well as name in case the event was cancelled and replaced with a new event with the same name
                 if name in self.events and self.events[name]['id'] == event['id']:
@@ -81,7 +80,7 @@ class Scheduler(commands.Cog):
                             message_id = message.id
                             self.events[name]['message-id'] = message_id
                             with open(FILE_PATH, 'w') as json_file:
-                                json.dump(self.events, json_file, indent=4)
+                                dump(self.events, json_file, indent=4)
                                 json_file.close()
                             # add reactions to reminder message for users to indicate 'attending' or 'absent'
                             await message.add_reaction('<:spimPog:772261869858848779>')
@@ -98,12 +97,12 @@ class Scheduler(commands.Cog):
                 self.events[name]['message-id'] = None
                 # if the event repeats, set the time to the next repeat interval
                 if self.events[name]['repeat']:
-                    self.events[name]['time'] = parser.parse(timestr=self.events[name]['time'], fuzzy=True) + datetime.timedelta(seconds=self.events[name]['repeat'])
+                    self.events[name]['time'] = parser.parse(timestr=self.events[name]['time'], fuzzy=True) + timedelta(seconds=self.events[name]['repeat'])
                 # if the event does not repeat, remove it from the events list and update the json file
                 else:
                     self.events.pop(name, None)
                     with open(FILE_PATH, 'w') as json_file:
-                        json.dump(self.events, json_file, indent=4)
+                        dump(self.events, json_file, indent=4)
                         json_file.close()
 
     @commands.group(name='event', help='Commands for managing events and reminders')
@@ -113,8 +112,8 @@ class Scheduler(commands.Cog):
     @commands.command(name='message', parent=event, help='Schedule a message to send at specified time using `HH:MM` format')
     async def schedule_message(self, ctx, message, *time_string):
         send_time = parser.parse(timestr=' '.join(time_string), fuzzy=True)
-        current_time = datetime.datetime.now()
-        send_delay = (send_time - datetime.datetime.now()).total_seconds()
+        current_time = datetime.now()
+        send_delay = (send_time - datetime.now()).total_seconds()
         await ctx.send(f"It is {current_time.time().isoformat('auto')}. Sending '{message}' at {send_time.time().isoformat('auto')} in {send_delay} seconds")
         await asyncio.sleep(send_delay)
         await ctx.send(message)
@@ -136,7 +135,7 @@ class Scheduler(commands.Cog):
         
         # create an empty event with default values and a unique id
         event = {
-            'id': uuid.uuid4().hex,
+            'id': uuid4().hex,
             'message-id': None,
             'time': 'Saturday at 3:00pm',
             'repeat': None,
@@ -168,7 +167,7 @@ class Scheduler(commands.Cog):
         if event:
             await ctx.send(f"Removed {name}")
             with open(FILE_PATH, 'w') as json_file:
-                json.dump(self.events, json_file, indent=4)
+                dump(self.events, json_file, indent=4)
                 json_file.close()
         else:
             await ctx.send(f'{name} not found in events list')
@@ -177,22 +176,22 @@ class Scheduler(commands.Cog):
     async def event_edit(self, ctx, *args):
         # parse the provided arguments into a dict
         options = self.parse_args(*args)
-        # check for if an event name was provided, return if not
-        if '--name' in options:
-            name = options['--name']
+        # check for if an event name was provided
+        name = options.pop('--name', None)
+        if name:
+            # pop event from event list and ensure it exists
+            event = self.events.pop(name, None)
+            if event:
+                # update the event with the parameters that were specified in options (excluding --name)
+                for flag in options:
+                    event[flag] = options[flag]
+                # add the event back to the list
+                await self.add_event(ctx, name, event)
+            else:
+                await ctx.send('Event with that name does not exist')
         else:
             await ctx.send('Must specify event name')
             return
-        # pop event from event list and ensure it exists
-        event = self.events.pop(name, None)
-        if event:
-            # update the event with the parameters that were specified in options
-            for flag in options:
-                event[flag] = options[flag]
-            # add the event back to the list
-            await self.add_event(ctx, name, event)
-        else:
-            await ctx.send('Event with that name does not exist')
 
     @commands.command(name='list', parent=event, help='List scheduled events')
     async def event_list(self, ctx, *event_names):
@@ -246,7 +245,7 @@ class Scheduler(commands.Cog):
                             if not user.id in event['absent']:
                                 event['absent'][user.id] = user.display_name
                         with open(FILE_PATH, 'w') as json_file:
-                                    json.dump(self.events, json_file, indent=4)
+                                    dump(self.events, json_file, indent=4)
                                     json_file.close()
 
     @commands.Cog.listener()
@@ -264,7 +263,7 @@ class Scheduler(commands.Cog):
                         elif emoji.name == 'spon':
                             event['absent'].pop(user_id, None)
                         with open(FILE_PATH, 'w') as json_file:
-                                    json.dump(self.events, json_file, indent=4)
+                                    dump(self.events, json_file, indent=4)
                                     json_file.close()
 
     @tasks.loop(seconds=15.0)
