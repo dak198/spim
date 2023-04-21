@@ -124,7 +124,7 @@ class Scheduler(commands.Cog):
         # parse the provided arguments into a dict
         options = self.parse_args(*args)
         # check for if an event name was provided, return if not
-        if options['--name']:
+        if '--name' in options:
             name = options['--name']
             # return if event name already exists
             if name in self.events:
@@ -178,7 +178,7 @@ class Scheduler(commands.Cog):
         # parse the provided arguments into a dict
         options = self.parse_args(*args)
         # check for if an event name was provided, return if not
-        if options['--name']:
+        if '--name' in options
             name = options['--name']
         else:
             await ctx.send('Must specify event name')
