@@ -60,7 +60,10 @@ class Scheduler(commands.Cog):
             # calculate wait times
             await ctx.send(self.events[name]['time'])
             event_delay = (parser.parse(timestr=self.events[name]['time'], fuzzy=True) - datetime.now()).total_seconds()
-            remind_delay = event_delay - self.events[name]['remind']
+            if self.events[name]['remind']:
+                remind_delay = event_delay - self.events[name]['remind']
+            else:
+                remind_delay = -1
             # skip waiting for the reminder if it is before the event time
             if remind_delay > 0:
                 # sleep thread until reminder time
