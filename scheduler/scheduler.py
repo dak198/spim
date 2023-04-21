@@ -158,7 +158,7 @@ class Scheduler(commands.Cog):
         if '--notify' in options and options['--notify'].lower() == 'true':
             event['notify'] = True
         # process the newly added event
-        self.add_event(ctx, name, event)
+        await self.add_event(ctx, name, event)
 
     @commands.command(name='cancel', parent=event, help='Cancel a scheduled event')
     async def event_cancel(self, ctx, name):
@@ -190,7 +190,7 @@ class Scheduler(commands.Cog):
             for flag in options:
                 event[flag] = options[flag]
             # add the event back to the list
-            self.add_event(ctx, name, event)
+            await self.add_event(ctx, name, event)
         else:
             await ctx.send('Event with that name does not exist')
 
