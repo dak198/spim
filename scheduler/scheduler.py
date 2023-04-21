@@ -63,7 +63,7 @@ class Scheduler(commands.Cog):
             if self.events[name]['remind']:
                 remind_delay = event_delay - self.events[name]['remind']
             else:
-                remind_delay = -1
+                remind_delay = 0
             # skip waiting for the reminder if it is before the event time
             if remind_delay > 0:
                 # sleep thread until reminder time
