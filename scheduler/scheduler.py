@@ -91,7 +91,7 @@ class Scheduler(commands.Cog):
                             await message.add_reaction('<:spon:922922345134424116>')
 
             # sleep thread until event time
-            await asyncio.sleep(self.events[name]['remind'])
+            await asyncio.sleep(event_delay)
             # make sure event still exists when done waiting
             if name in self.events:
                 # announce start of event
