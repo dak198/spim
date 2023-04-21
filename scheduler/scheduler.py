@@ -58,6 +58,7 @@ class Scheduler(commands.Cog):
         # loop in case of repeated event
         while name in self.events:
             # calculate wait times
+            await ctx.send(self.events[name]['time'])
             event_delay = (parser.parse(timestr=self.events[name]['time'], fuzzy=True) - datetime.now()).total_seconds()
             remind_delay = event_delay - self.events[name]['remind']
             # skip waiting for the reminder if it is before the event time
