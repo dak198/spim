@@ -149,21 +149,10 @@ class Spim(commands.Cog):
     # GENERAL COMMANDS #
     ####################
 
-    @commands.command(name='count', help='<number> - Counts from 1 to <number> with messages every 5 seconds')
-    async def count(self, ctx, number):
-        """Repeats a message every five seconds for a given number of times
-        
-        Keyword arguments:
-        number -- number of times to repeat the message
-        """
-        
-        number = int(number)
-        for i in range(number):
-            await ctx.send(str(i+1))
-            await asyncio.sleep(5)
-
     @commands.command(name='spimify', help='Reacts with every Spim emote to a message you reply to with this command')
     async def spimify(self, ctx):
+        """Reacts with every spim emote to a replied message"""
+        
         spims = ['<:spimPog:772261869858848779>', '<:spimPogR:775434707231047680>', '<:spimBall:1066624826086793366>', '<:spimPride:988519886479327242>', '<:spimThink:949780590121607209>', '<:spinta:1041857241600507924>']
         shuffle(spims)
         channel = ctx.channel
@@ -174,6 +163,12 @@ class Spim(commands.Cog):
     
     @commands.command(name='spimpoll', help='Creates a poll with <:spimPog:772261869858848779> <:spimPause:987933390110089216> <:spon:922922345134424116>')
     async def spimpoll(self, ctx, *poll_text):
+        """Create a poll with the given text
+        
+        Keyword arguments:
+        *poll_text -- text of the poll message
+        """
+        
         spims = ['<:spimPog:772261869858848779>', '<:spimPause:987933390110089216>', '<:spon:922922345134424116>']
         channel = ctx.channel
         if poll_text:
@@ -184,6 +179,12 @@ class Spim(commands.Cog):
 
     @commands.command(name='say', help='Enter a message for Spim to say')
     async def say(self, ctx, *message_text):
+        """Enter a message for the bot to say
+        
+        Keyword arguments:
+        *message_text -- text of the message
+        """
+        
         await ctx.message.delete()
         if message_text:
             await ctx.send(' '.join(message_text))
