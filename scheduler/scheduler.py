@@ -52,7 +52,7 @@ class Scheduler(commands.Cog):
         if self.events[name]['remind']:
             message_string += f" Sending reminder `{self.events[name]['remind']}` seconds before event."
         if self.events[name]['notify']:
-            message_string += 'Notifying with `@everyone`'
+            message_string += ' Notifying with `@everyone`'
         await ctx.send(message_string)
 
         # loop in case of repeated event
