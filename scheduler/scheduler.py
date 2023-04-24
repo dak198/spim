@@ -18,6 +18,7 @@ FILE_PATH = 'home/ec2-user/events.json'
 
 class Scheduler(commands.Cog):
     """Scheduler for events and reminders"""
+    # TODO: rewrite this using apscheduler instead of asyncio wait
 
     def __init__(self, bot: Red) -> None:
         self.bot = bot
