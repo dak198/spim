@@ -118,8 +118,8 @@ class Scheduler(commands.Cog):
     async def event(self, ctx):
         pass
 
-    @commands.command(name='schedule', parent=event, help='Schedule a new event')
-    async def event_schedule(self, ctx: commands.Context, *args):
+    @commands.command(name='add', parent=event, help='Schedule a new event')
+    async def event_add(self, ctx: commands.Context, *args):
         # parse the provided arguments into a dict
         options = self.parse_args(*args)
         # check for if an event name was provided, return if not
