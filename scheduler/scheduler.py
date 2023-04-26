@@ -213,7 +213,7 @@ class Scheduler(commands.Cog):
                 for user_id in event['absent']:
                     display_name = event['absent'][user_id]
                     absent_string += f"\n- {display_name}"
-                text += f"**{name}**\nTime: <t:{event['time']}:F>```\nRepeat interval: {event['repeat']} seconds\nReminder: {event['remind']} seconds prior\nAttending: {attend_string}\nAbsent: {absent_string}```"
+                text += f"\n**{name}**\nTime: <t:{event['time']}:F>```\nRepeat interval: {event['repeat']} seconds\nReminder: {event['remind']} seconds prior\nAttending: {attend_string}\nAbsent: {absent_string}```"
         else:
             text = '```No events scheduled```'
         await ctx.send(text)
