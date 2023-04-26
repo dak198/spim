@@ -4,7 +4,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import asyncio
 from uuid import uuid4
 from pytimeparse import parse
-from pytz import UTC
+from pytz import timezone, UTC
 from iteration_utilities import grouper
 from dateutil import parser
 from json import load, dump
@@ -31,7 +31,8 @@ class Scheduler(commands.Cog):
         except FileNotFoundError:
             self.events = {}
 
-        self.scheduler = BackgroundScheduler(timezone=UTC)
+        self.scheduler = BackgroundScheduler(timezone=timezone('US/Eastern'))
+        self.scheduler.remove_all_jobs()
         for name in self.events:
             event = self.events[name]
             if event['remind'] and not self.scheduler.get_job(event['remind-id']):
@@ -117,7 +118,7 @@ class Scheduler(commands.Cog):
         await ctx.send(message)
 
     @commands.command(name='schedule', parent=event, help='Schedule a new event')
-    async def event_schedule(self, ctx, *args):
+    async def event_schedule(self, ctx: commands.Context, *args):
         # parse the provided arguments into a dict
         options = self.parse_args(*args)
         # check for if an event name was provided, return if not
@@ -137,7 +138,7 @@ class Scheduler(commands.Cog):
             'remind-id': uuid4().hex,
             'channel-id': ctx.channel.id,
             'message-id': None,
-            'time': 'Saturday at 3:00pm',
+            'time': int(round(parser.parse(timestr="Saturday at 3:00pm", fuzzy=True).timestamp())),
             'repeat': None,
             'remind': None,
             'notify': False,
@@ -149,7 +150,7 @@ class Scheduler(commands.Cog):
         if 'time' in options:
             event['time'] = int(round(parser.parse(timestr=options['time'], fuzzy=True).timestamp()))
         else:
-            await ctx.send('No time specified, defaulting to Saturday at 3:00pm')
+            await ctx.send(f"No time specified, defaulting to <t:{event['time']}:F>")
         if 'repeat' in options:
             event['repeat'] = parse(options['repeat'], granularity='minutes')
         if 'remind' in options:
