@@ -54,7 +54,7 @@ class Scheduler(commands.Cog):
     async def send_reminder(self, name: str):
         event = self.events[name]
         # convert event time string to UTC timestamp
-        timestamp = int(round(parser.parse(timestr=event['time'], fuzzy=True).timestamp()))
+        timestamp = event['time']
         # add @everyone to the reminder string if enabled
         if event['notify']:
             notify = "@everyone "
@@ -95,7 +95,7 @@ class Scheduler(commands.Cog):
         self.scheduler.add_job(self.send_event, 'date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
 
         # print event info to the chat
-        message_string = f"Scheduling `{name}` at `{parser.parse(timestr=event['time'], fuzzy=True).time().isoformat('auto')}`."
+        message_string = f"Scheduling `{name}` for <t:{event['time']}:F>"
         if event['repeat']:
             message_string += f" Repeating every `{event['repeat']}` seconds."
         if event['remind']:
