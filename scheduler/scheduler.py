@@ -32,6 +32,7 @@ class Scheduler(commands.Cog):
             self.events = {}
 
         self.scheduler = AsyncIOScheduler(timezone=timezone('US/Eastern'))
+        self.scheduler.remove_all_jobs()
         for name in self.events:
             event = self.events[name]
             if event['remind'] and not self.scheduler.get_job(event['remind-id']):
