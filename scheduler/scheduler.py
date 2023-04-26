@@ -1,15 +1,13 @@
 from datetime import datetime
-from time import time
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import asyncio
 from uuid import uuid4
 from pytimeparse import parse
-from pytz import timezone, UTC
+from pytz import timezone
 from iteration_utilities import grouper
 from dateutil import parser
 from json import load, dump
 
-from discord.ext import tasks
 from redbot.core import commands
 from redbot.core.bot import Red
 from redbot.core.config import Config
@@ -19,7 +17,6 @@ FILE_PATH = 'home/ec2-user/events.json'
 
 class Scheduler(commands.Cog):
     """Scheduler for events and reminders"""
-    # TODO: rewrite this using apscheduler instead of asyncio wait
 
     def __init__(self, bot: Red) -> None:
         self.bot = bot
@@ -32,7 +29,6 @@ class Scheduler(commands.Cog):
             self.events = {}
 
         self.scheduler = AsyncIOScheduler(timezone=timezone('US/Eastern'))
-        self.scheduler.remove_all_jobs()
         for name in self.events:
             event = self.events[name]
             if event['remind'] and not self.scheduler.get_job(event['remind-id']):
@@ -40,6 +36,11 @@ class Scheduler(commands.Cog):
             if not self.scheduler.get_job(event['id']):
                 self.scheduler.add_job(self.send_event, 'date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
         self.scheduler.start()
+
+
+    ####################
+    # HELPER FUNCTIONS #
+    ####################
 
     def parse_args(self, *args):
         args_dict = {}
@@ -50,7 +51,7 @@ class Scheduler(commands.Cog):
             else:
                 raise SyntaxError(args)
         return args_dict
-    
+
     async def send_reminder(self, name: str):
         event = self.events[name]
         # convert event time string to UTC timestamp
@@ -108,18 +109,14 @@ class Scheduler(commands.Cog):
             message_string += ' Notifying with `@everyone`'
         await ctx.send(message_string)
 
+
+    ##################
+    # EVENT COMMANDS #
+    ##################
+
     @commands.group(name='event', help='Commands for managing events and reminders')
     async def event(self, ctx):
         pass
-
-    @commands.command(name='message', parent=event, help='Schedule a message to send at specified time using `HH:MM` format')
-    async def schedule_message(self, ctx, message, *time_string):
-        send_time = parser.parse(timestr=' '.join(time_string), fuzzy=True)
-        current_time = datetime.now()
-        send_delay = (send_time - datetime.now()).total_seconds()
-        await ctx.send(f"It is {current_time.time().isoformat('auto')}. Sending '{message}' at {send_time.time().isoformat('auto')} in {send_delay} seconds")
-        await asyncio.sleep(send_delay)
-        await ctx.send(message)
 
     @commands.command(name='schedule', parent=event, help='Schedule a new event')
     async def event_schedule(self, ctx: commands.Context, *args):
@@ -221,6 +218,19 @@ class Scheduler(commands.Cog):
             text = '```No events scheduled```'
         await ctx.send(text)
 
+    @commands.command(name='message', parent=event, help='Schedule a message to send at specified time using `HH:MM` format')
+    async def schedule_message(self, ctx, message, *time_string):
+        send_time = parser.parse(timestr=' '.join(time_string), fuzzy=True)
+        current_time = datetime.now()
+        send_delay = (send_time - datetime.now()).total_seconds()
+        await ctx.send(f"It is {current_time.time().isoformat('auto')}. Sending '{message}' at {send_time.time().isoformat('auto')} in {send_delay} seconds")
+        await asyncio.sleep(send_delay)
+        await ctx.send(message)
+
+
+    ###################
+    # EVENT LISTENERS #
+    ###################
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         user = payload.member
