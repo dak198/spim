@@ -120,7 +120,6 @@ class Scheduler(commands.Cog):
     async def event_schedule(self, ctx, *args):
         # parse the provided arguments into a dict
         options = self.parse_args(*args)
-        await ctx.send(options)
         # check for if an event name was provided, return if not
         if 'name' in options:
             name = options['name']
