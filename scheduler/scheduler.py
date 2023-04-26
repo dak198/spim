@@ -58,6 +58,8 @@ class Scheduler(commands.Cog):
         # add @everyone to the reminder string if enabled
         if event['notify']:
             notify = "@everyone "
+        else:
+            notify=""
         # send reminder string
         reminder_string = f"{notify}**{name}** starting <t:{timestamp}:F>"
         message = await self.bot.get_channel(event['channel-id']).send(reminder_string)
@@ -77,6 +79,8 @@ class Scheduler(commands.Cog):
         event = self.events[name]
         if event['notify']:
             notify = "@everyone "
+        else:
+            notify = ""
         await self.bot.get_channel(event['channel-id']).send(f"{notify}**{name}** starting now")
         if self.events['repeat']:
             event['time'] += event['repeat']
@@ -95,7 +99,7 @@ class Scheduler(commands.Cog):
         self.scheduler.add_job(self.send_event, 'date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
 
         # print event info to the chat
-        message_string = f"Scheduling `{name}` for <t:{event['time']}:F>"
+        message_string = f"Scheduling `{name}` for <t:{event['time']}:F>."
         if event['repeat']:
             message_string += f" Repeating every `{event['repeat']}` seconds."
         if event['remind']:
