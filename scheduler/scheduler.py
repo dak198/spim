@@ -188,13 +188,14 @@ class Scheduler(commands.Cog):
         name = options.pop('name', None)
         if name:
             if name in self.events:
+                event = self.events[name]
                 # update event with parameters specified in options (excluding name)
                 for flag in options:
-                    self.events[name][flag] = options[flag]
+                    event[flag] = options[flag]
                 # reschedule associated jobs in scheduler
-                self.scheduler.reschedule_job(self.events[name]['id'], trigger='date', run_date=self.events[name]['time'])
-                if self.events[name]['remind']:
-                    self.scheduler.reschedule_job(self.events[name]['remind-id'], trigger='date', run_date=self.events[name]['remind'])
+                self.scheduler.reschedule_job(event['id'], trigger='date', run_date=datetime.fromtimestamp(event['time']))
+                if event['remind']:
+                    self.scheduler.reschedule_job(event['remind-id'], trigger='date', run_date=datetime.fromtimestamp(event['remind']))
             else:
                 await ctx.send('Event with that name does not exist')
         else:
