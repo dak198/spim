@@ -21,7 +21,7 @@ class Scheduler(commands.Cog):
     """Scheduler for events and reminders"""
     # TODO: rewrite this using apscheduler instead of asyncio wait
 
-    def __init__(self, bot: Red) -> None:
+    async def __init__(self, bot: Red) -> None:
         self.bot = bot
 
         try:
@@ -36,9 +36,9 @@ class Scheduler(commands.Cog):
         for name in self.events:
             event = self.events[name]
             if event['remind'] and not self.scheduler.get_job(event['remind-id']):
-                self.scheduler.add_job(self.send_reminder, 'date', run_date=datetime.fromtimestamp(event['time'] - event['remind'] + event['repeat']), args=[name], id=event['remind-id'])
+                self.scheduler.add_job(await self.send_reminder, 'date', run_date=datetime.fromtimestamp(event['time'] - event['remind'] + event['repeat']), args=[name], id=event['remind-id'])
             if not self.scheduler.get_job(event['id']):
-                self.scheduler.add_job(self.send_event, 'date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
+                self.scheduler.add_job(await self.send_event, 'date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
         self.scheduler.start()
 
     def parse_args(self, *args):
@@ -71,7 +71,7 @@ class Scheduler(commands.Cog):
         await message.add_reaction('<:spimPog:772261869858848779>')
         await message.add_reaction('<:spon:922922345134424116>')
         if event['repeat']:
-            self.scheduler.add_job(self.send_reminder, 'date', run_date=datetime.fromtimestamp(event['time'] - event['remind'] + event['repeat']), args=[name], id=event['remind-id'])
+            self.scheduler.add_job(await self.send_reminder, 'date', run_date=datetime.fromtimestamp(event['time'] - event['remind'] + event['repeat']), args=[name], id=event['remind-id'])
 
     async def send_event(self, name: str):
         event = self.events[name]
@@ -80,7 +80,7 @@ class Scheduler(commands.Cog):
         await self.bot.get_channel(event['channel-id']).send(f"{notify}**{name}** starting now")
         if self.events['repeat']:
             event['time'] += event['repeat']
-            self.scheduler.add_job(self.send_event, 'date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
+            self.scheduler.add_job(await self.send_event, 'date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
 
 
     async def add_event(self, ctx, name: str, event: dict):
@@ -91,8 +91,8 @@ class Scheduler(commands.Cog):
             dump(self.events, json_file, indent=4)
 
         if event['remind']:
-            self.scheduler.add_job(self.send_reminder, 'date', run_date=datetime.fromtimestamp(event['time'] - event['remind']), args=[name], id=event['id'])
-        self.scheduler.add_job(self.send_event, 'date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
+            self.scheduler.add_job(await self.send_reminder, 'date', run_date=datetime.fromtimestamp(event['time'] - event['remind']), args=[name], id=event['id'])
+        self.scheduler.add_job(await self.send_event, 'date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
 
         # print event info to the chat
         message_string = f"Scheduling `{name}` at `{parser.parse(timestr=event['time'], fuzzy=True).time().isoformat('auto')}`."
