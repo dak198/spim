@@ -4,6 +4,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import asyncio
 from uuid import uuid4
 from pytimeparse import parse
+from pytz import UTC
 from iteration_utilities import grouper
 from dateutil import parser
 from json import load, dump
@@ -30,13 +31,14 @@ class Scheduler(commands.Cog):
         except FileNotFoundError:
             self.events = {}
 
-        self.scheduler = BackgroundScheduler()
+        self.scheduler = BackgroundScheduler(timezone=UTC)
         for name in self.events:
             event = self.events[name]
             if event['remind'] and not self.scheduler.get_job(event['remind-id']):
                 self.scheduler.add_job(self.send_reminder, 'date', run_date=datetime.fromtimestamp(event['time'] - event['remind'] + event['repeat']), args=[name], id=event['remind-id'])
             if not self.scheduler.get_job(event['id']):
                 self.scheduler.add_job(self.send_event, 'date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
+        self.scheduler.start()
 
     def parse_args(self, *args):
         args_dict = {}
