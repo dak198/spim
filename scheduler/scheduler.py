@@ -1,5 +1,6 @@
 from datetime import datetime
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.schedulers.base import JobLookupError
 import asyncio
 from uuid import uuid4
 from pytimeparse import parse
@@ -171,10 +172,12 @@ class Scheduler(commands.Cog):
             with open(FILE_PATH, 'w') as json_file:
                 dump(self.events, json_file, indent=4)
             # remove associated jobs from scheduler
-            if self.scheduler.get_job(event['id']):
+            try:
                 self.scheduler.remove_job(event['id'])
-            if self.scheduler.get_job(event['remind-id']):
-                self.scheduler.remove_job(event['remind-id'])
+                if event['remind']:
+                    self.scheduler.remove_job(event['remind-id'])
+            except JobLookupError as e:
+                raise e
             await ctx.send(f"Removed {name}")
         else:
             await ctx.send(f'{name} not found in events list')
