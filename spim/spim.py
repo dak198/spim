@@ -6,7 +6,7 @@ from random import shuffle
 import asyncio
 
 import discord
-from redbot.core import commands
+from redbot.core import commands, data_manager
 from redbot.core.bot import Red
 from redbot.core.config import Config
 
@@ -20,7 +20,9 @@ class Spim(commands.Cog):
     """Cogs for Red-DiscordBot V3 for use in Gear Getaway"""
 
     def __init__(self, bot: Red) -> None:
-        self.data = load(open('home/ec2-user/data.json'))
+        self.data_path = data_manager.cog_data_path(self) / 'data.json'
+        with open(self.data_path) as data_file:
+            self.data = load(data_file)
         self.bot = bot
         self.config = Config.get_conf(
             self,
@@ -199,8 +201,13 @@ class Spim(commands.Cog):
     ###################
 
     @commands.group(name='server', help='Commands for AWS server management')
-    async def server(self, ctx):
-        """Group for server commands"""
+    async def server(self):
+        """Commands for AWS server management"""
+        pass
+
+    @commands.group(name='set', parent=server, help='Commands for configuring AWS servers')
+    async def set(self):
+        """Commands for configuring AWS servers"""
         pass
 
     @commands.command(name='url', parent=server, help='Print the url currently used for servers managed by Spim')
