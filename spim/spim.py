@@ -244,7 +244,8 @@ class Spim(commands.Cog):
             try:
                 server_dns =  self.data['url']
                 embed_description = '**NEW:** Try accessing the server by using `' + server_dns + '`\n'
-                embed = discord.Embed(title='Active Servers', type='rich', description=embed_description, timestamp=datetime.utcnow())
+                embed_color = await self.bot.get_embed_color(ctx)
+                embed = discord.Embed(title='Active Servers', type='rich', color=embed_color, description=embed_description, timestamp=datetime.utcnow())
                 servers = self.get_server_list(filters=Filters)
                 if servers:
                     for _, name, status, url in servers:
