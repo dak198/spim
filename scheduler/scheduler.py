@@ -212,9 +212,10 @@ class Scheduler(commands.Cog):
                 event = self.events[name]
                 embed.add_field(name='Name', value=name)
                 embed.add_field(name='Time', value=f"<t:{event['time']}:F>")
+                embed.add_field(name='\u200b', value='\u200b')
                 embed.add_field(name='Repeat Interval', value=f"{event['repeat']} seconds")
                 embed.add_field(name='Reminder', value=f"{event['remind']} seconds prior")
-                embed.add_field(name='\u200b', value='\u200b', inline=True)
+                embed.add_field(name='\u200b', value='\u200b')
                 attend_string = ""
                 for user_id in event['attending']:
                     display_name = event['attending'][user_id]
