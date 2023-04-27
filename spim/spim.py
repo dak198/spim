@@ -27,7 +27,7 @@ class Spim(commands.Cog):
         except FileNotFoundError:
             self.data = {}
             with open(self.data_path, 'w') as data_file:
-                dump(self.data, data_file)
+                dump(self.data, data_file, indent=4)
         self.bot = bot
         self.config = Config.get_conf(
             self,
@@ -229,14 +229,14 @@ class Spim(commands.Cog):
                 region_name = self.data['region']
             )
         with open(self.data_path, 'w') as data_file:
-            dump(self.data, data_file)
+            dump(self.data, data_file, indent=4)
 
     @commands.command(name='url', parent=set, help='Set the dns url to use for servers')
     async def set_url(self, ctx: commands.Context, url: str):
         """Set the dns url to use for servers"""
         self.data['url'] = url
         with open(self.data_path, 'w') as data_file:
-            dump(self.data, data_file)
+            dump(self.data, data_file, indent=4)
 
     @commands.command(name='url', parent=server, help='Print the url currently used for servers managed by Spim')
     async def print_url(self, ctx: commands.Context):
