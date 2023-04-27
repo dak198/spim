@@ -223,7 +223,6 @@ class Scheduler(commands.Cog):
                     display_name = event['absent'][user_id]
                     absent_string += f"\n- {display_name}"
                 embed.add_field(name='Absent', value=absent_string, inline=True)
-                text += f"\n**{name}**\nTime: <t:{event['time']}:F>```\nRepeat interval: {event['repeat']} seconds\nReminder: {event['remind']} seconds prior\nAttending: {attend_string}\nAbsent: {absent_string}```"
         else:
             embed.add_field(name='No events scheduled')
         await ctx.send(embed=embed)
