@@ -233,7 +233,7 @@ class Scheduler(commands.Cog):
                 embed.add_field(name='\u200b', value='\u200b', inline=False)
             embed.remove_field(len(embed.fields) - 1)
         else:
-            embed.add_field(name='No events scheduled')
+            embed.description = 'No events scheduled'
         await ctx.send(embed=embed)
 
     @commands.command(name='message', parent=event, help='Schedule a message to send at specified time using `HH:MM` format')
