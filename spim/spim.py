@@ -1,4 +1,5 @@
 from typing import Literal
+from datetime import datetime
 from time import strftime
 from json import load
 from random import shuffle
@@ -164,11 +165,11 @@ class Spim(commands.Cog):
     @commands.command(name='spimpoll', help='Creates a poll with <:spimPog:772261869858848779> <:spimPause:987933390110089216> <:spon:922922345134424116>')
     async def spimpoll(self, ctx, *poll_text):
         """Create a poll with the given text
-        
+
         Keyword arguments:
         *poll_text -- text of the poll message
         """
-        
+
         spims = ['<:spimPog:772261869858848779>', '<:spimPause:987933390110089216>', '<:spon:922922345134424116>']
         channel = ctx.channel
         if poll_text:
@@ -213,7 +214,7 @@ class Spim(commands.Cog):
         await ctx.channel.send(content=self.data['region'])
 
     @commands.command(name='list', parent=server, help='List active and inactive servers')
-    async def server_list(self, ctx, *server_names):
+    async def server_list(self, ctx: commands.Context, *server_names):
         """Lists the status and URL for each server with the 'Spim-Managed' Tag set to true
         
         Keyword arguments:
@@ -242,23 +243,28 @@ class Spim(commands.Cog):
         while timer < UPDATE_COUNT:
             try:
                 server_dns =  self.data['url']
-                text = 'Last Updated: {} UTC\n**NEW:** Try accessing the server by using `' + server_dns + '`\n'
+                embed_description = '**NEW:** Try accessing the server by using `' + server_dns + '`\n'
+                embed = discord.Embed(title='Active Servers', color=self.bot.get_embed_color(), type='rich', description=embed_description, timestamp=datetime.utcnow())
                 servers = self.get_server_list(filters=Filters)
                 if servers:
                     for _, name, status, url in servers:
                         if not url: url = '—————'
-                        text += f'```Server: {name}\nStatus: {status}\nURL:\n{url}```'
+                        text = f'```Status: {status}\nURL:\n{url}```'
+                        embed.add_field(name, text)
                 elif len(server_names) > 1:
-                    text += f'```No servers found with names:\n' + '\n'.join(server_names) + '```'
+                    text = 'No servers found with names:'
+                    embed.add_field(name=text, value='\n'.join(server_names))
                 elif len(server_names) == 1:
-                    text += f'```No server found with name:\n' + '\n'.join(server_names) + '```'
+                    text = 'No server found with name:'
+                    embed.add_field(name=text, value='\n'.join(server_names))
                 else:
-                    text += '```No servers found.```'
+                    text += 'No servers found.'
+                    embed.add_field(name=text)
 
                 if not message:
-                    message = await ctx.channel.send(text.format(strftime("%H:%M")))
+                    message = await ctx.send(embed=embed)
                 else:
-                    await message.edit(content=text.format(strftime("%H:%M")))
+                    await message.edit(embed=embed)
                 timer += 1
                 await asyncio.sleep(SLEEP_DURATION)
             except Exception as e:
