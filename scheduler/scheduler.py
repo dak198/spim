@@ -217,7 +217,7 @@ class Scheduler(commands.Cog):
                 for user_id in event['attending']:
                     display_name = event['attending'][user_id]
                     attend_string += f"\n- {display_name}"
-                embed.add_field(name='Attending', value=attend_string, inline=True)
+                embed.add_field(name='Attending', value=attend_string, inline=False)
                 absent_string = ""
                 for user_id in event['absent']:
                     display_name = event['absent'][user_id]
