@@ -23,13 +23,12 @@ class Scheduler(commands.Cog):
         self.bot = bot
         self.data_path = data_manager.cog_data_path(self) / 'events.json'
         try:
-            json_file = open(self.data_path)
-            self.events = load(json_file)
-            json_file.close()
+            with open(self.data_path) as data_file:
+                self.events = load(data_file)
         except FileNotFoundError:
             self.events = {}
-            with open(self.data_path, 'w') as json_file:
-                dump(self.events, json_file)
+            with open(self.data_path, 'w') as data_file:
+                dump(self.events, data_file)
 
         self.scheduler = AsyncIOScheduler(timezone=timezone('US/Eastern'))
         for name in self.events:

@@ -1,7 +1,7 @@
 from typing import Literal
 from datetime import datetime
 from time import strftime
-from json import load
+from json import load, dump
 from random import shuffle
 import asyncio
 
@@ -21,8 +21,13 @@ class Spim(commands.Cog):
 
     def __init__(self, bot: Red) -> None:
         self.data_path = data_manager.cog_data_path(self) / 'data.json'
-        with open(self.data_path) as data_file:
-            self.data = load(data_file)
+        try:
+            with open(self.data_path) as data_file:
+                self.data = load(data_file)
+        except FileNotFoundError:
+            self.data = {}
+            with open(self.data_path, 'w') as data_file:
+                dump(self.data, data_file)
         self.bot = bot
         self.config = Config.get_conf(
             self,
