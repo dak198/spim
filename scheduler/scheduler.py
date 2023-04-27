@@ -8,6 +8,7 @@ from iteration_utilities import grouper
 from dateutil import parser
 from json import load, dump
 
+from discord import Embed
 from redbot.core import commands
 from redbot.core.bot import Red
 from redbot.core.config import Config
@@ -179,7 +180,7 @@ class Scheduler(commands.Cog):
             await ctx.send(f'{name} not found in events list')
 
     @commands.command(name='edit', parent=event, help='Edit an existing event')
-    async def event_edit(self, ctx, *args):
+    async def event_edit(self, ctx: commands.Context, *args):
         # parse provided arguments into a dict
         options = self.parse_args(*args)
         if options['time']:
@@ -203,23 +204,29 @@ class Scheduler(commands.Cog):
             return
 
     @commands.command(name='list', parent=event, help='List scheduled events')
-    async def event_list(self, ctx, *event_names):
+    async def event_list(self, ctx: commands.Context, *event_names):
+        embed_color = await self.bot.get_embed_color(ctx)
+        embed = Embed(title='Scheduled Events', type='rich', color=embed_color, timestamp=datetime.utcnow())
         if self.events:
-            text = 'Currently scheduled events:'
             for name in self.events:
                 event = self.events[name]
+                embed.add_field(name='Time', value=f"<t:{event['time']}:F>")
+                embed.add_field(name='Repeat Interval', value=f"{event['repeat']} seconds")
+                embed.add_field(name='Reminder', value=f"{event['remind']} seconds prior")
                 attend_string = ""
                 for user_id in event['attending']:
                     display_name = event['attending'][user_id]
                     attend_string += f"\n- {display_name}"
+                embed.add_field(name='Attending', value=attend_string, inline=True)
                 absent_string = ""
                 for user_id in event['absent']:
                     display_name = event['absent'][user_id]
                     absent_string += f"\n- {display_name}"
+                embed.add_field(name='Absent', value=absent_string, inline=True)
                 text += f"\n**{name}**\nTime: <t:{event['time']}:F>```\nRepeat interval: {event['repeat']} seconds\nReminder: {event['remind']} seconds prior\nAttending: {attend_string}\nAbsent: {absent_string}```"
         else:
-            text = '```No events scheduled```'
-        await ctx.send(text)
+            embed.add_field(name='No events scheduled')
+        await ctx.send(embed=embed)
 
     @commands.command(name='message', parent=event, help='Schedule a message to send at specified time using `HH:MM` format')
     async def schedule_message(self, ctx, message, *time_string):
