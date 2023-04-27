@@ -143,7 +143,8 @@ class Spim(commands.Cog):
             await asyncio.sleep(SLEEP_DURATION)
 
         await self.bot.change_presence(activity=None)
-        await ctx.send("```Servers no longer running```")
+        embed = discord.Embed(description="Servers no longer running", timestamp=datetime.utcnow())
+        await ctx.send(embed=embed)
 
 
     ####################
