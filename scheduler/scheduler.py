@@ -10,25 +10,26 @@ from dateutil import parser
 from json import load, dump
 
 from discord import Embed
-from redbot.core import commands
+from redbot.core import commands, data_manager
 from redbot.core.bot import Red
 from redbot.core.config import Config
 
 # path to the json file containing the events list
-FILE_PATH = 'home/ec2-user/events.json'
 
 class Scheduler(commands.Cog):
     """Scheduler for events and reminders"""
 
     def __init__(self, bot: Red) -> None:
         self.bot = bot
-
+        self.data_path = data_manager.cog_data_path(self) / 'events.json'
         try:
-            json_file = open(FILE_PATH)
+            json_file = open(self.data_path)
             self.events = load(json_file)
             json_file.close()
         except FileNotFoundError:
             self.events = {}
+            with open(self.data_path, 'w') as json_file:
+                dump(self.events, json_file)
 
         self.scheduler = AsyncIOScheduler(timezone=timezone('US/Eastern'))
         for name in self.events:
@@ -69,7 +70,7 @@ class Scheduler(commands.Cog):
         # save reminder message id to event data and output to json file
         message_id = message.id
         event['message-id'] = message_id
-        with open(FILE_PATH, 'w') as json_file:
+        with open(self.data_path, 'w') as json_file:
             dump(self.events, json_file, indent=4)
             json_file.close()
         # add reactions to reminder message for users to indicate 'attending' or 'absent'
@@ -94,7 +95,7 @@ class Scheduler(commands.Cog):
         # add event to event list
         self.events[name] = event
         # update event list in external file
-        with open(FILE_PATH, 'w') as json_file:
+        with open(self.data_path, 'w') as json_file:
             dump(self.events, json_file, indent=4)
 
         if event['remind']:
@@ -169,7 +170,7 @@ class Scheduler(commands.Cog):
         event = self.events.pop(name, None)
         if event:
             # update the json file
-            with open(FILE_PATH, 'w') as json_file:
+            with open(self.data_path, 'w') as json_file:
                 dump(self.events, json_file, indent=4)
             # remove associated jobs from scheduler
             try:
@@ -271,7 +272,7 @@ class Scheduler(commands.Cog):
                                 await message.remove_reaction('<:spimPog:772261869858848779>', user)
                             if not user.id in event['absent']:
                                 event['absent'][user.id] = user.display_name
-                        with open(FILE_PATH, 'w') as json_file:
+                        with open(self.data_path, 'w') as json_file:
                             dump(self.events, json_file, indent=4)
 
     @commands.Cog.listener()
@@ -288,5 +289,5 @@ class Scheduler(commands.Cog):
                             event['attending'].pop(user_id, None)
                         elif emoji.name == 'spon':
                             event['absent'].pop(user_id, None)
-                        with open(FILE_PATH, 'w') as json_file:
+                        with open(self.data_path, 'w') as json_file:
                             dump(self.events, json_file, indent=4)
