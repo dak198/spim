@@ -213,16 +213,17 @@ class Scheduler(commands.Cog):
                 embed.add_field(name='Time', value=f"<t:{event['time']}:F>", inline=False)
                 embed.add_field(name='Repeat Interval', value=f"{event['repeat']} seconds")
                 embed.add_field(name='Reminder', value=f"{event['remind']} seconds prior")
+                embed.add_field(name='\u200b', inline=False)
                 attend_string = ""
                 for user_id in event['attending']:
                     display_name = event['attending'][user_id]
                     attend_string += f"\n- {display_name}"
-                embed.add_field(name='Attending', value=attend_string, inline=False)
+                embed.add_field(name='Attending', value=attend_string)
                 absent_string = ""
                 for user_id in event['absent']:
                     display_name = event['absent'][user_id]
                     absent_string += f"\n- {display_name}"
-                embed.add_field(name='Absent', value=absent_string, inline=True)
+                embed.add_field(name='Absent', value=absent_string)
         else:
             embed.add_field(name='No events scheduled')
         await ctx.send(embed=embed)
