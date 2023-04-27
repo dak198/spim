@@ -85,7 +85,7 @@ class Scheduler(commands.Cog):
         else:
             notify = ""
         await self.bot.get_channel(event['channel-id']).send(f"{notify}**{name}** starting now")
-        if self.events['repeat']:
+        if event['repeat']:
             event['time'] += event['repeat']
             self.scheduler.add_job(self.send_event, 'date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
 
