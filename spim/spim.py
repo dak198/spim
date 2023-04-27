@@ -222,7 +222,7 @@ class Spim(commands.Cog):
         pass
 
     @commands.command(name='region', parent=set, help='Set the server region')
-    async def set_region(self, region: str):
+    async def set_region(self, ctx: commands.Context, region: str):
         """Set the server region"""
         self.data['region'] = region
         self.boto_config = botocore.config.Config(
@@ -232,7 +232,7 @@ class Spim(commands.Cog):
             dump(self.data, data_file)
 
     @commands.command(name='url', parent=set, help='Set the dns url to use for servers')
-    async def set_url(self, url: str):
+    async def set_url(self, ctx: commands.Context, url: str):
         """Set the dns url to use for servers"""
         self.data['url'] = url
         with open(self.data_path, 'w') as data_file:
