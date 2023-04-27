@@ -226,7 +226,7 @@ class Scheduler(commands.Cog):
                     absent_string += f"\n> {display_name}"
                 embed.add_field(name='Absent', value=absent_string)
                 embed.add_field(name='\u200b', value='\u200b', inline=False)
-            embed.remove_field(len(embed.fields - 1))
+            embed.remove_field(len(embed.fields) - 1)
         else:
             embed.add_field(name='No events scheduled')
         await ctx.send(embed=embed)
