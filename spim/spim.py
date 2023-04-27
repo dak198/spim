@@ -221,6 +221,23 @@ class Spim(commands.Cog):
         """Commands for configuring AWS servers"""
         pass
 
+    @commands.command(name='region', parent=set, help='Set the server region')
+    async def set_region(self, region: str):
+        """Set the server region"""
+        self.data['region'] = region
+        self.boto_config = botocore.config.Config(
+                region_name = self.data['region']
+            )
+        with open(self.data_path, 'w') as data_file:
+            dump(self.data, data_file)
+
+    @commands.command(name='url', parent=set, help='Set the dns url to use for servers')
+    async def set_url(self, url: str):
+        """Set the dns url to use for servers"""
+        self.data['url'] = url
+        with open(self.data_path, 'w') as data_file:
+            dump(self.data, data_file)
+
     @commands.command(name='url', parent=server, help='Print the url currently used for servers managed by Spim')
     async def print_url(self, ctx: commands.Context):
         """Print the dns url for the given service, stored in an external json file on the server running the bot"""
