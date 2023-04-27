@@ -35,9 +35,15 @@ class Spim(commands.Cog):
             force_registration=True,
         )
 
-        self.boto_config = botocore.config.Config(
-            region_name = self.data['region']
-        )
+        if 'region' in self.data:
+            self.boto_config = botocore.config.Config(
+                region_name = self.data['region']
+            )
+        else:
+            # set region to default if no region found in data file
+            self.boto_config = botocore.config.Config(
+                region_name = 'us-west-2'
+            )
 
         self.server_names = []
 
@@ -109,7 +115,7 @@ class Spim(commands.Cog):
 
         return response
 
-    async def set_status(self, ctx, *server_names):
+    async def set_status(self, ctx: commands.Context, *server_names):
         """Sets the bots status to "Streaming servers running" (it's a bit weird, but that's Discord for you)
             Checks every 5 minutes if servers are still running, unsets the status if they aren't
         
@@ -159,7 +165,7 @@ class Spim(commands.Cog):
     ####################
 
     @commands.command(name='spimify', help='Reacts with every Spim emote to a message you reply to with this command')
-    async def spimify(self, ctx):
+    async def spimify(self, ctx: commands.Context):
         """Reacts with every spim emote to a replied message"""
         
         spims = ['<:spimPog:772261869858848779>', '<:spimPogR:775434707231047680>', '<:spimBall:1066624826086793366>', '<:spimPride:988519886479327242>', '<:spimThink:949780590121607209>', '<:spinta:1041857241600507924>']
@@ -171,7 +177,7 @@ class Spim(commands.Cog):
             await message.add_reaction(s)
     
     @commands.command(name='spimpoll', help='Creates a poll with <:spimPog:772261869858848779> <:spimPause:987933390110089216> <:spon:922922345134424116>')
-    async def spimpoll(self, ctx, *poll_text):
+    async def spimpoll(self, ctx: commands.Context, *poll_text):
         """Create a poll with the given text
 
         Keyword arguments:
@@ -187,7 +193,7 @@ class Spim(commands.Cog):
                 await poll_message.add_reaction(s)
 
     @commands.command(name='say', help='Enter a message for Spim to say')
-    async def say(self, ctx, *message_text):
+    async def say(self, ctx: commands.Context, *message_text):
         """Enter a message for the bot to say
         
         Keyword arguments:
@@ -216,13 +222,16 @@ class Spim(commands.Cog):
         pass
 
     @commands.command(name='url', parent=server, help='Print the url currently used for servers managed by Spim')
-    async def print_url(self, ctx):
+    async def print_url(self, ctx: commands.Context):
         """Print the dns url for the given service, stored in an external json file on the server running the bot"""
-        server_dns = self.data['url']
-        await ctx.channel.send(f'`{server_dns}`')
+        if 'url' in self.data:
+            server_dns = self.data['url']
+            await ctx.channel.send(f'`{server_dns}`')
+        else:
+            await ctx.channel.send('`No url set`')
 
     @commands.command(name='region', parent=server, help='Print the name of the region used in boto3 config')
-    async def print_region(self, ctx):
+    async def print_region(self, ctx: commands.Context):
         """Print the region used for boto3 config"""
         await ctx.channel.send(content=self.data['region'])
 
@@ -255,8 +264,11 @@ class Spim(commands.Cog):
         message = None
         while timer < UPDATE_COUNT:
             try:
-                server_dns =  self.data['url']
-                embed_description = '**NEW:** Try accessing the server by using `' + server_dns + '`\n'
+                if 'url' in self.data:
+                    server_dns =  self.data['url']
+                    embed_description = 'Servers accessible through `' + server_dns + '`\n'
+                else:
+                    embed_description = f"Try setting a url with {self.bot.get_prefix(ctx.message)}server set url` for easier server access"
                 embed_color = await self.bot.get_embed_color(ctx)
                 embed = discord.Embed(title='Active Servers', type='rich', color=embed_color, description=embed_description, timestamp=datetime.utcnow())
                 servers = self.get_server_list(filters=Filters)
@@ -285,7 +297,7 @@ class Spim(commands.Cog):
                 raise e
 
     @commands.command(name='start', parent=server, help='Start the specified servers')
-    async def server_start(self, ctx, *server_names):
+    async def server_start(self, ctx: commands.Context, *server_names):
         """Starts the server with the specified name
             Prints the status if the server is already started.
             Keeps users updated of server status for a few minutes afterward.
