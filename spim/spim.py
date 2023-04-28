@@ -190,7 +190,7 @@ class Spim(commands.Cog):
         if items:
             items = list(items)
         if name in self.lists:
-            self.lists[name].append(items)
+            self.lists[name].extend(items)
         else:
             self.lists[name] = list(items)
         with open(self.list_path, 'w') as list_file:
