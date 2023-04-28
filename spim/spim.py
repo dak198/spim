@@ -176,9 +176,12 @@ class Spim(commands.Cog):
     async def manage_list(self, ctx: commands.Context, name):
         """Prints the list with the given name"""
         list_text = ''
-        for item in self.lists[name]:
-            list_text += f"• {item}\n"
-        embed = discord.Embed(title=name, description=list_text)
+        if name in self.lists:
+            for item in self.lists[name]:
+                list_text += f"• {item}\n"
+            embed = discord.Embed(title=name, description=list_text)
+        else:
+            embed = discord.Embed(description='List not found')
         await ctx.send(embed=embed)
 
     @commands.command(name='add', parent=manage_list, help='Add items to a list')
