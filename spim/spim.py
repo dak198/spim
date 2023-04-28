@@ -184,7 +184,10 @@ class Spim(commands.Cog):
     @commands.command(name='add', parent=manage_list, help='Add items to a list')
     async def list_add(self, ctx: commands.Context, name, *items):
         """Add items to a list"""
-        self.lists[name].append(items)
+        if name in self.lists:
+            self.lists[name].append(items)
+        else:
+            self.lists[name] = items
         with open(self.list_path, 'w') as list_file:
             dump(self.lists, list_file)
 
