@@ -187,6 +187,8 @@ class Spim(commands.Cog):
     @commands.command(name='add', parent=manage_list, help='Add items to a list')
     async def list_add(self, ctx: commands.Context, name, *items):
         """Add items to a list"""
+        if items:
+            items = list(items)
         if name in self.lists:
             self.lists[name].append(items)
         else:
@@ -199,7 +201,8 @@ class Spim(commands.Cog):
         """Remove a list or remove items from a list"""
         if name in self.lists:
             if items:
-                self.lists = [item for item in self.lists if item not in items]
+                items = list(items)
+                self.lists[name] = [item for item in self.lists if item not in items]
                 with open(self.list_path, 'w') as list_file:
                     dump(self.lists, list_file, indent=4)
                 if len(items) > 1:
