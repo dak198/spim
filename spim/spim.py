@@ -24,18 +24,18 @@ class Spim(commands.Cog):
         self.list_path = data_manager.cog_data_path(self) / 'lists.json'
         try:
             with open(self.server_config_path) as server_config_file:
-                self.data = load(server_config_file)
+                self.server_config = load(server_config_file)
         except FileNotFoundError:
-            self.data = {}
+            self.server_config = {}
             with open(self.server_config_path, 'w') as server_config_file:
-                dump(self.data, server_config_file, indent=4)
+                dump(self.server_config, server_config_file, indent=4)
         try:
             with open(self.list_path) as list_file:
                 self.lists = load(list_file)
         except FileNotFoundError:
             self.lists = {}
             with open(self.list_path, 'w') as list_file:
-                dump(self.list_path, list_file, indent=4)
+                dump(self.lists, list_file, indent=4)
         self.bot = bot
         self.config = Config.get_conf(
             self,
@@ -43,9 +43,9 @@ class Spim(commands.Cog):
             force_registration=True,
         )
 
-        if 'region' in self.data:
+        if 'region' in self.server_config:
             self.boto_config = botocore.config.Config(
-                region_name = self.data['region']
+                region_name = self.server_config['region']
             )
         else:
             # set region to default if no region found in data file
@@ -249,25 +249,25 @@ class Spim(commands.Cog):
     @commands.command(name='region', parent=set, help='Set the server region')
     async def set_region(self, ctx: commands.Context, region: str):
         """Set the server region"""
-        self.data['region'] = region
+        self.server_config['region'] = region
         self.boto_config = botocore.config.Config(
-                region_name = self.data['region']
+                region_name = self.server_config['region']
             )
         with open(self.server_config_path, 'w') as server_config_file:
-            dump(self.data, server_config_file, indent=4)
+            dump(self.server_config, server_config_file, indent=4)
 
     @commands.command(name='url', parent=set, help='Set the dns url to use for servers')
     async def set_url(self, ctx: commands.Context, url: str):
         """Set the dns url to use for servers"""
-        self.data['url'] = url
+        self.server_config['url'] = url
         with open(self.server_config_path, 'w') as server_config_file:
-            dump(self.data, server_config_file, indent=4)
+            dump(self.server_config, server_config_file, indent=4)
 
     @commands.command(name='url', parent=server, help='Print the url currently used for servers managed by Spim')
     async def print_url(self, ctx: commands.Context):
         """Print the dns url for the given service, stored in an external json file on the server running the bot"""
-        if 'url' in self.data:
-            server_dns = self.data['url']
+        if 'url' in self.server_config:
+            server_dns = self.server_config['url']
             await ctx.channel.send(f'`{server_dns}`')
         else:
             await ctx.channel.send('`No url set`')
@@ -275,7 +275,7 @@ class Spim(commands.Cog):
     @commands.command(name='region', parent=server, help='Print the name of the region used in boto3 config')
     async def print_region(self, ctx: commands.Context):
         """Print the region used for boto3 config"""
-        await ctx.channel.send(content=self.data['region'])
+        await ctx.channel.send(content=self.server_config['region'])
 
     @commands.command(name='list', parent=server, help='List active and inactive servers')
     async def server_list(self, ctx: commands.Context, *server_names):
@@ -306,8 +306,8 @@ class Spim(commands.Cog):
         message = None
         while timer < UPDATE_COUNT:
             try:
-                if 'url' in self.data:
-                    server_dns =  self.data['url']
+                if 'url' in self.server_config:
+                    server_dns =  self.server_config['url']
                     embed_description = 'Servers accessible through `' + server_dns + '`\n'
                 else:
                     embed_description = f"Try setting a url with `{ctx.prefix}server set url` for easier server access"
