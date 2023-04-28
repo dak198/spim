@@ -175,18 +175,20 @@ class Spim(commands.Cog):
     @commands.group(name='list', invoke_without_command=True)
     async def manage_list(self, ctx: commands.Context, name):
         """Prints the list with the given name"""
+        embed_color = await self.bot.get_embed_color(ctx)
         list_text = ''
         if name in self.lists:
             for item in self.lists[name]:
                 list_text += f"• {item}\n"
-            embed = discord.Embed(title=name, description=list_text)
+            embed = discord.Embed(title=name, description=list_text, color=embed_color)
         else:
-            embed = discord.Embed(description='List not found')
+            embed = discord.Embed(description='List not found', color=embed_color)
         await ctx.send(embed=embed)
 
     @commands.command(name='add', parent=manage_list, help='Add items to a list')
     async def list_add(self, ctx: commands.Context, name, *items):
         """Add items to a list"""
+        embed_color = await self.bot.get_embed_color(ctx)
         if items:
             items = list(items)
         if name in self.lists:
@@ -199,23 +201,24 @@ class Spim(commands.Cog):
     @commands.command(name='remove', parent=manage_list, help='Remove a list or remove items from a list')
     async def list_remove(self, ctx: commands.Context, name, *items):
         """Remove a list or remove items from a list"""
+        embed_color = await self.bot.get_embed_color(ctx)
         if name in self.lists:
             if items:
                 items = list(items)
-                self.lists[name] = [item for item in self.lists if item not in items]
+                self.lists[name] = [item for item in self.lists[name] if item not in items]
                 with open(self.list_path, 'w') as list_file:
                     dump(self.lists, list_file, indent=4)
                 if len(items) > 1:
-                    embed = discord.Embed(description=f"Removed **{len(items)}** items from **{name}**")
+                    embed = discord.Embed(description=f"Removed **{len(items)}** items from **{name}**", color=embed_color)
                 else:
-                    embed = discord.Embed(description=f"Removed **{len(items)}** items from **{name}**")
+                    embed = discord.Embed(description=f"Removed **{len(items)}** items from **{name}**", color=embed_color)
             else:
                 self.lists.pop(name)
-                embed = discord.Embed(description=f"Deleted **{name}**")
+                embed = discord.Embed(description=f"Deleted **{name}**", color=embed_color)
             with open(self.list_path, 'w') as list_file:
                 dump(self.lists, list_file, indent=4)
         else:
-            embed = discord.Embed(description=f"List not found")
+            embed = discord.Embed(description=f"List not found", color=embed_color)
         await ctx.send(embed=embed)
 
     @commands.command(name='spimify', help='Reacts with every Spim emote to a message you reply to with this command')
