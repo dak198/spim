@@ -197,6 +197,11 @@ class Spim(commands.Cog):
             self.lists[name] = list(items)
         with open(self.list_path, 'w') as list_file:
             dump(self.lists, list_file, indent=4)
+        if len(items) > 1:
+            embed = discord.Embed(description=f"Added **{len(items)}** item to **{name}**", color=embed_color)
+        else:
+            embed = discord.Embed(description=f"Added **{len(items)}** items to **{name}**", color=embed_color)
+        await ctx.send(embed=embed)
 
     @commands.command(name='remove', parent=manage_list, help='Remove a list or remove items from a list')
     async def list_remove(self, ctx: commands.Context, name, *items):
@@ -209,7 +214,7 @@ class Spim(commands.Cog):
                 with open(self.list_path, 'w') as list_file:
                     dump(self.lists, list_file, indent=4)
                 if len(items) > 1:
-                    embed = discord.Embed(description=f"Removed **{len(items)}** items from **{name}**", color=embed_color)
+                    embed = discord.Embed(description=f"Removed **{len(items)}** item from **{name}**", color=embed_color)
                 else:
                     embed = discord.Embed(description=f"Removed **{len(items)}** items from **{name}**", color=embed_color)
             else:
