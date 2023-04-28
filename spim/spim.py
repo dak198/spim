@@ -212,7 +212,7 @@ class Spim(commands.Cog):
                 items = list(items)
                 for item in items:
                     if not item in self.lists[name]:
-                        await ctx.send(discord.Embed(description=f"**{item}** not found in **{name}**", color=embed_color))
+                        await ctx.send(embed=discord.Embed(description=f"**{item}** not found in **{name}**", color=embed_color))
                         return
                 self.items[name] = [item for item in self.items[name] if item not in items]
                 with open(self.list_path, 'w') as list_file:
