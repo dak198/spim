@@ -285,7 +285,8 @@ class Spim(commands.Cog):
                     server_dns =  self.data['url']
                     embed_description = 'Servers accessible through `' + server_dns + '`\n'
                 else:
-                    embed_description = f"Try setting a url with {self.bot.get_prefix(ctx.message)}server set url` for easier server access"
+                    prefix = await self.bot.get_prefix(ctx.message)
+                    embed_description = f"Try setting a url with {prefix}server set url` for easier server access"
                 embed_color = await self.bot.get_embed_color(ctx)
                 embed = discord.Embed(title='Active Servers', type='rich', color=embed_color, description=embed_description, timestamp=datetime.utcnow())
                 servers = self.get_server_list(filters=Filters)
