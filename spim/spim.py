@@ -190,10 +190,30 @@ class Spim(commands.Cog):
         if name in self.lists:
             self.lists[name].append(items)
         else:
-            self.lists[name] = items
+            self.lists[name] = list(items)
         with open(self.list_path, 'w') as list_file:
-            dump(self.lists, list_file)
+            dump(self.lists, list_file, indent=4)
 
+    @commands.command(name='remove', parent=manage_list, help='Remove a list or remove items from a list')
+    async def list_remove(self, ctx: commands.Context, name, *items):
+        """Remove a list or remove items from a list"""
+        if name in self.lists:
+            if items:
+                self.lists = [item for item in self.lists if item not in items]
+                with open(self.list_path, 'w') as list_file:
+                    dump(self.lists, list_file, indent=4)
+                if len(items) > 1:
+                    embed = discord.Embed(description=f"Removed **{len(items)}** items from **{name}**")
+                else:
+                    embed = discord.Embed(description=f"Removed **{len(items)}** items from **{name}**")
+            else:
+                self.lists.pop(name)
+                embed = discord.Embed(description=f"Deleted **{name}**")
+            with open(self.list_path, 'w') as list_file:
+                dump(self.lists, list_file, indent=4)
+        else:
+            embed = discord.Embed(description=f"List not found")
+        await ctx.send(embed=embed)
 
     @commands.command(name='spimify', help='Reacts with every Spim emote to a message you reply to with this command')
     async def spimify(self, ctx: commands.Context):
