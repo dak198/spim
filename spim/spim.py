@@ -20,14 +20,22 @@ class Spim(commands.Cog):
     """Cogs for Red-DiscordBot V3 for use in Gear Getaway"""
 
     def __init__(self, bot: Red) -> None:
-        self.data_path = data_manager.cog_data_path(self) / 'data.json'
+        self.server_config_path = data_manager.cog_data_path(self) / 'server-config.json'
+        self.list_path = data_manager.cog_data_path(self) / 'lists.json'
         try:
-            with open(self.data_path) as data_file:
-                self.data = load(data_file)
+            with open(self.server_config_path) as server_config_file:
+                self.data = load(server_config_file)
         except FileNotFoundError:
             self.data = {}
-            with open(self.data_path, 'w') as data_file:
-                dump(self.data, data_file, indent=4)
+            with open(self.server_config_path, 'w') as server_config_file:
+                dump(self.data, server_config_file, indent=4)
+        try:
+            with open(self.list_path) as list_file:
+                self.lists = load(list_file)
+        except FileNotFoundError:
+            self.lists = {}
+            with open(self.list_path, 'w') as list_file:
+                dump(self.list_path, list_file, indent=4)
         self.bot = bot
         self.config = Config.get_conf(
             self,
@@ -94,12 +102,12 @@ class Spim(commands.Cog):
 
     def start_instance(self, inst_id):
         """Start the EC2 instance with the specified instance id
-        
+
         Keyword arguments:
         inst_id -- the id of the instance to start
         Return: the response of ec2.start_instances for the given instance id
         """
-        
+
         ec2 = boto3.client('ec2', config=self.boto_config)
 
         try:
@@ -118,11 +126,11 @@ class Spim(commands.Cog):
     async def set_status(self, ctx: commands.Context, *server_names):
         """Sets the bots status to "Streaming servers running" (it's a bit weird, but that's Discord for you)
             Checks every 5 minutes if servers are still running, unsets the status if they aren't
-        
+
         Keyword arguments:
         server_names -- optional list of running servers to print to chat
         """
-        
+
         SLEEP_DURATION = 5*60
 
         if server_names:
@@ -164,10 +172,27 @@ class Spim(commands.Cog):
     # GENERAL COMMANDS #
     ####################
 
+    @commands.group(name='list', invoke_without_command=True)
+    async def manage_list(self, ctx: commands.Context, name):
+        """Prints the list with the given name"""
+        list_text = ''
+        for item in self.lists[name]:
+            list_text += f"• {item}\n"
+        embed = discord.Embed(title=name, description=list_text)
+        await ctx.send(embed=embed)
+
+    @commands.command(name='add', parent=manage_list, help='Add items to a list')
+    async def list_add(self, ctx: commands.Context, name, *items):
+        """Add items to a list"""
+        self.lists[name].append(items)
+        with open(self.list_path, 'w') as list_file:
+            dump(self.lists, list_file)
+
+
     @commands.command(name='spimify', help='Reacts with every Spim emote to a message you reply to with this command')
     async def spimify(self, ctx: commands.Context):
         """Reacts with every spim emote to a replied message"""
-        
+
         spims = ['<:spimPog:772261869858848779>', '<:spimPogR:775434707231047680>', '<:spimBall:1066624826086793366>', '<:spimPride:988519886479327242>', '<:spimThink:949780590121607209>', '<:spinta:1041857241600507924>']
         shuffle(spims)
         channel = ctx.channel
@@ -195,11 +220,11 @@ class Spim(commands.Cog):
     @commands.command(name='say', help='Enter a message for Spim to say')
     async def say(self, ctx: commands.Context, *message_text):
         """Enter a message for the bot to say
-        
+
         Keyword arguments:
         *message_text -- text of the message
         """
-        
+
         await ctx.message.delete()
         if message_text:
             await ctx.send(' '.join(message_text))
@@ -228,15 +253,15 @@ class Spim(commands.Cog):
         self.boto_config = botocore.config.Config(
                 region_name = self.data['region']
             )
-        with open(self.data_path, 'w') as data_file:
-            dump(self.data, data_file, indent=4)
+        with open(self.server_config_path, 'w') as server_config_file:
+            dump(self.data, server_config_file, indent=4)
 
     @commands.command(name='url', parent=set, help='Set the dns url to use for servers')
     async def set_url(self, ctx: commands.Context, url: str):
         """Set the dns url to use for servers"""
         self.data['url'] = url
-        with open(self.data_path, 'w') as data_file:
-            dump(self.data, data_file, indent=4)
+        with open(self.server_config_path, 'w') as server_config_file:
+            dump(self.data, server_config_file, indent=4)
 
     @commands.command(name='url', parent=server, help='Print the url currently used for servers managed by Spim')
     async def print_url(self, ctx: commands.Context):
@@ -255,11 +280,11 @@ class Spim(commands.Cog):
     @commands.command(name='list', parent=server, help='List active and inactive servers')
     async def server_list(self, ctx: commands.Context, *server_names):
         """Lists the status and URL for each server with the 'Spim-Managed' Tag set to true
-        
+
         Keyword arguments:
         server_names -- optional list of server names to list
         """
-        
+
         SLEEP_DURATION = 20
         UPDATE_COUNT = 6
 
