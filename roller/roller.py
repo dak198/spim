@@ -25,7 +25,7 @@ class Roller(commands.Cog):
         rolls = {'TOO_BIG': False}
         result = expression.evaluate(rolls)
         result_string = str(result)
-        embed = Embed(title=result_string, timestamp=datetime.utcnow(), color=color)
+        embed = Embed(title=result_string, color=color)
         embed.set_author(name=ctx.author.name, icon_url=ctx.author.avatar_url)
 
         if not rolls['TOO_BIG']:
