@@ -19,12 +19,14 @@ class Roller(commands.Cog):
     @commands.command(name="roll", help="output a random roll for a given combination of dice")
     async def roll(self, ctx: commands.Context, *input_string):
         # remove all whitespace from input string
+        color = await self.bot.get_embed_color(ctx)
         input_string = ''.join(input_string)
         expression = Expression(input_string)
         rolls = {'TOO_BIG': False}
         result = expression.evaluate(rolls)
         result_string = str(result)
-        embed = Embed(title=result_string, author=ctx.author, timestamp=datetime.utcnow())
+        embed = Embed(title=result_string, timestamp=datetime.utcnow(), color=color)
+        embed.set_author(ctx.author)
 
         if not rolls['TOO_BIG']:
             for die in rolls:
