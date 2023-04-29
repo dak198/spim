@@ -1,8 +1,9 @@
 import random
 import re
 import math
+from datetime import datetime
 
-import discord
+from discord import Embed
 from redbot.core import commands
 from redbot.core.bot import Red
 from redbot.core.config import Config
@@ -16,32 +17,34 @@ class Roller(commands.Cog):
         self.bot = bot
 
     @commands.command(name="roll", help="output a random roll for a given combination of dice")
-    async def roll(self, ctx, *input_string):
+    async def roll(self, ctx: commands.Context, *input_string):
         # remove all whitespace from input string
         input_string = ''.join(input_string)
         expression = Expression(input_string)
         rolls = {'TOO_BIG': False}
         result = expression.evaluate(rolls)
-        message_string = str(result)
+        result_string = str(result)
+        embed = Embed(author=ctx.author, timestamp=datetime.utcnow())
+        embed.add_field(name='Result', value=result_string)
 
         if not rolls['TOO_BIG']:
             for die in rolls:
                 if die != 'TOO_BIG':
-                    message_string += f"\n{die}: {' '.join(rolls[die])}"
+                    embed.add_field(name=die, value=' '.join(rolls[die]))
 
-        if len(message_string) > MESSAGE_LENGTH_LIMIT:
-            message_string = str(result)
-        await ctx.send(message_string)
+        # if len(message_string) > MESSAGE_LENGTH_LIMIT:
+        #     message_string = str(result)
+        await ctx.send(embed=embed)
 
 def inside_paren(expr_string: str, index: int):
     """Determines if a given index in a string is inside a set of parentheses
-    
+
     Keyword arguments:
     expr_string -- string that may contain parentheses
     index -- index to check
     Return: True if index is inside at least one set of parentheses, False otherwise
     """
-    
+
     leading = {
         # number of '(' characters before the index
         '(': expr_string.count('(', 0, index),
