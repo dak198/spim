@@ -24,8 +24,7 @@ class Roller(commands.Cog):
         rolls = {'TOO_BIG': False}
         result = expression.evaluate(rolls)
         result_string = str(result)
-        embed = Embed(author=ctx.author, timestamp=datetime.utcnow())
-        embed.add_field(name='Result', value=result_string)
+        embed = Embed(title=result_string, author=ctx.author, timestamp=datetime.utcnow())
 
         if not rolls['TOO_BIG']:
             for die in rolls:
