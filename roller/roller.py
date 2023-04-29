@@ -31,7 +31,7 @@ class Roller(commands.Cog):
         if not rolls['TOO_BIG']:
             for die in rolls:
                 if die != 'TOO_BIG':
-                    embed.add_field(name=die, value=' '.join(rolls[die]))
+                    embed.add_field(name=die, value=f"> {' '.join(rolls[die])}")
 
         # if len(message_string) > MESSAGE_LENGTH_LIMIT:
         #     message_string = str(result)
