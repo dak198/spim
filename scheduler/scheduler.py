@@ -41,8 +41,6 @@ class Scheduler(commands.Cog):
             if not self.scheduler.get_job(event['id']):
                 self.scheduler.add_job(self.send_event, 'date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
         self.scheduler.start()
-        print(f"Jobs:\n{str(self.scheduler.get_jobs())}")
-        raise ValueError
 
 
     ####################
@@ -115,7 +113,6 @@ class Scheduler(commands.Cog):
         if event['notify']:
             message_string += ' Notifying with `@everyone`'
         await ctx.send(message_string)
-        print(f"Jobs:\n{str(self.scheduler.get_jobs())}")
 
 
     ##################
@@ -168,7 +165,6 @@ class Scheduler(commands.Cog):
             event['notify'] = True
         # process the newly added event
         await self.add_event(ctx, name, event)
-        print(f"Jobs:\n{str(self.scheduler.get_jobs())}")
 
     @commands.command(name='cancel', parent=event, help='Cancel a scheduled event')
     async def event_cancel(self, ctx, name):
@@ -188,7 +184,6 @@ class Scheduler(commands.Cog):
             await ctx.send(f"Removed {name}")
         else:
             await ctx.send(f'{name} not found in events list')
-        print(f"Jobs:\n{str(self.scheduler.get_jobs())}")
 
     @commands.command(name='edit', parent=event, help='Edit an existing event')
     async def event_edit(self, ctx: commands.Context, *args):
@@ -213,7 +208,6 @@ class Scheduler(commands.Cog):
         else:
             await ctx.send('Must specify event name')
             return
-        print(f"Jobs:\n{str(self.scheduler.get_jobs())}")
 
     @commands.command(name='list', parent=event, help='List scheduled events')
     async def event_list(self, ctx: commands.Context, *event_names):
