@@ -111,7 +111,7 @@ class Scheduler(commands.Cog):
         if event['remind']:
             message_string += f" Sending reminder `{event['remind']}` seconds before event."
         if event['notify']:
-            message_string += ' Notifying with `@everyone`'
+            message_string += ' Notifying with `@everyone`.'
         await ctx.send(message_string)
 
 
