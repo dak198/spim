@@ -111,6 +111,7 @@ class Scheduler(commands.Cog):
         if event['notify']:
             message_string += ' Notifying with `@everyone`'
         await ctx.send(message_string)
+        print(f"Jobs:\n{str(self.scheduler.get_jobs())}")
 
 
     ##################
@@ -183,7 +184,7 @@ class Scheduler(commands.Cog):
             await ctx.send(f"Removed {name}")
         else:
             await ctx.send(f'{name} not found in events list')
-            print(f"Jobs:\n{str(self.scheduler.get_jobs())}")
+        print(f"Jobs:\n{str(self.scheduler.get_jobs())}")
 
     @commands.command(name='edit', parent=event, help='Edit an existing event')
     async def event_edit(self, ctx: commands.Context, *args):
