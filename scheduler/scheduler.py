@@ -42,7 +42,7 @@ class Scheduler(commands.Cog):
                 self.scheduler.add_job(self.send_event, 'date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
         self.scheduler.start()
 
-    def __del__(self):
+    def cog_unload(self):
         self.scheduler.shutdown()
 
     ####################
