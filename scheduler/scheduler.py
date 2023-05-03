@@ -206,7 +206,7 @@ class Scheduler(commands.Cog):
     async def event_edit(self, ctx: commands.Context, *args):
         # parse provided arguments into a dict
         options = self.parse_args(*args)
-        if options['time']:
+        if 'time' in options:
             options['time'] = int(round(parser.parse(timestr=options['time'], fuzzy=True).timestamp()))
         # check for if an event name was provided
         name = options.pop('name', None)
