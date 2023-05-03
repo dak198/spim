@@ -140,6 +140,10 @@ class Scheduler(commands.Cog):
     # EVENT COMMANDS #
     ##################
 
+    @commands.command(name='print-jobs', help='Print all jobs from the scheduler')
+    async def print_jobs(self, ctx):
+        await ctx.send(f"`{str(self.scheduler.get_jobs())}`")
+
     @commands.group(name='event', help='Commands for managing events and reminders')
     async def event(self, ctx):
         pass
