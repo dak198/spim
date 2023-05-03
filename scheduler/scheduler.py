@@ -76,7 +76,6 @@ class Scheduler(commands.Cog):
         event['message-id'] = message_id
         with open(self.data_path, 'w') as json_file:
             dump(self.events, json_file, indent=4)
-            json_file.close()
         # add reactions to reminder message for users to indicate 'attending' or 'absent'
         await message.add_reaction('<:spimPog:772261869858848779>')
         await message.add_reaction('<:spon:922922345134424116>')
