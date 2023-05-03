@@ -91,6 +91,26 @@ class Scheduler(commands.Cog):
         if event['repeat']:
             event['time'] += event['repeat']
             self.scheduler.add_job(self.send_event, 'date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
+        else:
+            self.remove_event(name)
+
+    def remove_event(self, name: str):
+        # attempt to remove event with given name from event list
+        event = self.events.pop(name, None)
+        if event:
+            # update the json file
+            with open(self.data_path, 'w') as json_file:
+                dump(self.events, json_file, indent=4)
+            # remove associated jobs from scheduler
+            try:
+                self.scheduler.remove_job(event['id'])
+                if event['remind']:
+                    self.scheduler.remove_job(event['remind-id'])
+            except JobLookupError as e:
+                raise e
+            return True
+        else:
+            return False
 
 
     async def add_event(self, ctx, name: str, event: dict):
@@ -168,19 +188,7 @@ class Scheduler(commands.Cog):
 
     @commands.command(name='cancel', parent=event, help='Cancel a scheduled event')
     async def event_cancel(self, ctx, name):
-        # attempt to remove event with given name from event list
-        event = self.events.pop(name, None)
-        if event:
-            # update the json file
-            with open(self.data_path, 'w') as json_file:
-                dump(self.events, json_file, indent=4)
-            # remove associated jobs from scheduler
-            try:
-                self.scheduler.remove_job(event['id'])
-                if event['remind']:
-                    self.scheduler.remove_job(event['remind-id'])
-            except JobLookupError as e:
-                raise e
+        if self.remove_event(name):
             await ctx.send(f"Removed {name}")
         else:
             await ctx.send(f'{name} not found in events list')
