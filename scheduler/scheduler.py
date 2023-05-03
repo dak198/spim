@@ -38,6 +38,7 @@ class Scheduler(commands.Cog):
             if not self.scheduler.get_job(event['id']):
                 self.scheduler.add_job(self.send_event, 'date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
         self.scheduler.start()
+        raise ValueError("Jobs:\n{}".format('\n'.join(self.scheduler.get_jobs())))
 
 
     ####################
