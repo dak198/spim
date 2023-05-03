@@ -34,7 +34,7 @@ class Scheduler(commands.Cog):
         for name in self.events:
             event = self.events[name]
             if event['remind'] and not self.scheduler.get_job(event['remind-id']):
-                if event['time'] - event['remind'] > datetime.utcnow():
+                if event['time'] - event['remind'] > datetime.utcnow().timestamp():
                     self.scheduler.add_job(self.send_reminder, 'date', run_date=datetime.fromtimestamp(event['time'] - event['remind']), args=[name], id=event['remind-id'])
                 elif event['repeat']:
                     self.scheduler.add_job(self.send_reminder, 'date', run_date=datetime.fromtimestamp(event['time'] - event['remind'] + event['repeat']), args=[name], id=event['remind-id'])
