@@ -9,7 +9,7 @@ from iteration_utilities import grouper
 from dateutil import parser
 from json import load, dump
 
-from discord import Embed
+from discord import Embed, AllowedMentions
 from redbot.core import commands, data_manager
 from redbot.core.bot import Red
 from redbot.core.config import Config
@@ -66,11 +66,13 @@ class Scheduler(commands.Cog):
         # add @everyone to the reminder string if enabled
         if event['notify']:
             notify = "@everyone "
+            allowed_mentions = AllowedMentions(everyone=True)
         else:
+            allowed_mentions = None
             notify=""
         # send reminder string
         reminder_string = f"{notify}**{name}** starting <t:{timestamp}:F>"
-        message = await self.bot.get_channel(event['channel-id']).send(reminder_string)
+        message = await self.bot.get_channel(event['channel-id']).send(reminder_string, allowed_mentions=allowed_mentions)
         # save reminder message id to event data and output to json file
         message_id = message.id
         event['message-id'] = message_id
@@ -86,9 +88,11 @@ class Scheduler(commands.Cog):
         event = self.events[name]
         if event['notify']:
             notify = "@everyone "
+            allowed_mentions = AllowedMentions(everyone=True)
         else:
             notify = ""
-        await self.bot.get_channel(event['channel-id']).send(f"{notify}**{name}** starting now")
+            allowed_mentions = None
+        await self.bot.get_channel(event['channel-id']).send(f"{notify}**{name}** starting now", allowed_mentions=allowed_mentions)
         if event['repeat']:
             event['time'] += event['repeat']
             self.scheduler.add_job(self.send_event, 'date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
@@ -114,7 +118,7 @@ class Scheduler(commands.Cog):
             return False
 
 
-    async def add_event(self, ctx, name: str, event: dict):
+    async def add_event(self, ctx: commands.Context, name: str, event: dict):
         # add event to event list
         self.events[name] = event
         # update event list in external file
