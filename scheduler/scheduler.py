@@ -208,14 +208,14 @@ class Scheduler(commands.Cog):
             dump(self.events, json_file, indent=4)
 
         # add jobs for sending event and reminder info, or reschedule them if they already exist
-        await ctx.send(f"Event time: {event['time']}\nRemind time: {event['time'] - event['remind']}\nCurrent time: {datetime.utcnow().timestamp()}")
+        await ctx.send(f"Event time: <t:{event['time']}>\nRemind time: <t:{event['time'] - event['remind']}>\nCurrent time: <t:{datetime.now().timestamp()}>")
         if self.scheduler.get_job(event['remind-id']):
-            if event['remind'] and event['time'] - event['remind'] > datetime.utcnow().timestamp():
+            if event['remind'] and event['time'] - event['remind'] > datetime.now().timestamp():
                 self.scheduler.reschedule_job(event['remind-id'], trigger='date', run_date=datetime.fromtimestamp(event['time'] - event['remind']))
             elif event['repeat']:
                 self.scheduler.reschedule_job(event['remind-id'], trigger='date', run_date=datetime.fromtimestamp(event['time'] - event['remind'] + event['repeat']))
         else:
-            if event['remind'] and event['time'] - event['remind'] > datetime.utcnow().timestamp():
+            if event['remind'] and event['time'] - event['remind'] > datetime.now().timestamp():
                 self.scheduler.add_job(self.send_reminder, 'date', run_date=datetime.fromtimestamp(event['time'] - event['remind']), args=[name], id=event['remind-id'])
             elif event['repeat']:
                 self.scheduler.add_job(event['remind-id'], trigger='date', run_date=datetime.fromtimestamp(event['time'] - event['remind'] + event['repeat']))
