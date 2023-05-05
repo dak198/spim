@@ -224,7 +224,7 @@ class Scheduler(commands.Cog):
         if self.scheduler.get_job(event['id']):
             self.scheduler.reschedule_job(event['id'], trigger='date', run_date=datetime.fromtimestamp(event['time']))
         else:
-            self.scheduler.add_job(self.send_event, 'date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
+            self.scheduler.add_job(self.send_event, trigger='date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
 
         # print event info to the chat
         await self.event_list(ctx, name)
