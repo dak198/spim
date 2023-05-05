@@ -224,7 +224,7 @@ class Scheduler(commands.Cog):
             self.scheduler.add_job(self.send_event, 'date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
 
         # print event info to the chat
-        self.event_list(ctx, name)
+        await self.event_list(ctx, name)
 
     @commands.command(name='cancel', parent=event, help='Cancel a scheduled event')
     async def event_cancel(self, ctx, name):
