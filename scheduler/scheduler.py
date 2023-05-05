@@ -52,7 +52,7 @@ class Scheduler(commands.Cog):
 
     def new_event(self, **kwargs) -> dict[str]:
         if 'channel_id' in kwargs:
-            channel_id = kwargs['channel-id']
+            channel_id = kwargs['channel_id']
         else:
             channel_id = 661373412400431104
         return {
