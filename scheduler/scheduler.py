@@ -220,7 +220,7 @@ class Scheduler(commands.Cog):
                 if remind_time > datetime.now().timestamp():
                     self.scheduler.add_job(self.send_reminder, 'date', run_date=datetime.fromtimestamp(remind_time), args=[name], id=event['remind-id'])
                 elif event['repeat']:
-                    self.scheduler.add_job(self.send_reminder, event['remind-id'], 'date', run_date=datetime.fromtimestamp(remind_time + event['repeat']), args=[name], id=event['remind-id'])
+                    self.scheduler.add_job(self.send_reminder, 'date', run_date=datetime.fromtimestamp(remind_time + event['repeat']), args=[name], id=event['remind-id'])
         if self.scheduler.get_job(event['id']):
             self.scheduler.reschedule_job(event['id'], 'date', run_date=datetime.fromtimestamp(event['time']))
         else:
