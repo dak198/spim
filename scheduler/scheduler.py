@@ -117,7 +117,7 @@ class Scheduler(commands.Cog):
         if 'remind' in args_dict and (remind := parse(args_dict['remind'], granularity='minutes')) > 0:
             args_dict['remind'] = remind
         if 'notify' in args_dict:
-            notify = args_dict['notify'].tolower()
+            notify = args_dict['notify'].lower()
             if notify == 'true':
                 args_dict['notify'] = True
             elif notify == 'false':
