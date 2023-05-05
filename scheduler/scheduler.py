@@ -88,7 +88,7 @@ class Scheduler(commands.Cog):
                 return
 
         # extract event name from args, returning if no name was provided
-        if not (name := str(args_dict.pop(args_dict['name'], None))):
+        if not (name := str(args_dict.pop('name', None))):
             await ctx.send("Error: Must provide `--name`")
             return
         
@@ -101,8 +101,6 @@ class Scheduler(commands.Cog):
         # check for invalid args
         for arg in args_dict:
             if arg not in event:
-                await ctx.send(f"`name: {name}`")
-                await ctx.send(f"`{str(args_dict)}`")
                 await ctx.send(f"Error: Flag `--{arg}` not recognized")
                 return
 
