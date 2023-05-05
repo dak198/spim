@@ -101,6 +101,7 @@ class Scheduler(commands.Cog):
         # check for invalid args
         for arg in args_dict:
             if arg not in event:
+                await ctx.send(f"`name: {name}`")
                 await ctx.send(f"`{str(args_dict)}`")
                 await ctx.send(f"Error: Flag `--{arg}` not recognized")
                 return
