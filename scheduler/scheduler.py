@@ -88,7 +88,7 @@ class Scheduler(commands.Cog):
                 return
 
         # extract event name from args, returning if no name was provided
-        if not (name := str(args_dict.pop(name, None))):
+        if not (name := str(args_dict.pop(args_dict['name'], None))):
             await ctx.send("Error: Must provide `--name`")
             return
         
