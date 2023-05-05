@@ -32,8 +32,8 @@ class Scheduler(commands.Cog):
                 dump(self.events, data_file)
 
         self.scheduler = AsyncIOScheduler(timezone=timezone('US/Eastern'))
-        for name in self.events:
-            self.schedule_jobs(name)
+        for name, event in self.events.items():
+            self.schedule_jobs(name, event)
         self.scheduler.start()
 
     def cog_unload(self):
@@ -43,9 +43,8 @@ class Scheduler(commands.Cog):
     # HELPER FUNCTIONS #
     ####################
 
-    def schedule_jobs(self, name: str):
+    def schedule_jobs(self, name: str, event: dict[str]):
         """Schedule jobs corresponding to the event with the given name"""
-        event = self.events[name]
         if event['remind']:
             remind_time = event['time'] - event['remind']
             if remind_time > datetime.now().timestamp():
@@ -54,9 +53,8 @@ class Scheduler(commands.Cog):
                 self.scheduler.add_job(self.send_reminder, trigger='date', run_date=datetime.fromtimestamp(remind_time + event['repeat']), args=[name], id=event['remind-id'])
         self.scheduler.add_job(self.send_event, trigger='date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
 
-    def reschedule_jobs(self, name: str):
+    def reschedule_jobs(self, name: str, event: dict[str]):
         """Reschedule jobs corresponding to the event with the given name"""
-        event = self.events[name]
         if event['remind']:
             remind_time = event['time'] - event['remind']
             if remind_time > datetime.now().timestamp():
@@ -219,9 +217,9 @@ class Scheduler(commands.Cog):
 
         # add jobs for sending event and reminder info, or reschedule them if they already exist
         if name in self.events:
-            self.reschedule_jobs(name)
+            self.reschedule_jobs(name, event)
         else:
-            self.schedule_jobs(name)
+            self.schedule_jobs(name, event)
         self.events[name] = event
 
         # update event list in external file
