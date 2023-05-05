@@ -33,15 +33,7 @@ class Scheduler(commands.Cog):
 
         self.scheduler = AsyncIOScheduler(timezone=timezone('US/Eastern'))
         for name in self.events:
-            event = self.events[name]
-            if event['remind'] and not self.scheduler.get_job(event['remind-id']):
-                remind_time = event['time'] - event['remind']
-                if remind_time > datetime.now().timestamp():
-                    self.scheduler.add_job(self.send_reminder, trigger='date', run_date=datetime.fromtimestamp(remind_time), args=[name], id=event['remind-id'])
-                elif event['repeat']:
-                    self.scheduler.add_job(self.send_reminder, trigger='date', run_date=datetime.fromtimestamp(remind_time + event['repeat']), args=[name], id=event['remind-id'])
-            if not self.scheduler.get_job(event['id']):
-                self.scheduler.add_job(self.send_event, trigger='date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
+            self.schedule_jobs(name)
         self.scheduler.start()
 
     def cog_unload(self):
@@ -50,6 +42,28 @@ class Scheduler(commands.Cog):
     ####################
     # HELPER FUNCTIONS #
     ####################
+
+    def schedule_jobs(self, name: str):
+        """Schedule jobs corresponding to the event with the given name"""
+        event = self.events[name]
+        if event['remind']:
+            remind_time = event['time'] - event['remind']
+            if remind_time > datetime.now().timestamp():
+                self.scheduler.add_job(self.send_reminder, trigger='date', run_date=datetime.fromtimestamp(remind_time), args=[name], id=event['remind-id'])
+            elif event['repeat']:
+                self.scheduler.add_job(self.send_reminder, trigger='date', run_date=datetime.fromtimestamp(remind_time + event['repeat']), args=[name], id=event['remind-id'])
+        self.scheduler.add_job(self.send_event, trigger='date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
+
+    def reschedule_jobs(self, name: str):
+        """Reschedule jobs corresponding to the event with the given name"""
+        event = self.events[name]
+        if event['remind']:
+            remind_time = event['time'] - event['remind']
+            if remind_time > datetime.now().timestamp():
+                self.scheduler.reschedule_job(event['remind-id'], trigger='date', run_date=datetime.fromtimestamp(remind_time))
+            elif event['repeat']:
+                self.scheduler.reschedule_job(event['remind-id'], trigger='date', run_date=datetime.fromtimestamp(remind_time + event['repeat']))
+        self.scheduler.reschedule_job(event['id'], trigger='date', run_date=datetime.fromtimestamp(event['time']))
 
     def new_event(self, **kwargs) -> dict[str]:
         if 'channel_id' in kwargs:
@@ -69,15 +83,15 @@ class Scheduler(commands.Cog):
             'absent': {}
         }
 
-    async def parse_args(self, ctx: commands.Context, *args) -> tuple[str, dict]:
+    async def parse_args(self, ctx: commands.Context, *args) -> tuple[str, dict[str]]:
         """Parse arguments from a given string and use them to generate an event
-        
+
         Keyword arguments:
         ctx -- context passed from the command method that called parse_args
         *args -- tuple containing pairs of flags and values. Flags should be marked with leading '--' and immediately followed by their corresponding value.
         Return: tuple containing the event name and dict representing the event
         """
-        
+
         # pair up the positional arguments into a dict
         args_dict = {}
         for group in grouper(args, 2, fillvalue=None):
@@ -202,29 +216,17 @@ class Scheduler(commands.Cog):
     async def event(self, ctx: commands.Context, *args):
         # create an event using provided arguments and add it to the event list
         name, event = await self.parse_args(ctx, *args)
+
+        # add jobs for sending event and reminder info, or reschedule them if they already exist
+        if name in self.events:
+            self.reschedule_jobs(name)
+        else:
+            self.schedule_jobs(name)
         self.events[name] = event
 
         # update event list in external file
         with open(self.data_path, 'w') as json_file:
             dump(self.events, json_file, indent=4)
-
-        # add jobs for sending event and reminder info, or reschedule them if they already exist
-        if event['remind']:
-            remind_time = event['time'] - event['remind']
-            if self.scheduler.get_job(event['remind-id']):
-                if remind_time > datetime.now().timestamp():
-                    self.scheduler.reschedule_job(event['remind-id'], trigger='date', run_date=datetime.fromtimestamp(remind_time))
-                elif event['repeat']:
-                    self.scheduler.reschedule_job(event['remind-id'], trigger='date', run_date=datetime.fromtimestamp(remind_time + event['repeat']))
-            else:
-                if remind_time > datetime.now().timestamp():
-                    self.scheduler.add_job(self.send_reminder, trigger='date', run_date=datetime.fromtimestamp(remind_time), args=[name], id=event['remind-id'])
-                elif event['repeat']:
-                    self.scheduler.add_job(self.send_reminder, trigger='date', run_date=datetime.fromtimestamp(remind_time + event['repeat']), args=[name], id=event['remind-id'])
-        if self.scheduler.get_job(event['id']):
-            self.scheduler.reschedule_job(event['id'], trigger='date', run_date=datetime.fromtimestamp(event['time']))
-        else:
-            self.scheduler.add_job(self.send_event, trigger='date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
 
         # print event info to the chat
         await self.event_list(ctx, name)
