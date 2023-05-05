@@ -35,10 +35,10 @@ class Scheduler(commands.Cog):
         for name in self.events:
             event = self.events[name]
             if event['remind'] and not self.scheduler.get_job(event['remind-id']):
-                if event['time'] - event['remind'] > datetime.utcnow().timestamp():
-                    self.scheduler.add_job(self.send_reminder, 'date', run_date=datetime.fromtimestamp(event['time'] - event['remind']), args=[name], id=event['remind-id'])
+                if (remind_time := event['time'] - event['remind']) > datetime.now().timestamp():
+                    self.scheduler.add_job(self.send_reminder, 'date', run_date=datetime.fromtimestamp(remind_time), args=[name], id=event['remind-id'])
                 elif event['repeat']:
-                    self.scheduler.add_job(self.send_reminder, 'date', run_date=datetime.fromtimestamp(event['time'] - event['remind'] + event['repeat']), args=[name], id=event['remind-id'])
+                    self.scheduler.add_job(self.send_reminder, 'date', run_date=datetime.fromtimestamp(remind_time + event['repeat']), args=[name], id=event['remind-id'])
             if not self.scheduler.get_job(event['id']):
                 self.scheduler.add_job(self.send_event, 'date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
         self.scheduler.start()
@@ -236,7 +236,7 @@ class Scheduler(commands.Cog):
     @commands.command(name='list', parent=event, help='List scheduled events')
     async def event_list(self, ctx: commands.Context, *event_names):
         embed_color = await self.bot.get_embed_color(ctx)
-        embed = Embed(title='Scheduled Events', type='rich', color=embed_color, timestamp=datetime.utcnow())
+        embed = Embed(title='Scheduled Events', type='rich', color=embed_color, timestamp=datetime.now())
         if event_names:
             events = event_names
         else:
