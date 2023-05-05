@@ -14,7 +14,8 @@ from redbot.core import commands, data_manager
 from redbot.core.bot import Red
 from redbot.core.config import Config
 
-# path to the json file containing the events list
+# default time string for new events
+DEFAULT_TIMESTR = 'Saturday at 3:00pm'
 
 class Scheduler(commands.Cog):
     """Scheduler for events and reminders"""
@@ -49,15 +50,85 @@ class Scheduler(commands.Cog):
     # HELPER FUNCTIONS #
     ####################
 
-    def parse_args(self, *args):
+    def new_event(**kwargs) -> dict[str]:
+        if 'channel_id' in kwargs:
+            channel_id = kwargs['channel-id']
+        else:
+            channel_id = 661373412400431104
+        return {
+            'id': uuid4().hex,
+            'remind-id': uuid4().hex,
+            'channel-id': channel_id,
+            'message-id': None,
+            'time': int(round(parser.parse(timestr=DEFAULT_TIMESTR, fuzzy=True).timestamp())),
+            'repeat': None,
+            'remind': None,
+            'notify': False,
+            'attending': {},
+            'absent': {}
+        }
+
+    async def parse_args(self, ctx: commands.Context, *args) -> tuple[str, dict]:
+        """Parse arguments from a given string and use them to generate an event
+        
+        Keyword arguments:
+        ctx -- context passed from the command method that called parse_args
+        *args -- tuple containing pairs of flags and values. Flags should be marked with leading '--' and immediately followed by their corresponding value.
+        Return: tuple containing the event name and dict representing the event
+        """
+        
+        # pair up the positional arguments into a dict
         args_dict = {}
         for group in grouper(args, 2, fillvalue=None):
             flag, arg = group
             if str(flag).startswith('--'):
                 args_dict[flag[2:]] = arg
             else:
-                raise SyntaxError(args)
-        return args_dict
+                await ctx.send(f"Error: Flag `{flag}` must start with `--`")
+                return
+
+        # extract event name from args, returning if no name was provided
+        if not (name := str(args_dict.pop(name, None))):
+            await ctx.send("Error: Must provide `--name`")
+            return
+        
+        # attempt to get the event with the given name from events list, generating a new event if no such event exists
+        if name in self.events:
+            event = self.events[name]
+        else:
+            event = self.new_event(channel_id=ctx.channel.id)
+
+        # check for invalid args
+        for arg in args_dict:
+            if arg not in event:
+                await ctx.send(f"Error: Flag '--{arg}' not recognized")
+                return
+
+        # handle args that have a different internal representation than the provided string
+        if 'channel-id' in args_dict:
+            event['channel-id'] = int(args_dict['channel-id'])
+        if 'time' in args_dict:
+            args_dict['time'] = int(round(parser.parse(timestr=args_dict['time'], fuzzy=True).timestamp()))
+        elif not name in self.events:
+            await ctx.send(f"`--time` not provided, defaulting to <t:{int(round(parser.parse(timestr=DEFAULT_TIMESTR, fuzzy=True).timestamp()))}:F>")
+        if 'repeat' in args_dict and (repeat := parse(args_dict['repeat'], granularity='minutes')) > 0:
+            args_dict['repeat'] = repeat
+        if 'remind' in args_dict and (remind := parse(args_dict['remind'], granularity='minutes')) > 0:
+            args_dict['remind'] = remind
+        if 'notify' in args_dict:
+            notify = args_dict['notify'].tolower()
+            if notify == 'true':
+                args_dict['notify'] = True
+            elif notify == 'false':
+                args_dict['notify'] = False
+            else:
+                args_dict.pop('notify', None)
+
+        # replace event attributes with the ones specified in args
+        for arg in args_dict:
+            event[arg] = args_dict[arg]
+
+        return name, event
 
     async def send_reminder(self, name: str):
         event = self.events[name]
@@ -118,138 +189,84 @@ class Scheduler(commands.Cog):
             return False
 
 
-    async def add_event(self, ctx: commands.Context, name: str, event: dict):
-        # add event to event list
-        self.events[name] = event
-        # update event list in external file
-        with open(self.data_path, 'w') as json_file:
-            dump(self.events, json_file, indent=4)
-
-        if event['remind']:
-            self.scheduler.add_job(self.send_reminder, 'date', run_date=datetime.fromtimestamp(event['time'] - event['remind']), args=[name], id=event['remind-id'])
-        self.scheduler.add_job(self.send_event, 'date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
-
-        # print event info to the chat
-        message_string = f"Scheduling `{name}` for <t:{event['time']}:F>."
-        if event['repeat']:
-            message_string += f" Repeating every `{event['repeat']}` seconds."
-        if event['remind']:
-            message_string += f" Sending reminder `{event['remind']}` seconds before event."
-        if event['notify']:
-            message_string += ' Notifying with `@everyone`.'
-        await ctx.send(message_string)
-
-
     ##################
     # EVENT COMMANDS #
     ##################
 
     @commands.command(name='print-jobs', help='Print all jobs from the scheduler')
-    async def print_jobs(self, ctx):
+    async def print_jobs(self, ctx: commands.Context):
         await ctx.send(f"`{str(self.scheduler.get_jobs())}`")
 
-    @commands.group(name='event', help='Commands for managing events and reminders')
-    async def event(self, ctx):
-        pass
+    @commands.group(name='event', invoke_without_command=True, help='Schedule a new event or edit an existing one')
+    async def event(self, ctx: commands.Context, *args):
+        # create an event using provided arguments and add it to the event list
+        name, event = self.parse_args(ctx, *args)
+        self.events[name] = event
 
-    @commands.command(name='add', parent=event, help='Schedule a new event')
-    async def event_add(self, ctx: commands.Context, *args):
-        # parse the provided arguments into a dict
-        options = self.parse_args(*args)
-        # check for if an event name was provided, return if not
-        if 'name' in options:
-            name = options['name']
-            # return if event name already exists
-            if name in self.events:
-                await ctx.send('Event with that name already exists')
-                return
-        else:
-            await ctx.send('Must specify event name')
-            return
-        
-        # create an empty event with default values and a unique id
-        event = {
-            'id': uuid4().hex,
-            'remind-id': uuid4().hex,
-            'channel-id': ctx.channel.id,
-            'message-id': None,
-            'time': int(round(parser.parse(timestr="Saturday at 3:00pm", fuzzy=True).timestamp())),
-            'repeat': None,
-            'remind': None,
-            'notify': False,
-            'attending': {},
-            'absent': {}
-        }
+        # update event list in external file
+        with open(self.data_path, 'w') as json_file:
+            dump(self.events, json_file, indent=4)
 
-        # configure the empty event with the provided arguments
-        if 'time' in options:
-            event['time'] = int(round(parser.parse(timestr=options['time'], fuzzy=True).timestamp()))
+        # add jobs for sending event and reminder info, or reschedule them if they already exist
+        if self.scheduler.get_job(event['remind-id']):
+            if event['remind'] and (remind_time := event['time'] - event['remind']) > datetime.utcnow().timestamp():
+                self.scheduler.reschedule_job(event['remind-id'], trigger='date', run_date=datetime.fromtimestamp(remind_time))
+            elif event['repeat']:
+                self.scheduler.reschedule_job(event['remind-id'], trigger='date', run_date=datetime.fromtimestamp(remind_time + event['repeat']))
         else:
-            await ctx.send(f"No time specified, defaulting to <t:{event['time']}:F>")
-        if 'repeat' in options:
-            event['repeat'] = parse(options['repeat'], granularity='minutes')
-        if 'remind' in options:
-            event['remind'] = parse(options['remind'], granularity='minutes')
-        if 'notify' in options and options['notify'].lower() == 'true':
-            event['notify'] = True
-        # process the newly added event
-        await self.add_event(ctx, name, event)
+            if event['remind'] and (remind_time := event['time'] - event['remind']) > datetime.utcnow().timestamp():
+                self.scheduler.add_job(self.send_reminder, 'date', run_date=datetime.fromtimestamp(remind_time), args=[name], id=event['remind-id'])
+            elif event['repeat']:
+                self.scheduler.add_job(event['remind-id'], trigger='date', run_date=datetime.fromtimestamp(remind_time + event['repeat']))
+        if self.scheduler.get_job(event['id']):
+            self.scheduler.reschedule_job(event['id'], trigger='date', run_date=datetime.fromtimestamp(event['time']))
+        else:
+            self.scheduler.add_job(self.send_event, 'date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
+
+        # print event info to the chat
+        self.event_list(ctx, name)
 
     @commands.command(name='cancel', parent=event, help='Cancel a scheduled event')
     async def event_cancel(self, ctx, name):
         if self.remove_event(name):
             await ctx.send(f"Removed {name}")
         else:
-            await ctx.send(f'{name} not found in events list')
-
-    @commands.command(name='edit', parent=event, help='Edit an existing event')
-    async def event_edit(self, ctx: commands.Context, *args):
-        # parse provided arguments into a dict
-        options = self.parse_args(*args)
-        if 'time' in options:
-            options['time'] = int(round(parser.parse(timestr=options['time'], fuzzy=True).timestamp()))
-        # check for if an event name was provided
-        name = options.pop('name', None)
-        if name:
-            if name in self.events:
-                event = self.events[name]
-                # update event with parameters specified in options (excluding name)
-                for flag in options:
-                    event[flag] = options[flag]
-                # reschedule associated jobs in scheduler
-                self.scheduler.reschedule_job(event['id'], trigger='date', run_date=datetime.fromtimestamp(event['time']))
-                if event['remind']:
-                    self.scheduler.reschedule_job(event['remind-id'], trigger='date', run_date=datetime.fromtimestamp(event['remind']))
-            else:
-                await ctx.send('Event with that name does not exist')
-        else:
-            await ctx.send('Must specify event name')
-            return
+            await ctx.send(f"`{name}` not found in events list")
 
     @commands.command(name='list', parent=event, help='List scheduled events')
     async def event_list(self, ctx: commands.Context, *event_names):
         embed_color = await self.bot.get_embed_color(ctx)
         embed = Embed(title='Scheduled Events', type='rich', color=embed_color, timestamp=datetime.utcnow())
-        if self.events:
-            for name in self.events:
-                event = self.events[name]
-                embed.add_field(name='Name', value=name)
-                embed.add_field(name='Time', value=f"<t:{event['time']}:F>")
-                embed.add_field(name='\u200b', value='\u200b')
-                embed.add_field(name='Repeat Interval', value=f"{event['repeat']} seconds")
-                embed.add_field(name='Reminder', value=f"{event['remind']} seconds prior")
-                embed.add_field(name='\u200b', value='\u200b')
-                attend_string = ""
-                for user_id in event['attending']:
-                    display_name = event['attending'][user_id]
-                    attend_string += f"\n> {display_name}"
-                embed.add_field(name='Attending', value=attend_string)
-                absent_string = ""
-                for user_id in event['absent']:
-                    display_name = event['absent'][user_id]
-                    absent_string += f"\n> {display_name}"
-                embed.add_field(name='Absent', value=absent_string)
-                embed.add_field(name='\u200b', value='\u200b', inline=False)
+        if event_names:
+            events = event_names
+        else:
+            events = self.events
+        if events:
+            for name in events:
+                if name in self.events:
+                    event = self.events[name]
+                    embed.add_field(name='Name', value=name)
+                    embed.add_field(name='Time', value=f"<t:{event['time']}:F>")
+                    embed.add_field(name='\u200b', value='\u200b')
+                    embed.add_field(name='Repeat Interval', value=f"{event['repeat']} seconds")
+                    embed.add_field(name='Reminder', value=f"{event['remind']} seconds prior")
+                    if event['notify']:
+                        embed.add_field(name='Notify', value='Yes')
+                    else:
+                        embed.add_field(name='Notify', value='No')
+                    attend_string = ""
+                    for user_id in event['attending']:
+                        display_name = event['attending'][user_id]
+                        attend_string += f"\n> {display_name}"
+                    embed.add_field(name='Attending', value=attend_string)
+                    absent_string = ""
+                    for user_id in event['absent']:
+                        display_name = event['absent'][user_id]
+                        absent_string += f"\n> {display_name}"
+                    embed.add_field(name='Absent', value=absent_string)
+                    embed.add_field(name='\u200b', value='\u200b', inline=False)
+                else:
+                    ctx.send(f"Error: `{name}` not found in events list")
             embed.remove_field(len(embed.fields) - 1)
         else:
             embed.description = 'No events scheduled'
@@ -268,6 +285,7 @@ class Scheduler(commands.Cog):
     ###################
     # EVENT LISTENERS #
     ###################
+
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload):
         user = payload.member
