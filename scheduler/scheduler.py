@@ -200,7 +200,7 @@ class Scheduler(commands.Cog):
     @commands.group(name='event', invoke_without_command=True, help='Schedule a new event or edit an existing one')
     async def event(self, ctx: commands.Context, *args):
         # create an event using provided arguments and add it to the event list
-        name, event = self.parse_args(ctx, *args)
+        name, event = await self.parse_args(ctx, *args)
         self.events[name] = event
 
         # update event list in external file
