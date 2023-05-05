@@ -209,15 +209,15 @@ class Scheduler(commands.Cog):
 
         # add jobs for sending event and reminder info, or reschedule them if they already exist
         if self.scheduler.get_job(event['remind-id']):
-            if event['remind'] and ((remind_time := event['time'] - event['remind']) > datetime.utcnow().timestamp()):
-                self.scheduler.reschedule_job(event['remind-id'], trigger='date', run_date=datetime.fromtimestamp(remind_time))
+            if event['remind'] and event['time'] - event['remind'] > datetime.utcnow().timestamp():
+                self.scheduler.reschedule_job(event['remind-id'], trigger='date', run_date=datetime.fromtimestamp(event['time'] - event['remind']))
             elif event['repeat']:
-                self.scheduler.reschedule_job(event['remind-id'], trigger='date', run_date=datetime.fromtimestamp(remind_time + event['repeat']))
+                self.scheduler.reschedule_job(event['remind-id'], trigger='date', run_date=datetime.fromtimestamp(event['time'] - event['remind'] + event['repeat']))
         else:
-            if event['remind'] and ((remind_time := event['time'] - event['remind']) > datetime.utcnow().timestamp()):
-                self.scheduler.add_job(self.send_reminder, 'date', run_date=datetime.fromtimestamp(remind_time), args=[name], id=event['remind-id'])
+            if event['remind'] and event['time'] - event['remind'] > datetime.utcnow().timestamp():
+                self.scheduler.add_job(self.send_reminder, 'date', run_date=datetime.fromtimestamp(event['time'] - event['remind']), args=[name], id=event['remind-id'])
             elif event['repeat']:
-                self.scheduler.add_job(event['remind-id'], trigger='date', run_date=datetime.fromtimestamp(remind_time + event['repeat']))
+                self.scheduler.add_job(event['remind-id'], trigger='date', run_date=datetime.fromtimestamp(event['time'] - event['remind'] + event['repeat']))
         if self.scheduler.get_job(event['id']):
             self.scheduler.reschedule_job(event['id'], trigger='date', run_date=datetime.fromtimestamp(event['time']))
         else:
