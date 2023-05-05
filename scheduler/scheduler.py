@@ -50,7 +50,7 @@ class Scheduler(commands.Cog):
     # HELPER FUNCTIONS #
     ####################
 
-    def new_event(**kwargs) -> dict[str]:
+    def new_event(self, **kwargs) -> dict[str]:
         if 'channel_id' in kwargs:
             channel_id = kwargs['channel-id']
         else:
