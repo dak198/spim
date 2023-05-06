@@ -247,7 +247,7 @@ class Scheduler(commands.Cog):
     @commands.command(name='list', parent=event, help='List scheduled events')
     async def event_list(self, ctx: commands.Context, *event_names):
         embed_color = await self.bot.get_embed_color(ctx)
-        embed = Embed(title='Scheduled Events', type='rich', color=embed_color, timestamp=datetime.now())
+        embed = Embed(title='Scheduled Events', type='rich', color=embed_color, timestamp=datetime.utcnow())
         if event_names:
             events = event_names
         else:
@@ -304,24 +304,22 @@ class Scheduler(commands.Cog):
         message_id = payload.message_id
         message = await self.bot.get_channel(payload.channel_id).fetch_message(message_id)
         if user.id != self.bot.user.id:
-            for name in self.events:
-                event = self.events[name]
-                if 'message-id' in event:
-                    if message_id == event['message-id']:
-                        if emoji.name == 'spimPog':
-                            if user.id in event['absent']:
-                                event['absent'].pop(user.id)
-                                await message.remove_reaction('<:spon:922922345134424116>', user)
-                            if not user.id in event['attending']:
-                                event['attending'][user.id] = user.display_name
-                        elif emoji.name == 'spon':
-                            if user.id in event['attending']:
-                                event['attending'].pop(user.id)
-                                await message.remove_reaction('<:spimPog:772261869858848779>', user)
-                            if not user.id in event['absent']:
-                                event['absent'][user.id] = user.display_name
-                        with open(self.data_path, 'w') as json_file:
-                            dump(self.events, json_file, indent=4)
+            for event in self.events.values():
+                if message_id == event['message-id']:
+                    if emoji.name == 'spimPog':
+                        if user.id in event['absent']:
+                            event['absent'].pop(user.id)
+                            await message.remove_reaction('<:spon:922922345134424116>', user)
+                        if not user.id in event['attending']:
+                            event['attending'][user.id] = user.display_name
+                    elif emoji.name == 'spon':
+                        if user.id in event['attending']:
+                            event['attending'].pop(user.id)
+                            await message.remove_reaction('<:spimPog:772261869858848779>', user)
+                        if not user.id in event['absent']:
+                            event['absent'][user.id] = user.display_name
+                    with open(self.data_path, 'w') as json_file:
+                        dump(self.events, json_file, indent=4)
 
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
@@ -329,13 +327,11 @@ class Scheduler(commands.Cog):
         emoji = payload.emoji
         message_id = payload.message_id
         if user_id != self.bot.user.id:
-            for name in self.events:
-                event = self.events[name]
-                if 'message-id' in event:
-                    if message_id == event['message-id']:
-                        if emoji.name == 'spimPog':
-                            event['attending'].pop(user_id, None)
-                        elif emoji.name == 'spon':
-                            event['absent'].pop(user_id, None)
-                        with open(self.data_path, 'w') as json_file:
-                            dump(self.events, json_file, indent=4)
+            for event in self.events.values():
+                if message_id == event['message-id']:
+                    if emoji.name == 'spimPog':
+                        event['attending'].pop(user_id, None)
+                    elif emoji.name == 'spon':
+                        event['absent'].pop(user_id, None)
+                    with open(self.data_path, 'w') as json_file:
+                        dump(self.events, json_file, indent=4)
