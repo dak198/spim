@@ -50,6 +50,7 @@ class Scheduler(commands.Cog):
             remind_time = event['time'] - event['remind']
             if remind_time <= datetime.now().timestamp() and event['repeat']:
                 remind_time = self.remind_time(event)
+                raise ValueError(f"Remind time: {remind_time}\nCurrent time: {datetime.now().timestamp()}")
             self.scheduler.add_job(self.send_reminder, trigger='date', run_date=datetime.fromtimestamp(remind_time), args=[name], id=event['remind-id'])
         self.scheduler.add_job(self.send_event, trigger='date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
 
