@@ -134,9 +134,9 @@ class Scheduler(commands.Cog):
             args_dict['remind'] = remind
         if 'notify' in args_dict:
             notify = args_dict['notify'].lower()
-            if notify == 'true':
+            if notify == 'true' or notify == 'yes':
                 args_dict['notify'] = True
-            elif notify == 'false':
+            elif notify == 'false' or notify == 'no':
                 args_dict['notify'] = False
             else:
                 args_dict.pop('notify', None)
