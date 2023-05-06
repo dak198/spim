@@ -8,6 +8,7 @@ from pytz import timezone
 from iteration_utilities import grouper
 from dateutil import parser
 from json import load, dump
+from math import ceil
 
 from discord import Embed, AllowedMentions
 from redbot.core import commands, data_manager
@@ -47,21 +48,24 @@ class Scheduler(commands.Cog):
         """Schedule jobs corresponding to the event with the given name"""
         if event['remind']:
             remind_time = event['time'] - event['remind']
-            if remind_time > datetime.now().timestamp():
-                self.scheduler.add_job(self.send_reminder, trigger='date', run_date=datetime.fromtimestamp(remind_time), args=[name], id=event['remind-id'])
-            elif event['repeat']:
-                self.scheduler.add_job(self.send_reminder, trigger='date', run_date=datetime.fromtimestamp(remind_time + event['repeat']), args=[name], id=event['remind-id'])
+            if remind_time <= datetime.now().timestamp() and event['repeat']:
+                remind_time = self.remind_time(event)
+            self.scheduler.add_job(self.send_reminder, trigger='date', run_date=datetime.fromtimestamp(remind_time), args=[name], id=event['remind-id'])
         self.scheduler.add_job(self.send_event, trigger='date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
 
     def reschedule_jobs(self, name: str, event: dict[str]):
         """Reschedule jobs corresponding to the event with the given name"""
         if event['remind']:
             remind_time = event['time'] - event['remind']
-            if remind_time > datetime.now().timestamp():
-                self.scheduler.reschedule_job(event['remind-id'], trigger='date', run_date=datetime.fromtimestamp(remind_time))
-            elif event['repeat']:
-                self.scheduler.reschedule_job(event['remind-id'], trigger='date', run_date=datetime.fromtimestamp(remind_time + event['repeat']))
+            if remind_time <= datetime.now().timestamp() and event['repeat']:
+                remind_time = self.remind_time(event)
+            self.scheduler.reschedule_job(event['remind-id'], trigger='date', run_date=datetime.fromtimestamp(remind_time))
         self.scheduler.reschedule_job(event['id'], trigger='date', run_date=datetime.fromtimestamp(event['time']))
+
+    def remind_time(self, event: dict[str]):
+        remind_time = event['time'] - event['repeat']
+        now = datetime.now().timestamp()
+        return remind_time + event['repeat'] * ceil((remind_time - now) / event['repeat'])
 
     def new_event(self, **kwargs) -> dict[str]:
         if 'channel_id' in kwargs:
@@ -140,6 +144,10 @@ class Scheduler(commands.Cog):
         # replace event attributes with the ones specified in args
         for arg in args_dict:
             event[arg] = args_dict[arg]
+
+        # set remind to None if it has already passed and the event does not repeat
+        if event['remind'] and event['time'] - event['remind'] < datetime.now().timestamp() and not event['repeat']:
+            event['remind'] = None
 
         return name, event
 
