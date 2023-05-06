@@ -64,7 +64,7 @@ class Scheduler(commands.Cog):
         self.scheduler.reschedule_job(event['id'], trigger='date', run_date=datetime.fromtimestamp(event['time']))
 
     def remind_time(self, event: dict[str]):
-        remind_time = event['time'] - event['repeat']
+        remind_time = event['time'] - event['remind']
         now = datetime.now().timestamp()
         return remind_time + event['repeat'] * ceil((remind_time - now) / event['repeat'])
 
