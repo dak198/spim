@@ -66,7 +66,7 @@ class Scheduler(commands.Cog):
     def remind_time(self, event: dict[str]):
         remind_time = event['time'] - event['remind']
         now = datetime.now().timestamp()
-        return remind_time + event['repeat'] * ceil((remind_time - now) / event['repeat'])
+        return remind_time + event['repeat'] * ceil((now - remind_time) / event['repeat'])
 
     def new_event(self, **kwargs) -> dict[str]:
         if 'channel_id' in kwargs:
