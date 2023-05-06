@@ -247,7 +247,7 @@ class Scheduler(commands.Cog):
     @commands.command(name='list', parent=event, help='List scheduled events')
     async def event_list(self, ctx: commands.Context, *event_names):
         embed_color = await self.bot.get_embed_color(ctx)
-        embed = Embed(title='Scheduled Events', type='rich', color=embed_color, timestamp=datetime.utcnow())
+        embed = Embed(title='Scheduled Events', type='rich', color=embed_color, timestamp=datetime.now())
         if event_names:
             events = event_names
         else:
