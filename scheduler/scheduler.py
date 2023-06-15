@@ -1,6 +1,4 @@
 from datetime import datetime
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler.schedulers.base import JobLookupError
 import asyncio
 from uuid import uuid4
 from pytimeparse import parse
@@ -8,9 +6,10 @@ from pytz import timezone
 from iteration_utilities import grouper
 from dateutil import parser
 from json import load, dump
-from math import ceil
 
 from discord import Embed, AllowedMentions
+from discord.ext import tasks
+from discord.utils import utcnow
 from redbot.core import commands, data_manager
 from redbot.core.bot import Red
 from redbot.core.config import Config
@@ -32,40 +31,12 @@ class Scheduler(commands.Cog):
             with open(self.data_path, 'w') as data_file:
                 dump(self.events, data_file)
 
-        self.scheduler = AsyncIOScheduler(timezone=timezone('US/Eastern'))
-        for name, event in self.events.items():
-            self.schedule_jobs(name, event)
-        self.scheduler.start()
-
     def cog_unload(self):
         self.scheduler.shutdown()
 
     ####################
     # HELPER FUNCTIONS #
     ####################
-
-    def schedule_jobs(self, name: str, event: dict[str]):
-        """Schedule jobs corresponding to the event with the given name"""
-        if event['remind']:
-            remind_time = event['time'] - event['remind']
-            if remind_time <= datetime.now().timestamp() and event['repeat']:
-                remind_time = self.remind_time(event)
-            self.scheduler.add_job(self.send_reminder, trigger='date', run_date=datetime.fromtimestamp(remind_time), args=[name], id=event['remind-id'])
-        self.scheduler.add_job(self.send_event, trigger='date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
-
-    def reschedule_jobs(self, name: str, event: dict[str]):
-        """Reschedule jobs corresponding to the event with the given name"""
-        if event['remind']:
-            remind_time = event['time'] - event['remind']
-            if remind_time <= datetime.now().timestamp() and event['repeat']:
-                remind_time = self.remind_time(event)
-            self.scheduler.reschedule_job(event['remind-id'], trigger='date', run_date=datetime.fromtimestamp(remind_time))
-        self.scheduler.reschedule_job(event['id'], trigger='date', run_date=datetime.fromtimestamp(event['time']))
-
-    def remind_time(self, event: dict[str]):
-        remind_time = event['time'] - event['remind']
-        now = datetime.now().timestamp()
-        return remind_time + event['repeat'] * ceil((now - remind_time) / event['repeat'])
 
     def new_event(self, **kwargs) -> dict[str]:
         if 'channel_id' in kwargs:
@@ -74,7 +45,6 @@ class Scheduler(commands.Cog):
             channel_id = 661373412400431104
         return {
             'id': uuid4().hex,
-            'remind-id': uuid4().hex,
             'channel-id': channel_id,
             'message-id': None,
             'time': int(round(parser.parse(timestr=DEFAULT_TIMESTR, fuzzy=True).timestamp())),
@@ -173,8 +143,6 @@ class Scheduler(commands.Cog):
         # add reactions to reminder message for users to indicate 'attending' or 'absent'
         await message.add_reaction('<:spimPog:772261869858848779>')
         await message.add_reaction('<:spon:922922345134424116>')
-        if event['repeat']:
-            self.scheduler.add_job(self.send_reminder, trigger='date', run_date=datetime.fromtimestamp(event['time'] - event['remind'] + event['repeat']), args=[name], id=event['remind-id'])
 
     async def send_event(self, name: str):
         event = self.events[name]
@@ -185,11 +153,6 @@ class Scheduler(commands.Cog):
             notify = ""
             allowed_mentions = None
         await self.bot.get_channel(event['channel-id']).send(f"{notify}**{name}** starting now", allowed_mentions=allowed_mentions)
-        if event['repeat']:
-            event['time'] += event['repeat']
-            self.scheduler.add_job(self.send_event, trigger='date', run_date=datetime.fromtimestamp(event['time']), args=[name], id=event['id'])
-        else:
-            self.remove_event(name)
 
     def remove_event(self, name: str):
         # attempt to remove event with given name from event list
@@ -198,13 +161,6 @@ class Scheduler(commands.Cog):
             # update the json file
             with open(self.data_path, 'w') as json_file:
                 dump(self.events, json_file, indent=4)
-            # remove associated jobs from scheduler
-            try:
-                self.scheduler.remove_job(event['id'])
-                if event['remind']:
-                    self.scheduler.remove_job(event['remind-id'])
-            except JobLookupError as e:
-                raise e
             return True
         else:
             return False
@@ -214,20 +170,12 @@ class Scheduler(commands.Cog):
     # EVENT COMMANDS #
     ##################
 
-    @commands.command(name='print-jobs', help='Print all jobs from the scheduler')
-    async def print_jobs(self, ctx: commands.Context):
-        await ctx.send(f"`{str(self.scheduler.get_jobs())}`")
-
     @commands.group(name='event', invoke_without_command=True, help='Schedule a new event or edit an existing one')
     async def event(self, ctx: commands.Context, *args):
         # create an event using provided arguments and add it to the event list
         name, event = await self.parse_args(ctx, *args)
 
-        # add jobs for sending event and reminder info, or reschedule them if they already exist
-        if name in self.events:
-            self.reschedule_jobs(name, event)
-        else:
-            self.schedule_jobs(name, event)
+        # add created event to event list
         self.events[name] = event
 
         # update event list in external file
@@ -335,3 +283,15 @@ class Scheduler(commands.Cog):
                         event['absent'].pop(user_id, None)
                     with open(self.data_path, 'w') as json_file:
                         dump(self.events, json_file, indent=4)
+
+    @tasks.loop(minutes=1.0)
+    async def check_event(self):
+        for name, event in self.events.items():
+            if utcnow().timestamp() > event['time']:
+                self.send_event(name)
+                if event['repeat']:
+                    event['time'] += event['repeat']
+                else:
+                    self.remove_event(name)
+            elif event['remind'] and utcnow().timestamp() > event['time'] - event['remind']:
+                self.send_reminder(name)
