@@ -282,7 +282,7 @@ class Scheduler(commands.Cog):
                     with open(self.data_path, 'w') as json_file:
                         dump(self.events, json_file, indent=4)
 
-    @tasks.loop(minutes=1.0)
+    @tasks.loop(seconds=5.0)
     async def check_event(self):
         for name, event in self.events.copy().items():
             if utcnow().timestamp() > event['time']:
