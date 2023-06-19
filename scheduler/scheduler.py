@@ -32,9 +32,6 @@ class Scheduler(commands.Cog):
                 dump(self.events, data_file)
         self.check_event.start()
 
-    def cog_unload(self):
-        self.scheduler.shutdown()
-
     ####################
     # HELPER FUNCTIONS #
     ####################
@@ -290,10 +287,10 @@ class Scheduler(commands.Cog):
         await self.bot.get_channel(661373412400431104).send("checking events")
         for name, event in self.events.items():
             if utcnow().timestamp() > event['time']:
-                self.send_event(name)
+                await self.send_event(name)
                 if event['repeat']:
                     event['time'] += event['repeat']
                 else:
                     self.remove_event(name)
             elif event['remind'] and utcnow().timestamp() > event['time'] - event['remind']:
-                self.send_reminder(name)
+                await self.send_reminder(name)
