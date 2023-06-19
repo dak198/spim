@@ -44,9 +44,14 @@ class Scheduler(commands.Cog):
             channel_id = kwargs['channel_id']
         else:
             channel_id = 661373412400431104
+        if 'guild_id' in kwargs:
+            guild_id = kwargs['guild_id']
+        else:
+            guild_id = 608871009541685249
         return {
             'id': uuid4().hex,
             'channel-id': channel_id,
+            'guild-id': guild_id,
             'message-id': None,
             'time': int(round(parser.parse(timestr=DEFAULT_TIMESTR, fuzzy=True).timestamp())),
             'repeat': None,
@@ -84,7 +89,7 @@ class Scheduler(commands.Cog):
         if name in self.events:
             event = self.events[name]
         else:
-            event = self.new_event(channel_id=ctx.channel.id)
+            event = self.new_event(channel_id=ctx.channel.id, guild_id=ctx.guild.id)
 
         # check for invalid args
         for arg in args_dict:
