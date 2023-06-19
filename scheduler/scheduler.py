@@ -30,6 +30,7 @@ class Scheduler(commands.Cog):
             self.events = {}
             with open(self.data_path, 'w') as data_file:
                 dump(self.events, data_file)
+        self.check_event.start()
 
     def cog_unload(self):
         self.scheduler.shutdown()
