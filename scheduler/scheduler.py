@@ -284,7 +284,6 @@ class Scheduler(commands.Cog):
 
     @tasks.loop(minutes=1.0)
     async def check_event(self):
-        await self.bot.get_channel(661373412400431104).send("checking events")
         for name, event in self.events.copy().items():
             if utcnow().timestamp() > event['time']:
                 await self.send_event(name)
