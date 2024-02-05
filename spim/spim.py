@@ -300,7 +300,7 @@ class Spim(commands.Cog):
                 if servers:
                     for _, name, status, url in servers:
                         if not url: url = '—————'
-                        text = f'```Status: {status}\nURL:\n{url}```'
+                        text = f'Status: ```{status}```URL: ```{url}```'
                         embed.add_field(name=name, value=text)
                 elif len(server_names) > 1:
                     text = 'No servers found with names:'
