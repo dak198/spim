@@ -148,7 +148,7 @@ class Spim(commands.Cog):
             } ]
 
         # Set bot status to show that servers are running
-        await self.bot.change_presence(activity=discord.Game('servers running'))
+        await self.bot.change_presence(activity=discord.CustomActivity('Servers running'))
 
         # Print server list to chat
         await self.server_list(ctx, *server_names)
