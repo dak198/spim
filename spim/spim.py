@@ -172,7 +172,7 @@ class Spim(commands.Cog):
     # GENERAL COMMANDS #
     ####################
 
-    @app_commands.command(name='spimify', help='Reacts with every Spim emote to a message you reply to with this command')
+    @app_commands.command(name='spimify', description='Reacts with every Spim emote to a message you reply to with this command')
     async def spimify(self, ctx: commands.Context):
         """Reacts with every spim emote to a replied message"""
 
