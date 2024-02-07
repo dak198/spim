@@ -176,13 +176,12 @@ class Spim(commands.Cog):
     async def hello(self, interaction: discord.Interaction):
         await interaction.response.send_message("Hello World!", ephemeral=True)
 
-    @app_commands.command(name='spimify', description='Reacts with every Spim emote to a message you reply to with this command')
-    async def spimify(self, inter: discord.Interaction):
+    @app_commands.context_menu(name='Spimify')
+    async def spimify(self, inter: discord.Interaction, message: discord.Message):
         """Reacts with every spim emote to a replied message"""
 
         spims = ['<:spimPog:772261869858848779>', '<:spimPogR:775434707231047680>', '<:spimBall:1066624826086793366>', '<:spimPride:988519886479327242>', '<:spimThink:949780590121607209>', '<:spinta:1041857241600507924>']
         shuffle(spims)
-        message = await inter.original_response()
         for s in spims:
             await message.add_reaction(s)
     
