@@ -427,5 +427,5 @@ async def spimify(inter: discord.Interaction, message: discord.Message):
     shuffle(spims)
     for s in spims:
         await message.add_reaction(s)
-
-    await inter.followup.delete()
+    
+    await inter.response.send_message('Spimified!', delete_after=5)
