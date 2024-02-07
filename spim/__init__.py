@@ -1,8 +1,7 @@
 import json
+import discord
 from pathlib import Path
-
 from redbot.core.bot import Red
-
 from .spim import Spim, spimify
 
 with open(Path(__file__).parent / "info.json") as fp:

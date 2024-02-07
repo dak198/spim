@@ -3,9 +3,10 @@ import asyncio
 from uuid import uuid4
 from pytimeparse import parse
 from pytz import timezone
-from iteration_utilities import grouper
+from iteration_utilities import grouper # type: ignore
 from dateutil import parser
 from json import load, dump
+from typing import Union
 
 from discord import Embed, AllowedMentions
 from discord.ext import tasks
@@ -39,13 +40,13 @@ class Scheduler(commands.Cog):
     # HELPER FUNCTIONS #
     ####################
 
-    def new_event(self, **kwargs) -> dict[str]:
+    def new_event(self, **kwargs) -> dict[str, Union[str, int, bool, float, dict, None]]:
         if 'channel_id' in kwargs:
-            channel_id = kwargs['channel_id']
+            channel_id: int = kwargs['channel_id']
         else:
             channel_id = 661373412400431104
         if 'guild_id' in kwargs:
-            guild_id = kwargs['guild_id']
+            guild_id: int = kwargs['guild_id']
         else:
             guild_id = 608871009541685249
         return {
@@ -61,7 +62,7 @@ class Scheduler(commands.Cog):
             'absent': {}
         }
 
-    async def parse_args(self, ctx: commands.Context, *args) -> tuple[str, dict[str]]:
+    async def parse_args(self, ctx: commands.Context, *args) -> Union[tuple[str, dict[str, Union[str, int, float]]], None]:
         """Parse arguments from a given string and use them to generate an event
 
         Keyword arguments:
@@ -96,7 +97,7 @@ class Scheduler(commands.Cog):
             if arg not in event:
                 await ctx.send(f"Error: Flag `--{arg}` not recognized")
                 return
-
+            
         # handle args that have a different internal representation than the provided string
         if 'channel-id' in args_dict:
             event['channel-id'] = int(args_dict['channel-id'])
@@ -104,9 +105,9 @@ class Scheduler(commands.Cog):
             args_dict['time'] = int(round(parser.parse(timestr=args_dict['time'], fuzzy=True).timestamp()))
         elif not name in self.events:
             await ctx.send(f"`--time` not provided, defaulting to <t:{int(round(parser.parse(timestr=DEFAULT_TIMESTR, fuzzy=True).timestamp()))}:F>")
-        if 'repeat' in args_dict and (repeat := parse(args_dict['repeat'], granularity='minutes')) > 0:
+        if 'repeat' in args_dict and (repeat := parse(args_dict['repeat'], granularity='minutes')) is not None and repeat > 0:
             args_dict['repeat'] = repeat
-        if 'remind' in args_dict and (remind := parse(args_dict['remind'], granularity='minutes')) > 0:
+        if 'remind' in args_dict and (remind := parse(args_dict['remind'], granularity='minutes')) is not None and remind > 0:
             args_dict['remind'] = remind
         if 'notify' in args_dict:
             notify = args_dict['notify'].lower()

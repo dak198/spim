@@ -431,3 +431,7 @@ async def spimify(inter: discord.Interaction, message: discord.Message):
         await message.add_reaction(s)
     
     await inter.delete_original_response()
+
+@app_commands.context_menu(name='Poll')
+async def poll(inter: discord.Interaction, message: discord.Message):
+    """Creates a poll from the given message"""

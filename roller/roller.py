@@ -22,7 +22,7 @@ class Roller(commands.Cog):
         color = await self.bot.get_embed_color(ctx)
         input_string = ''.join(input_string)
         expression = Expression(input_string)
-        rolls = {'TOO_BIG': False}
+        rolls: dict = {'TOO_BIG': False}
         result = expression.evaluate(rolls)
         result_string = str(result)
         embed = Embed(title=result_string, color=color)
