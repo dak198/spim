@@ -421,7 +421,7 @@ class Spim(commands.Cog):
 async def spimify(inter: discord.Interaction, message: discord.Message):
     """Reacts with every spim emote to a replied message"""
 
-    await inter.response.defer(ephemeral=True, thinking=True)
+    await inter.response.send_message('Spimifying...', ephemeral=True)
 
     spims = ['<:spimPog:772261869858848779>', '<:spimPogR:775434707231047680>', '<:spimBall:1066624826086793366>', '<:spimPride:988519886479327242>', '<:spimThink:949780590121607209>', '<:spinta:1041857241600507924>']
     shuffle(spims)
