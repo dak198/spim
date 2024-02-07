@@ -11,7 +11,8 @@ from redbot.core.bot import Red
 from redbot.core.config import Config
 
 import boto3
-import botocore
+import botocore.exceptions
+import botocore.config
 
 RequestType = Literal["discord_deleted_user", "owner", "user", "user_strict"]
 
@@ -57,7 +58,7 @@ class Spim(commands.Cog):
 
     async def red_delete_data_for_user(self, *, requester: RequestType, user_id: int) -> None:
         # TODO: Replace this with the proper end user data removal handling.
-        super().red_delete_data_for_user(requester=requester, user_id=user_id)
+        await super().red_delete_data_for_user(requester=requester, user_id=user_id)
 
 
     ####################
@@ -89,6 +90,7 @@ class Spim(commands.Cog):
         output = []
         for reservation in response['Reservations']:
             for instance in reservation['Instances']:
+                tag = dict()
                 for tag in instance['Tags']:
                     if tag['Key'] == 'Name':
                         break
@@ -301,8 +303,8 @@ class Spim(commands.Cog):
                     text = 'No server found with name:'
                     embed.add_field(name=text, value='\n'.join(server_names))
                 else:
-                    text += 'No servers found.'
-                    embed.add_field(name=text)
+                    text = 'No servers found.'
+                    embed.add_field(name=text, value='')
 
                 if not message:
                     message = await ctx.send(embed=embed)
@@ -351,7 +353,7 @@ class Spim(commands.Cog):
                 await ctx.send(f'```No server found with name:\n' + '\n'.join(server_names) + '```')
         except botocore.exceptions.ClientError as error:
             if error.response['Error']['Code'] == 'IncorrectSpotRequestState':
-                ctx.send(f'```No Spot capacity available at the moment. Please try again in a few minutes.```')
+                await ctx.send(f'```No Spot capacity available at the moment. Please try again in a few minutes.```')
             else:
                 raise error
 
@@ -401,7 +403,7 @@ class Spim(commands.Cog):
                     if not item in self.lists[name]:
                         await ctx.send(embed=discord.Embed(description=f"**{item}** not found in **{name}**", color=embed_color))
                         return
-                self.items[name] = [item for item in self.items[name] if item not in items]
+                self.lists[name] = [item for item in self.lists[name] if item not in items]
                 with open(self.list_path, 'w') as list_file:
                     dump(self.lists, list_file, indent=4)
                 if len(items) > 1:
