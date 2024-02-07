@@ -439,7 +439,7 @@ async def poll(inter: discord.Interaction, message: discord.Message):
     await inter.response.send_message('Adding reactions...', ephemeral=True)
 
     reactions = message.reactions
-    message.clear_reactions
+    await message.clear_reactions()
     for reaction in reactions:
         await message.add_reaction(reaction.emoji)
 
