@@ -182,7 +182,7 @@ class Spim(commands.Cog):
 
         spims = ['<:spimPog:772261869858848779>', '<:spimPogR:775434707231047680>', '<:spimBall:1066624826086793366>', '<:spimPride:988519886479327242>', '<:spimThink:949780590121607209>', '<:spinta:1041857241600507924>']
         shuffle(spims)
-        message = await inter.channel.fetch_message(inter.message.reference.message_id)
+        message = await inter.channel.fetch_message(inter.original_response())
         for s in spims:
             await message.add_reaction(s)
     
