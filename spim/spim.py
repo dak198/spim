@@ -175,15 +175,6 @@ class Spim(commands.Cog):
     @app_commands.command()
     async def hello(self, interaction: discord.Interaction):
         await interaction.response.send_message("Hello World!", ephemeral=True)
-
-    @app_commands.context_menu(name='Spimify')
-    async def spimify(self, inter: discord.Interaction, message: discord.Message):
-        """Reacts with every spim emote to a replied message"""
-
-        spims = ['<:spimPog:772261869858848779>', '<:spimPogR:775434707231047680>', '<:spimBall:1066624826086793366>', '<:spimPride:988519886479327242>', '<:spimThink:949780590121607209>', '<:spinta:1041857241600507924>']
-        shuffle(spims)
-        for s in spims:
-            await message.add_reaction(s)
     
     @commands.command(name='spimpoll', help='Creates a poll with <:spimPog:772261869858848779> <:spimPause:987933390110089216> <:spon:922922345134424116>')
     async def spimpoll(self, ctx: commands.Context, *poll_text):
@@ -425,3 +416,12 @@ class Spim(commands.Cog):
         else:
             embed = discord.Embed(description=f"List not found", color=embed_color)
         await ctx.send(embed=embed)
+
+@app_commands.context_menu(name='Spimify')
+async def spimify(self, inter: discord.Interaction, message: discord.Message):
+    """Reacts with every spim emote to a replied message"""
+
+    spims = ['<:spimPog:772261869858848779>', '<:spimPogR:775434707231047680>', '<:spimBall:1066624826086793366>', '<:spimPride:988519886479327242>', '<:spimThink:949780590121607209>', '<:spinta:1041857241600507924>']
+    shuffle(spims)
+    for s in spims:
+        await message.add_reaction(s)
