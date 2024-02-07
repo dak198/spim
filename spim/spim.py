@@ -428,4 +428,4 @@ async def spimify(inter: discord.Interaction, message: discord.Message):
     for s in spims:
         await message.add_reaction(s)
 
-    await inter.followup.send("Spimified!", ephemeral=True)
+    await inter.followup.delete_message()
