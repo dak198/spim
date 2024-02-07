@@ -6,7 +6,7 @@ from random import shuffle
 import asyncio
 
 import discord
-from redbot.core import commands, data_manager
+from redbot.core import commands, app_commands, data_manager
 from redbot.core.bot import Red
 from redbot.core.config import Config
 
@@ -172,7 +172,7 @@ class Spim(commands.Cog):
     # GENERAL COMMANDS #
     ####################
 
-    @commands.command(name='spimify', help='Reacts with every Spim emote to a message you reply to with this command')
+    @app_commands.command(name='spimify', help='Reacts with every Spim emote to a message you reply to with this command')
     async def spimify(self, ctx: commands.Context):
         """Reacts with every spim emote to a replied message"""
 
