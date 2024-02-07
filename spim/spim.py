@@ -213,12 +213,12 @@ class Spim(commands.Cog):
     # SERVER COMMANDS #
     ###################
 
-    @commands.hybrid_group(name='server', help='Commands for AWS server management')
+    @commands.group(name='server', help='Commands for AWS server management')
     async def server(self, ctx: commands.Context):
         """Commands for AWS server management"""
         pass
 
-    @commands.hybrid_group(name='set', parent=server, help='Commands for configuring AWS servers')
+    @commands.group(name='set', parent=server, help='Commands for configuring AWS servers')
     async def set(self, ctx: commands.Context):
         """Commands for configuring AWS servers"""
         pass
