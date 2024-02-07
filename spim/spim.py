@@ -172,6 +172,10 @@ class Spim(commands.Cog):
     # GENERAL COMMANDS #
     ####################
 
+    @app_commands.command()
+    async def hello(self, interaction: discord.Interaction):
+        await interaction.response.send_message("Hello World!", ephemeral=True)
+
     @app_commands.command(name='spimify', description='Reacts with every Spim emote to a message you reply to with this command')
     async def spimify(self, ctx: commands.Context):
         """Reacts with every spim emote to a replied message"""
