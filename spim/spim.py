@@ -4,6 +4,7 @@ from time import strftime
 from json import load, dump
 from random import shuffle
 import asyncio
+import os
 
 import discord
 from discord import ui
@@ -22,8 +23,9 @@ class Spim(commands.Cog):
     """Cogs for Red-DiscordBot V3 for use in Gear Getaway"""
 
     def __init__(self, bot: Red) -> None:
-        self.server_config_path = data_manager.cog_data_path(self) / 'server-config.json'
-        self.list_path = data_manager.cog_data_path(self) / 'lists.json'
+        self.server_config_path = os.path.join(data_manager.cog_data_path(self), 'server-config.json')
+        self.list_path = os.path.join(data_manager.cog_data_path(self), 'lists.json')
+        self.poll_path = os.path.join(data_manager.cog_data_path(self), 'polls.json')
         try:
             with open(self.server_config_path) as server_config_file:
                 self.server_config = load(server_config_file)
@@ -38,6 +40,13 @@ class Spim(commands.Cog):
             self.lists = {}
             with open(self.list_path, 'w') as list_file:
                 dump(self.lists, list_file, indent=4)
+        try:
+            with open(self.poll_path) as poll_file:
+                self.polls = load(poll_file)
+        except FileNotFoundError:
+            self.polls = {}
+            with open(self.poll_path, 'w') as poll_file:
+                dump(self.polls, poll_file, indent=4)
         self.bot = bot
         self.config = Config.get_conf(
             self,
@@ -420,13 +429,13 @@ class Spim(commands.Cog):
             embed = discord.Embed(description=f"List not found", color=embed_color)
         await ctx.send(embed=embed)
 
-class Poll(ui.Modal, title='Poll Duration'):
-    minutes = ui.TextInput(label='Minutes:', placeholder='0')
-    hours = ui.TextInput(label='Hours:', placeholder='0')
-    days = ui.TextInput(label='Days:', placeholder='0') 
+    class Poll(ui.Modal, title='Poll Duration'):
+        minutes = ui.TextInput(label='Minutes:', placeholder='0')
+        hours = ui.TextInput(label='Hours:', placeholder='0')
+        days = ui.TextInput(label='Days:', placeholder='0')
 
-    async def on_submit(self, inter: discord.Interaction):
-        await inter.response.send_message(f'Expiration time set', ephemeral=True, delete_after=10)
+        async def on_submit(self, inter: discord.Interaction):
+            await inter.response.send_message(f'Expiration time set', ephemeral=True, delete_after=10)
 
 @app_commands.context_menu(name='Spimify')
 async def spimify(inter: discord.Interaction, message: discord.Message):
@@ -445,7 +454,10 @@ async def spimify(inter: discord.Interaction, message: discord.Message):
 async def poll(inter: discord.Interaction, message: discord.Message):
     """Creates a poll from the given message"""
 
-    await inter.response.send_modal(Poll())
+    poll = Spim.Poll()
+    await inter.response.send_modal(poll)
+    result = poll.to_dict()
+    print(f'result: {result}')
 
     reactions = message.reactions
     await message.clear_reactions()
