@@ -437,6 +437,20 @@ class Spim(commands.Cog):
         async def on_submit(self, inter: discord.Interaction):
             await inter.response.send_message(f'Expiration time set', ephemeral=True, delete_after=10)
 
+    @app_commands.context_menu(name='Poll')
+    async def poll(inter: discord.Interaction, message: discord.Message):
+        """Creates a poll from the given message"""
+
+        poll = Spim.Poll()
+        await inter.response.send_modal(poll)
+        result = poll.to_dict()
+        print(f'result: {result}')
+        
+        reactions = message.reactions
+        await message.clear_reactions()
+        for reaction in reactions:
+            await message.add_reaction(reaction.emoji)
+
 @app_commands.context_menu(name='Spimify')
 async def spimify(inter: discord.Interaction, message: discord.Message):
     """Reacts with every spim emote to a replied message"""
@@ -449,17 +463,3 @@ async def spimify(inter: discord.Interaction, message: discord.Message):
         await message.add_reaction(s)
     
     await inter.delete_original_response()
-
-@app_commands.context_menu(name='Poll')
-async def poll(inter: discord.Interaction, message: discord.Message):
-    """Creates a poll from the given message"""
-
-    poll = Spim.Poll()
-    await inter.response.send_modal(poll)
-    result = poll.to_dict()
-    print(f'result: {result}')
-
-    reactions = message.reactions
-    await message.clear_reactions()
-    for reaction in reactions:
-        await message.add_reaction(reaction.emoji)
