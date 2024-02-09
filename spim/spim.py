@@ -429,14 +429,6 @@ class Spim(commands.Cog):
             embed = discord.Embed(description=f"List not found", color=embed_color)
         await ctx.send(embed=embed)
 
-    class Poll(ui.Modal, title='Poll Duration'):
-        minutes = ui.TextInput(label='Minutes:', placeholder='0')
-        hours = ui.TextInput(label='Hours:', placeholder='0')
-        days = ui.TextInput(label='Days:', placeholder='0')
-
-        async def on_submit(self, inter: discord.Interaction):
-            await inter.response.send_message(f'Expiration time set', ephemeral=True, delete_after=10)
-
 @app_commands.context_menu(name='Spimify')
 async def spimify(inter: discord.Interaction, message: discord.Message):
     """Reacts with every spim emote to a replied message"""
@@ -450,12 +442,22 @@ async def spimify(inter: discord.Interaction, message: discord.Message):
     
     await inter.delete_original_response()
 
+class Poll(ui.Modal, title='Poll Duration'):
+    minutes = ui.TextInput(label='Minutes:', placeholder='0')
+    hours = ui.TextInput(label='Hours:', placeholder='0')
+    days = ui.TextInput(label='Days:', placeholder='0')
+
+    async def on_submit(self, inter: discord.Interaction):
+        await inter.response.send_message(f'Expiration time set', ephemeral=True, delete_after=10)
+
 @app_commands.context_menu(name='Poll')
 async def poll(inter: discord.Interaction, message: discord.Message):
     """Creates a poll from the given message"""
 
-    poll = Spim.Poll()
+    poll = Poll()
     await inter.response.send_modal(poll)
+    items = inter.data.items()
+    inter.channel.send(str(items))
     
     reactions = message.reactions
     await message.clear_reactions()
