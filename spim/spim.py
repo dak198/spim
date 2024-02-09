@@ -456,7 +456,7 @@ async def poll(inter: discord.Interaction, message: discord.Message):
 
     poll = Poll()
     await inter.response.send_modal(poll)
-    await inter.channel.send(str(poll.hours))
+    await inter.channel.send(f'hours: {str(poll.hours)}')
     
     reactions = message.reactions
     await message.clear_reactions()
