@@ -69,6 +69,11 @@ class Spim(commands.Cog):
 
         self.server_names = []
 
+        self.check_polls.start()
+
+    def cog_unload(self):
+        self.check_polls.cancel()
+
     async def red_delete_data_for_user(self, *, requester: RequestType, user_id: int) -> None:
         # TODO: Replace this with the proper end user data removal handling.
         await super().red_delete_data_for_user(requester=requester, user_id=user_id)
