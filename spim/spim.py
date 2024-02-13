@@ -8,7 +8,7 @@ import asyncio
 import os
 
 import discord
-from discord import CategoryChannel, ForumChannel, Thread, Reaction, ui
+from discord import CategoryChannel, ForumChannel, MessageReference, Thread, Reaction, ui
 from discord.abc import PrivateChannel, GuildChannel
 from discord.ext import tasks
 from redbot.core import commands, app_commands, data_manager
@@ -209,7 +209,15 @@ class Spim(commands.Cog):
 
     @commands.command(name='poll', help='Reply with this command to turn a message and its current reactions into a poll')
     async def poll(self, ctx: commands.Context, *poll_duration_text):
-        message = ctx.message
+        reference = ctx.message.reference
+        if not reference:
+            await ctx.send('Error: Command must be a reply to an existing message')
+            return
+        message_id = reference.message_id
+        if not message_id:
+            await ctx.send('Error retrieving id for replied message')
+            return
+        message = await ctx.fetch_message(message_id)
         reactions = message.reactions
         for reaction in reactions:
             await message.add_reaction(reaction.emoji)
