@@ -179,7 +179,7 @@ class Spim(commands.Cog):
             await asyncio.sleep(SLEEP_DURATION)
 
         await self.bot.change_presence(activity=None)
-        embed = discord.Embed(description="Servers no longer running", timestamp=datetime.utcnow())
+        embed = discord.Embed(description="Servers no longer running", timestamp=discord.utils.utcnow())
         await ctx.send(embed=embed)
 
 
@@ -229,7 +229,7 @@ class Spim(commands.Cog):
             await ctx.send(f'Error: could not parse poll duration of `{poll_duration}`')
             return
             
-        self.polls[message.id] = {'channel': ctx.channel.id, 'time': (datetime.utcnow() + timedelta(float(duration))).timestamp()}
+        self.polls[message.id] = {'channel': ctx.channel.id, 'time': (discord.utils.utcnow() + timedelta(float(duration))).timestamp()}
         with open(self.poll_path, 'w') as poll_file:
             dump(self.polls, poll_file, indent=4)
 
@@ -328,7 +328,7 @@ class Spim(commands.Cog):
                 else:
                     embed_description = f"Try setting a url with `{ctx.prefix}server set url` for easier server access"
                 embed_color = await self.bot.get_embed_color(ctx)
-                embed = discord.Embed(title='Active Servers', type='rich', color=embed_color, description=embed_description, timestamp=datetime.utcnow())
+                embed = discord.Embed(title='Active Servers', type='rich', color=embed_color, description=embed_description, timestamp=discord.utils.utcnow())
                 servers = self.get_server_list(filters=Filters)
                 if servers:
                     for _, name, status, url in servers:
