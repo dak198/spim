@@ -487,9 +487,7 @@ class Spim(commands.Cog):
                                 max_reactions = [reaction]
                             elif len(reaction_users) == max_reaction_users:
                                 max_reactions.append(reaction)
-                users = set(([user for user in
-                              [user_list for user_list in
-                               [reaction.users() for reaction in message.reactions]] if user != self.bot.user]))
+                users = set([user for user_list in [reaction.users() for reaction in message.reactions] async for user in user_list if user != self.bot.user])
                 reply_text = f'Poll finished with `{len(users)}` responses.'
                 if len(max_reactions) >= 1:
                     if len(max_reactions) == 1:
