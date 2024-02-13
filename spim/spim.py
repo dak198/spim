@@ -473,6 +473,8 @@ class Spim(commands.Cog):
         for id, poll in self.polls.items():
             if discord.utils.utcnow().timestamp() > poll['time']:
                 self.polls.pop(id)
+                with open(self.poll_path, 'w') as poll_file:
+                    dump(self.polls, poll_file, indent=4)
                 channel = self.bot.get_channel(poll['channel'])
                 if isinstance(channel, Thread) or isinstance(channel, PrivateChannel) or isinstance(channel, CategoryChannel) or isinstance(channel, ForumChannel):
                     print(f'Error: non-messageable channel type {type(channel)} found for id {poll["channel"]}')
@@ -496,9 +498,6 @@ class Spim(commands.Cog):
                                 max_reactions.append(reaction)
                 users = set([user for user_list in [reaction.users() for reaction in message.reactions] async for user in user_list if user != self.bot.user])
                 reply_text = f'Poll finished with `{len(users)}` responses! '
-                self.polls.pop(id)
-                with open(self.poll_path, 'w') as poll_file:
-                    dump(self.polls, poll_file, indent=4)
                 if len(max_reactions) >= 1:
                     if len(max_reactions) == 1:
                         reply_text += 'Poll Winner: '
