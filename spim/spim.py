@@ -219,6 +219,7 @@ class Spim(commands.Cog):
             return
         message = await ctx.fetch_message(message_id)
         reactions = message.reactions
+        await message.clear_reactions()
         for reaction in reactions:
             await message.add_reaction(reaction.emoji)
 
