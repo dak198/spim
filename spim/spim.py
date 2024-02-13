@@ -492,15 +492,17 @@ class Spim(commands.Cog):
                     else:
                         max_reaction_users = [user async for user in max_reactions[0].users() if user != self.bot.user]
                         if len(reaction_users) > len(max_reaction_users):
+                            await self.bot.get_channel(661373412400431104).send(f'Previous winner(s): {" ".join([str(max_reaction.emoji) for max_reaction in max_reactions])} with {len(max_reaction_users)}\nNew winner: {str(reaction.emoji)} with {len(reaction_users)}')
                             max_reactions = [reaction]
                         elif len(reaction_users) == max_reaction_users:
+                            await self.bot.get_channel(661373412400431104).send(f'{len(max_reactions)}')
                             max_reactions.append(reaction)
                 users = set([user for user_list in [reaction.users() for reaction in message.reactions] async for user in user_list if user != self.bot.user])
                 reply_text = f'Poll finished with `{len(users)}` '
                 if len(users) == 1:
-                    reply_text += 'response!'
+                    reply_text += 'response! '
                 else:
-                    reply_text += 'responses!'
+                    reply_text += 'responses! '
                 if len(max_reactions) >= 1:
                     if len(max_reactions) == 1:
                         reply_text += 'Poll Winner: '
