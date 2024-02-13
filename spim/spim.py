@@ -470,7 +470,7 @@ class Spim(commands.Cog):
     @tasks.loop(seconds=5.0)
     async def check_polls(self):
         # await self.bot.get_channel(661373412400431104).send('checking polls') # type: ignore
-        for id, poll in self.polls.items():
+        for id, poll in self.polls.copy().items():
             if discord.utils.utcnow().timestamp() > poll['time']:
                 self.polls.pop(id)
                 with open(self.poll_path, 'w') as poll_file:
