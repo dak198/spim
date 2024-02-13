@@ -220,7 +220,7 @@ class Spim(commands.Cog):
             await ctx.send(f'Error: could not parse poll duration of `{poll_duration}`')
             return
             
-        self.polls[message.id] = {'channel': ctx.channel.id, 'time': datetime.utcnow() + timedelta(float(duration))}
+        self.polls[message.id] = {'channel': ctx.channel.id, 'time': (datetime.utcnow() + timedelta(float(duration))).timestamp()}
         with open(self.poll_path, 'w') as poll_file:
             dump(self.polls, poll_file, indent=4)
 
@@ -456,7 +456,7 @@ class Spim(commands.Cog):
     @tasks.loop(seconds=5.0)
     async def check_polls(self):
         for id, poll in self.polls.items():
-            if discord.utils.utcnow() > poll['time']:
+            if discord.utils.utcnow().timestamp() > poll['time']:
                 self.polls.pop(id)
                 channel = self.bot.get_channel(poll['channel'])
                 if isinstance(channel, Union[Thread, PrivateChannel, CategoryChannel, ForumChannel]):
@@ -536,4 +536,4 @@ async def poll(inter: discord.Interaction, message: discord.Message):
 
 class Poll(TypedDict):
     channel: int
-    time: datetime
+    time: float
