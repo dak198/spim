@@ -485,13 +485,13 @@ class Spim(commands.Cog):
                 message: discord.Message = await channel.fetch_message(id)
                 max_reactions: list[Reaction] = []
                 for reaction in message.reactions:
-                    reaction_users = [user async for user in reaction.users()]
+                    reaction_users = [user async for user in reaction.users() if user != self.bot.user]
                     if not max_reactions:
-                        if len(reaction_users) > 1:
+                        if len(reaction_users) >= 1:
                             max_reactions.append(reaction)
                     else:
                         for max_reaction in max_reactions:
-                            max_reaction_users = [user async for user in max_reaction.users()]
+                            max_reaction_users = [user async for user in max_reaction.users() if user != self.bot.user]
                             if len(reaction_users) > len(max_reaction_users):
                                 max_reactions = [reaction]
                             elif len(reaction_users) == max_reaction_users:
