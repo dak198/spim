@@ -234,7 +234,7 @@ class Spim(commands.Cog):
             await ctx.send(f'Error: could not parse poll duration of `{poll_duration}`')
             return
             
-        self.polls[message.id] = {'channel': ctx.channel.id, 'time': (discord.utils.utcnow() + timedelta(float(duration))).timestamp()}
+        self.polls[message.id] = {'channel': ctx.channel.id, 'time': (discord.utils.utcnow() + timedelta(seconds=duration)).timestamp()}
         with open(self.poll_path, 'w') as poll_file:
             dump(self.polls, poll_file, indent=4)
 
