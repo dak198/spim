@@ -469,7 +469,7 @@ class Spim(commands.Cog):
 
     @tasks.loop(seconds=5.0)
     async def check_polls(self):
-        await self.bot.get_channel(661373412400431104).send('checking polls') # type: ignore
+        # await self.bot.get_channel(661373412400431104).send('checking polls') # type: ignore
         for id, poll in self.polls.items():
             if discord.utils.utcnow().timestamp() > poll['time']:
                 self.polls.pop(id)
