@@ -503,6 +503,8 @@ class Spim(commands.Cog):
                         reply_text += 'Poll Winners: '
                     reply_text += ' '.join([str(max_reaction.emoji) for max_reaction in max_reactions])
                 await message.reply(reply_text)
+            else:
+                await self.bot.get_channel(661373412400431104).send(f'`{poll["time"] - discord.utils.utcnow().timestamp()}` seconds left on poll `{id}`')
                         
 
 #########################
