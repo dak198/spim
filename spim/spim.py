@@ -497,6 +497,8 @@ class Spim(commands.Cog):
                 users = set([user for user_list in [reaction.users() for reaction in message.reactions] async for user in user_list if user != self.bot.user])
                 reply_text = f'Poll finished with `{len(users)}` responses! '
                 self.polls.pop(id)
+                with open(self.poll_path, 'w') as poll_file:
+                    dump(self.polls, poll_file, indent=4)
                 if len(max_reactions) >= 1:
                     if len(max_reactions) == 1:
                         reply_text += 'Poll Winner: '
@@ -506,8 +508,6 @@ class Spim(commands.Cog):
                 await message.reply(reply_text)
             else:
                 await self.bot.get_channel(661373412400431104).send(f'`{poll["time"] - discord.utils.utcnow().timestamp()}` seconds left on poll `{id}`')
-        with open(self.poll_path, 'w') as poll_file:
-            dump(self.polls, poll_file, indent=4)
 
 #########################
 # CONTEXT MENU COMMANDS #
