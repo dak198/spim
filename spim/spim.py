@@ -474,7 +474,7 @@ class Spim(commands.Cog):
             if discord.utils.utcnow().timestamp() > poll['time']:
                 self.polls.pop(id)
                 channel = self.bot.get_channel(poll['channel'])
-                if isinstance(channel, Union[Thread, PrivateChannel, CategoryChannel, ForumChannel]):
+                if isinstance(channel, Thread) or isinstance(channel, PrivateChannel) or isinstance(channel, CategoryChannel) or isinstance(channel, ForumChannel):
                     print(f'Error: non-messageable channel type {type(channel)} found for id {poll["channel"]}')
                     return
                 if not channel:
