@@ -14,9 +14,7 @@ from redbot.core import commands, app_commands, data_manager
 from redbot.core.bot import Red
 from redbot.core.config import Config
 
-import boto3
-import botocore.exceptions
-import botocore.config
+import boto3, botocore
 
 RequestType = Literal["discord_deleted_user", "owner", "user", "user_strict"]
 
