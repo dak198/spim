@@ -10,7 +10,11 @@
         "jack"
     ],
     "required_cogs": {},
-    "requirements": [],
+    "requirements": [
+        "boto3",
+        "botocore.exceptions",
+        "botocore.config"
+    ],
     "tags": [
         "tag1",
         "tag2",
