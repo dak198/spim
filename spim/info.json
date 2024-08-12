@@ -12,8 +12,7 @@
     "required_cogs": {},
     "requirements": [
         "boto3",
-        "botocore.exceptions",
-        "botocore.config"
+        "botocore"
     ],
     "tags": [
         "tag1",
