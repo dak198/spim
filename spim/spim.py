@@ -1,6 +1,5 @@
 from typing import Literal, Text, Union, TypedDict
 from datetime import datetime, timedelta
-from pytimeparse import parse
 from time import strftime
 from json import load, dump
 from random import shuffle
@@ -28,7 +27,7 @@ class Spim(commands.Cog):
     def __init__(self, bot: Red) -> None:
         self.server_config_path = os.path.join(data_manager.cog_data_path(self), 'server-config.json')
         self.list_path = os.path.join(data_manager.cog_data_path(self), 'lists.json')
-        self.poll_path = os.path.join(data_manager.cog_data_path(self), 'polls.json')
+
         try:
             with open(self.server_config_path) as server_config_file:
                 self.server_config = load(server_config_file)
@@ -43,13 +42,7 @@ class Spim(commands.Cog):
             self.lists = {}
             with open(self.list_path, 'w') as list_file:
                 dump(self.lists, list_file, indent=4)
-        try:
-            with open(self.poll_path) as poll_file:
-                self.polls = load(poll_file)
-        except FileNotFoundError:
-            self.polls: dict[int, Poll] = {}
-            with open(self.poll_path, 'w') as poll_file:
-                dump(self.polls, poll_file, indent=4)
+
         self.bot = bot
         self.config = Config.get_conf(
             self,
@@ -68,11 +61,6 @@ class Spim(commands.Cog):
             )
 
         self.server_names = []
-
-        self.check_polls.start()
-
-    def cog_unload(self):
-        self.check_polls.cancel()
 
     async def red_delete_data_for_user(self, *, requester: RequestType, user_id: int) -> None:
         # TODO: Replace this with the proper end user data removal handling.
@@ -195,48 +183,6 @@ class Spim(commands.Cog):
     @app_commands.command()
     async def hello(self, interaction: discord.Interaction):
         await interaction.response.send_message("Hello World!", ephemeral=True)
-    
-    @commands.command(name='spimpoll', help='Creates a poll with <:spimPog:772261869858848779> <:spimPause:987933390110089216> <:spon:922922345134424116>')
-    async def spimpoll(self, ctx: commands.Context, *poll_text):
-        """Create a poll with the given text
-
-        Keyword arguments:
-        *poll_text -- text of the poll message
-        """
-
-        spims = ['<:spimPog:772261869858848779>', '<:spimPause:987933390110089216>', '<:spon:922922345134424116>']
-        channel = ctx.channel
-        if poll_text:
-            await ctx.message.delete()
-            poll_message = await ctx.send(' '.join(poll_text))
-            for s in spims:
-                await poll_message.add_reaction(s)
-
-    @commands.command(name='poll', help='Reply with this command to turn a message and its current reactions into a poll')
-    async def poll(self, ctx: commands.Context, *poll_duration_text):
-        reference = ctx.message.reference
-        if not reference:
-            await ctx.send('Error: Command must be a reply to an existing message')
-            return
-        message_id = reference.message_id
-        if not message_id:
-            await ctx.send('Error retrieving id for replied message')
-            return
-        message = await ctx.fetch_message(message_id)
-        reactions = message.reactions
-        await message.clear_reactions()
-        for reaction in reactions:
-            await message.add_reaction(reaction.emoji)
-
-        poll_duration = ' '.join(poll_duration_text)
-        duration = parse(poll_duration, granularity='minutes')
-        if not duration:
-            await ctx.send(f'Error: could not parse poll duration of `{poll_duration}`')
-            return
-            
-        self.polls[message.id] = {'channel': ctx.channel.id, 'time': (discord.utils.utcnow() + timedelta(seconds=duration)).timestamp()}
-        with open(self.poll_path, 'w') as poll_file:
-            dump(self.polls, poll_file, indent=4)
 
     @commands.command(name='say', help='Enter a message for Spim to say')
     async def say(self, ctx: commands.Context, *message_text):
@@ -467,51 +413,9 @@ class Spim(commands.Cog):
     # EVENT LISTENERS #
     ###################
 
-    @tasks.loop(seconds=5.0)
-    async def check_polls(self):
-        # await self.bot.get_channel(661373412400431104).send('checking polls') # type: ignore
-        for id, poll in self.polls.copy().items():
-            if discord.utils.utcnow().timestamp() > poll['time']:
-                self.polls.pop(id)
-                with open(self.poll_path, 'w') as poll_file:
-                    dump(self.polls, poll_file, indent=4)
-                channel = self.bot.get_channel(poll['channel'])
-                if isinstance(channel, Thread) or isinstance(channel, PrivateChannel) or isinstance(channel, CategoryChannel) or isinstance(channel, ForumChannel):
-                    print(f'Error: non-messageable channel type {type(channel)} found for id {poll["channel"]}')
-                    return
-                if not channel:
-                    print(f'Error: no channel found for id {poll["channel"]}')
-                    return
-                message: discord.Message = await channel.fetch_message(id)
-                max_reactions: list[Reaction] = []
-                for reaction in message.reactions:
-                    reaction_users = [user async for user in reaction.users() if user != self.bot.user]
-                    if not max_reactions:
-                        if len(reaction_users) >= 1:
-                            max_reactions.append(reaction)
-                    else:
-                        max_reaction_users = [user async for user in max_reactions[0].users() if user != self.bot.user]
-                        if len(reaction_users) > len(max_reaction_users):
-                            max_reactions = [reaction]
-                        elif len(reaction_users) == len(max_reaction_users):
-                            max_reactions.append(reaction)
-                users = set([user for user_list in [reaction.users() for reaction in message.reactions] async for user in user_list if user != self.bot.user])
-                reply_text = f'Poll finished with `{len(users)}` '
-                if len(users) == 1:
-                    reply_text += 'response! '
-                else:
-                    reply_text += 'responses! '
-                if len(max_reactions) >= 1:
-                    if len(max_reactions) == 1:
-                        reply_text += 'Poll Winner: '
-                    else:
-                        reply_text += 'Poll Winners: '
-                    reply_text += ' '.join([str(max_reaction.emoji) for max_reaction in max_reactions])
-                await message.reply(reply_text)
-
-#########################
-# CONTEXT MENU COMMANDS #
-#########################
+    #########################
+    # CONTEXT MENU COMMANDS #
+    #########################
 
 @app_commands.context_menu(name='Spimify')
 async def spimify(inter: discord.Interaction, message: discord.Message):
@@ -525,32 +429,3 @@ async def spimify(inter: discord.Interaction, message: discord.Message):
         await message.add_reaction(s)
     
     await inter.delete_original_response()
-
-class PollModal(ui.Modal, title='Poll Duration'):
-    minutes = ui.TextInput(label='Minutes:', placeholder='0')
-    hours = ui.TextInput(label='Hours:', placeholder='0')
-    days = ui.TextInput(label='Days:', placeholder='0')
-
-    async def on_submit(self, inter: discord.Interaction):
-        await inter.response.send_message(f'Expiration time set', ephemeral=True, delete_after=10)
-
-@app_commands.context_menu(name='Poll')
-async def poll(inter: discord.Interaction, message: discord.Message):
-    """Creates a poll from the given message"""
-
-    poll = PollModal()
-    await inter.response.send_modal(poll)
-    channel = inter.channel
-    if isinstance(channel, Union[Thread, PrivateChannel, CategoryChannel, ForumChannel, None]):
-        print(f'Error: interaction channel type [{type(channel)}] is non-messageable')
-        return
-    await channel.send(f'hours: {str(poll.hours)}')
-    
-    reactions = message.reactions
-    await message.clear_reactions()
-    for reaction in reactions:
-        await message.add_reaction(reaction.emoji)
-
-class Poll(TypedDict):
-    channel: int
-    time: float
